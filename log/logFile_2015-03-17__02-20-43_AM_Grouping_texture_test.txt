@@ -1,0 +1,280 @@
+
+
+
+ ======================== 03/17/2015 02:20:43 AM ====================== 
+
+===Using the following network options ===
+    nHiddenUnits:  (1) {} 
+                   (2) {120} 
+         netType:  "MLP" 
+
+
+
+=== Using the following noisy-letter options : ===
+                   noiseFilter:  {filterType="white"} 
+                       blurStd:  0 
+                    doOverFeat:  false 
+           doTextureStatistics:  true 
+              retrainFromLayer:  (1) "classifier" 
+                                 (2) "" 
+    trainOnIndividualPositions:  false 
+                      Nori_txt:  4 
+                     imageSize:  {64, 64} 
+                     SNR_train:  {1, 1.5, 2, 2.5, 3} 
+                 autoImageSize:  false 
+                     sizeStyle:  "k32" 
+                         OriXY:  {Ny=1, dX=0, Nori=21, Nx=1, dOri=2, dY=0} 
+                trainingWiggle:  {none=1} 
+    retrainOnCombinedPositions:  false 
+                      fontName:  (1) {fonts={"Snakes"}, wiggles={none=1}} 
+                                 (2) {fonts={"Snakes"}, wiggles={orientation=5}} 
+                                 (3) {fonts={"Snakes"}, wiggles={orientation=10}} 
+                                 (4) {fonts={"Snakes"}, wiggles={orientation=15}} 
+                                 (5) {fonts={"Snakes"}, wiggles={orientation=20}} 
+                                 (6) {fonts={"Snakes"}, wiggles={orientation=25}} 
+                                 (7) {fonts={"Snakes"}, wiggles={orientation=30}} 
+                                 (8) {fonts={"Snakes"}, wiggles={orientation=35}} 
+                                 (9) {fonts={"Snakes"}, wiggles={orientation=40}} 
+                                 (10) {fonts={"Snakes"}, wiggles={orientation=45}} 
+                                 (11) {fonts={"Snakes"}, wiggles={orientation=50}} 
+                                 (12) {fonts={"Snakes"}, wiggles={orientation=55}} 
+                                 (13) {fonts={"Snakes"}, wiggles={orientation=60}} 
+                                 (14) {fonts={"Snakes"}, wiggles={orientation=65}} 
+                                 (15) {fonts={"Snakes"}, wiggles={orientation=70}} 
+                                 (16) {fonts={"Snakes"}, wiggles={orientation=75}} 
+                                 (17) {fonts={"Snakes"}, wiggles={orientation=80}} 
+                                 (18) {fonts={"Snakes"}, wiggles={orientation=85}} 
+                                 (19) {fonts={"Snakes"}, wiggles={orientation=90}} 
+                                 (20) {fonts={"Snakes"}, wiggles={offset=5}} 
+                                 (21) {fonts={"Snakes"}, wiggles={offset=10}} 
+                                 (22) {fonts={"Snakes"}, wiggles={offset=15}} 
+                                 (23) {fonts={"Snakes"}, wiggles={offset=20}} 
+                                 (24) {fonts={"Snakes"}, wiggles={offset=25}} 
+                                 (25) {fonts={"Snakes"}, wiggles={offset=30}} 
+                                 (26) {fonts={"Snakes"}, wiggles={offset=35}} 
+                                 (27) {fonts={"Snakes"}, wiggles={offset=40}} 
+                                 (28) {fonts={"Snakes"}, wiggles={offset=45}} 
+                                 (29) {fonts={"Snakes"}, wiggles={offset=50}} 
+                                 (30) {fonts={"Snakes"}, wiggles={offset=55}} 
+                                 (31) {fonts={"Snakes"}, wiggles={offset=60}} 
+                                 (32) {fonts={"Snakes"}, wiggles={phase=10}} 
+                     networkId:  0 
+                 trainingNoise:  (1) {applyFourierMaskGainFactor=true, filterType="1/f", f_exp=1.6} 
+                                 (2) {applyFourierMaskGainFactor=true, filterType="1/f", f_exp=1.7} 
+                                 (3) {filterType="white"} 
+                      Nscl_txt:  4 
+               textureStatsUse:  "V2" 
+                        Na_txt:  7 
+                       expName:  "Grouping" 
+                      stimType:  "NoisyLettersTextureStats" 
+                 trainingOriXY:  {Ny=1, dX=0, Nori=21, Nx=1, dOri=2, dY=0} 
+
+
+
+
+ More Details: 
+ ===Using the following networks ===  1 : MLP_X
+  2 : MLP_120
+
+===Using the following networks (full descriptions) ===  1 : MLP: (1 layer)
+  2 : MLP: (2 layers: 120 HU)
+
+===Using the following fonts : ===
+   1 : Snakes_N
+  2 : Snakes_Or5
+  3 : Snakes_Or10
+  4 : Snakes_Or15
+  5 : Snakes_Or20
+  6 : Snakes_Or25
+  7 : Snakes_Or30
+  8 : Snakes_Or35
+  9 : Snakes_Or40
+  10 : Snakes_Or45
+  11 : Snakes_Or50
+  12 : Snakes_Or55
+  13 : Snakes_Or60
+  14 : Snakes_Or65
+  15 : Snakes_Or70
+  16 : Snakes_Or75
+  17 : Snakes_Or80
+  18 : Snakes_Or85
+  19 : Snakes_Or90
+  20 : Snakes_Of5
+  21 : Snakes_Of10
+  22 : Snakes_Of15
+  23 : Snakes_Of20
+  24 : Snakes_Of25
+  25 : Snakes_Of30
+  26 : Snakes_Of35
+  27 : Snakes_Of40
+  28 : Snakes_Of45
+  29 : Snakes_Of50
+  30 : Snakes_Of55
+  31 : Snakes_Of60
+  32 : Snakes_Ph
+
+=== Using the following noisy-letter settings : ===
+  1 : Snakes_N-k32_SNR1h3__21ori[2]-[64x64]_trNpink16N_N4_K4_M7_rtCls
+  2 : Snakes_N-k32_SNR1h3__21ori[2]-[64x64]_trNpink17N_N4_K4_M7_rtCls
+  3 : Snakes_N-k32_SNR1h3__21ori[2]-[64x64]_N4_K4_M7
+  4 : Snakes_Or5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  5 : Snakes_Or5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  6 : Snakes_Or5-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  7 : Snakes_Or10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  8 : Snakes_Or10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  9 : Snakes_Or10-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  10 : Snakes_Or15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  11 : Snakes_Or15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  12 : Snakes_Or15-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  13 : Snakes_Or20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  14 : Snakes_Or20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  15 : Snakes_Or20-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  16 : Snakes_Or25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  17 : Snakes_Or25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  18 : Snakes_Or25-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  19 : Snakes_Or30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  20 : Snakes_Or30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  21 : Snakes_Or30-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  22 : Snakes_Or35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  23 : Snakes_Or35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  24 : Snakes_Or35-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  25 : Snakes_Or40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  26 : Snakes_Or40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  27 : Snakes_Or40-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  28 : Snakes_Or45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  29 : Snakes_Or45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  30 : Snakes_Or45-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  31 : Snakes_Or50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  32 : Snakes_Or50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  33 : Snakes_Or50-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  34 : Snakes_Or55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  35 : Snakes_Or55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  36 : Snakes_Or55-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  37 : Snakes_Or60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  38 : Snakes_Or60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  39 : Snakes_Or60-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  40 : Snakes_Or65-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  41 : Snakes_Or65-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  42 : Snakes_Or65-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  43 : Snakes_Or70-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  44 : Snakes_Or70-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  45 : Snakes_Or70-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  46 : Snakes_Or75-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  47 : Snakes_Or75-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  48 : Snakes_Or75-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  49 : Snakes_Or80-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  50 : Snakes_Or80-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  51 : Snakes_Or80-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  52 : Snakes_Or85-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  53 : Snakes_Or85-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  54 : Snakes_Or85-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  55 : Snakes_Or90-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  56 : Snakes_Or90-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  57 : Snakes_Or90-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  58 : Snakes_Of5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  59 : Snakes_Of5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  60 : Snakes_Of5-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  61 : Snakes_Of10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  62 : Snakes_Of10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  63 : Snakes_Of10-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  64 : Snakes_Of15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  65 : Snakes_Of15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  66 : Snakes_Of15-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  67 : Snakes_Of20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  68 : Snakes_Of20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  69 : Snakes_Of20-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  70 : Snakes_Of25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  71 : Snakes_Of25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  72 : Snakes_Of25-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  73 : Snakes_Of30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  74 : Snakes_Of30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  75 : Snakes_Of30-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  76 : Snakes_Of35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  77 : Snakes_Of35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  78 : Snakes_Of35-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  79 : Snakes_Of40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  80 : Snakes_Of40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  81 : Snakes_Of40-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  82 : Snakes_Of45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  83 : Snakes_Of45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  84 : Snakes_Of45-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  85 : Snakes_Of50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  86 : Snakes_Of50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  87 : Snakes_Of50-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  88 : Snakes_Of55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  89 : Snakes_Of55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  90 : Snakes_Of55-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  91 : Snakes_Of60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  92 : Snakes_Of60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  93 : Snakes_Of60-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  94 : Snakes_Ph-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7_rtCls
+  95 : Snakes_Ph-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7_rtCls
+  96 : Snakes_Ph-k32_SNR1h3__21ori[2]-[64x64]_trWN_N4_K4_M7
+  97 : Snakes_N-k32_SNR1h3__21ori[2]-[64x64]_trNpink16N_N4_K4_M7
+  98 : Snakes_N-k32_SNR1h3__21ori[2]-[64x64]_trNpink17N_N4_K4_M7
+  99 : Snakes_Or5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  100 : Snakes_Or5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  101 : Snakes_Or10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  102 : Snakes_Or10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  103 : Snakes_Or15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  104 : Snakes_Or15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  105 : Snakes_Or20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  106 : Snakes_Or20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  107 : Snakes_Or25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  108 : Snakes_Or25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  109 : Snakes_Or30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  110 : Snakes_Or30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  111 : Snakes_Or35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  112 : Snakes_Or35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  113 : Snakes_Or40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  114 : Snakes_Or40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  115 : Snakes_Or45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  116 : Snakes_Or45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  117 : Snakes_Or50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  118 : Snakes_Or50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  119 : Snakes_Or55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  120 : Snakes_Or55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  121 : Snakes_Or60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  122 : Snakes_Or60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  123 : Snakes_Or65-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  124 : Snakes_Or65-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  125 : Snakes_Or70-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  126 : Snakes_Or70-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  127 : Snakes_Or75-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  128 : Snakes_Or75-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  129 : Snakes_Or80-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  130 : Snakes_Or80-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  131 : Snakes_Or85-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  132 : Snakes_Or85-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  133 : Snakes_Or90-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  134 : Snakes_Or90-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  135 : Snakes_Of5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  136 : Snakes_Of5-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  137 : Snakes_Of10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  138 : Snakes_Of10-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  139 : Snakes_Of15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  140 : Snakes_Of15-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  141 : Snakes_Of20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  142 : Snakes_Of20-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  143 : Snakes_Of25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  144 : Snakes_Of25-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  145 : Snakes_Of30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  146 : Snakes_Of30-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  147 : Snakes_Of35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  148 : Snakes_Of35-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  149 : Snakes_Of40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  150 : Snakes_Of40-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  151 : Snakes_Of45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  152 : Snakes_Of45-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  153 : Snakes_Of50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  154 : Snakes_Of50-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  155 : Snakes_Of55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  156 : Snakes_Of55-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  157 : Snakes_Of60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  158 : Snakes_Of60-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+  159 : Snakes_Ph-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink16N_N4_K4_M7
+  160 : Snakes_Ph-k32_SNR1h3__21ori[2]-[64x64]_trWN_trNpink17N_N4_K4_M7
+
+
+
+
