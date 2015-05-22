@@ -1118,7 +1118,6 @@ doNoisyLetters = function() -- (allFontNames, allSNRs, loadOpts, noisyLetterOpts
                        --]]
                                  
     --lock.waitUntilNoLocks()
-
     local nSkipped
     
     local nStartFrom = 1
@@ -1135,7 +1134,7 @@ doNoisyLetters = function() -- (allFontNames, allSNRs, loadOpts, noisyLetterOpts
 
         do
             --error('!') 
-            return
+           -- return
         end
         
     end
