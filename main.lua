@@ -4,19 +4,21 @@
 --local home_dir = os.getenv("HOME")
 --local home_dir = paths.home
 
-dofile (paths.home .. '/Code/nyu/letters/torch/avi_scripts.lua')
+--dofile (paths.home .. '/Code/nyu/letters/torch/avi_scripts.lua')
+dofile 'avi_scripts.lua'   -- should be in the same folder
 
 torch.manualSeed(123)
 
 hostname = os.getenv('hostname') 
 onLaptop = (hostname == 'XPS')
-assert(hostname == 'XPS' or string.find(hostname, '.nyu.edu'))
+onNYUserver = string.find(hostname, '.nyu.edu')
+assert(onLaptop or onNYUserver)
+
 
 
 do 
     --return
 end
-
 
 
 if onLaptop then
@@ -107,7 +109,8 @@ if useZBSdebugger then
 end
     
 
-letters_dir = paths.home ..'/Code/nyu/letters/' 
+--letters_dir = paths.home ..'/Code/nyu/letters/' 
+letters_dir = '/f/nyu/letters/' 
 torchLetters_dir  = letters_dir .. 'torch/'
 matlabLetters_dir = letters_dir .. 'MATLAB/'
 
@@ -123,31 +126,27 @@ if expName == 'Crowding' then
 end
 
 if onLaptop then
-    torch_datasets_dir = torchLetters_dir .. 'datasets/'  .. dataset_subfolder
-    matlab_datasets_dir = matlabLetters_dir .. 'datasets/' .. dataset_subfolder
-    
-    training_dir = torchLetters_dir .. 'TrainedNetworks/' .. results_subfolder
-    results_dir = torchLetters_dir .. 'Results/' .. results_subfolder
+    data_dir = letters_dir .. 'data/'
     
     overfeat_weights_dir = '/usr/local/overfeat/data/default/'
 
-else
-    nyu_data_dir = '/misc/vlgscratch2/LecunGroup/ziskind/lettersData/'
+elseif onNYUserver then
+    data_dir = '/misc/vlgscratch2/LecunGroup/ziskind/lettersData/'
     --nyu_data_dir = '/home/ziskind/lettersData/' -- this is a symlink to scratch location
-    torch_datasets_dir = nyu_data_dir .. 'torch/datasets/'  .. dataset_subfolder
-    matlab_datasets_dir = nyu_data_dir .. 'MATLAB/datasets/'  .. dataset_subfolder
     
-    training_dir = nyu_data_dir .. 'torch/TrainedNetworks/' .. results_subfolder
-    results_dir = nyu_data_dir .. 'torch/Results/' .. results_subfolder
-    
-    overfeat_weights_dir = nyu_data_dir .. 'torch/overfeat/data/default/'
+    overfeat_weights_dir = data_dir .. 'torch/overfeat/data/default/'
     
 end
 
+torch_datasets_dir = torchLetters_dir .. 'torch/datasets/'  .. dataset_subfolder
+matlab_datasets_dir = matlabLetters_dir .. 'MATLAB/datasets/' .. dataset_subfolder
+
+training_dir = data_dir .. 'torch/TrainedNetworks/' .. results_subfolder
+results_dir = data_dir .. 'torch/Results/' .. results_subfolder
+
+
 if not paths.dirp(results_dir)     then createFolder(results_dir)     end
 if not paths.dirp(training_dir)    then createFolder(training_dir)    end
-
-
 
 
 svhn_dir = torch_datasets_dir .. 'SVHN/'
@@ -168,9 +167,8 @@ require 'image'
 require 'lfs'
 
 
-
-dofile (torchLetters_dir .. 'logger2.lua')
-dofile (torchLetters_dir .. 'trainingLogger.lua')
+--dofile (torchLetters_dir .. 'logger2.lua')
+--dofile (torchLetters_dir .. 'trainingLogger.lua')
 
 
 local actionIfNoGPULock = 'turnGPUoff'
@@ -248,17 +246,16 @@ local filesToCheckForUpdatesAfterDone = {'main.lua', 'doNoisyLetters.lua', 'doCr
 
 print('Loading files')
 dofile (torchLetters_dir .. 'load_data.lua')
-dofile (torchLetters_dir .. 'generate_model.lua')
-dofile (torchLetters_dir .. 'train_model.lua')
+--dofile (torchLetters_dir .. 'generate_model.lua')
+--dofile (torchLetters_dir .. 'train_model.lua')
 
-dofile (torchLetters_dir .. 'trainingLogger.lua')
+--dofile (torchLetters_dir .. 'trainingLogger.lua')
 --dofile (torchLetters_dir .. 'font.lua')
 
-dofile (torchLetters_dir .. 'lbfgs_cuda.lua')
-dofile (torchLetters_dir .. 'lswolfe_cuda.lua')
+--dofile (torchLetters_dir .. 'lbfgs_cuda.lua')
+--dofile (torchLetters_dir .. 'lswolfe_cuda.lua')
 dofile (torchLetters_dir .. 'doNoisyTrainingBatch.lua')
 dofile (torchLetters_dir .. 'doCrowdedTrainingBatch.lua')
-dofile (torchLetters_dir .. 'SpatialL1Pooling.lua')
 
 print('done')
 
