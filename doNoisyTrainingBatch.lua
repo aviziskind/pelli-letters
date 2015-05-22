@@ -49,7 +49,7 @@ doNoisyTrainingBatch = function(allNetworks, all_LetterOpts, allSNRs_test, nTria
             local SNR_train = letterOpts.SNR_train
             
             --local size_str = string.format('Size = %s. ', getFontSizeStr(sizeStyle))
-            --local snr_train_str =  string.format('SNR-train = %s. ', toOrderedList(SNR_train))
+            --local snr_train_str =  string.format('SNR-train = %s. ', abbrevList(SNR_train))
             local OriXY = letterOpts_i.OriXY
             local nPositions_opt = OriXY.Nx * OriXY.Ny * OriXY.Nori
             local trainOnIndividualPositions = letterOpts_i.trainOnIndividualPositions and nPositions_opt > 1
