@@ -16,8 +16,8 @@ doNoisyLetters = function() -- (allFontNames, allSNRs, loadOpts, noisyLetterOpts
     local doOverFeat     = (modelName == 'OverFeat')
     
     local channels_doSVHN = false
-    --local channelTuningStage = 'train'
-    local channelTuningStage = 'test'
+    local channelTuningStage = 'train'
+    --local channelTuningStage = 'test'
     
     --local channelTuningTestOn = 'hiLo'
     local channelTuningTestOn = 'band'

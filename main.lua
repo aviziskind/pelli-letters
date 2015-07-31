@@ -32,10 +32,10 @@ useZBSdebugger = false
 
 --if not expName then
 
---expName = 'ChannelTuning'
+expName = 'ChannelTuning'
 --expName = 'Crowding'
 --expName = 'Grouping'
-expName = 'Complexity'
+--expName = 'Complexity'
 --expName = 'TrainingWithNoise'
 --expName = 'TestConvNet'
 
