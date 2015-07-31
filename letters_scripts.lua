@@ -259,7 +259,7 @@ getCrowdedLetterOptsStr = function(crowdedLetterOpts)
             assert(targetPosition == 'all')
             return 'T' .. targetPosition
         else
-            return 'T' .. abbrevOrderedList(targetPosition)
+            return 'T' .. abbrevList(targetPosition)
         end
     end
     
@@ -527,7 +527,7 @@ getLetterOptsStr = function(letterOpts)
     
     local sizeStyle_str = '-' .. getFontSizeStr(letterOpts.sizeStyle)
     
-    local snr_train_str = '_SNR' .. abbrevOrderedList(letterOpts.SNR_train)
+    local snr_train_str = '_SNR' .. abbrevList(letterOpts.SNR_train)
         
     local opt_str
     
@@ -646,13 +646,13 @@ getSnakeWiggleStr = function ( wiggleSettings_orig )
     
     
     if haveOriWiggle then
-        local oriAnglesStr = string.format('Or%s', abbrevOrderedList(wiggleSettings.orientation))
+        local oriAnglesStr = string.format('Or%s', abbrevList(wiggleSettings.orientation))
         
         str = string.append(str, oriAnglesStr, sep)
     end
 
     if haveOffsetWiggle then
-        local offsetAnglesStr = string.format('Of%s', abbrevOrderedList(wiggleSettings.offset))
+        local offsetAnglesStr = string.format('Of%s', abbrevList(wiggleSettings.offset))
         
         str = string.append(str, offsetAnglesStr, sep)
     end

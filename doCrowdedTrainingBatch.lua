@@ -39,7 +39,7 @@ doCrowdedTrainingBatch = function(allNetworks, all_LetterOpts, allSNRs_test, nTr
             
             local SNR_train = crowdedLetterOpts.SNR_train
             
-            local snr_train_str =  string.format('SNR-train = %s. ', abbrevOrderedList(SNR_train))
+            local snr_train_str =  string.format('SNR-train = %s. ', abbrevList(SNR_train))
             local crowdedLetterOpt_str = getCrowdedLetterOptsStr(crowdedLetterOpts)
                             
             local crowdedLetterOpts_1let = table.copy(crowdedLetterOpts)
