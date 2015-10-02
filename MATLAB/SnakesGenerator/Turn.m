@@ -1,0 +1,1 @@
+function newTurtle=Turn(turtle,deg)% deg clockwiseoldAngle=atan2(turtle.direction(2),turtle.direction(1));newAngle=oldAngle-pi*deg/180;turtle.direction=[cos(newAngle),sin(newAngle)];if turtle.print	fprintf(' Turn %.0f deg (%.0f to %0.f);',deg,oldAngle*180/pi,newAngle*180/pi);endnewTurtle=turtle;

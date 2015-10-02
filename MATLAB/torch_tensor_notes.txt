@@ -1,0 +1,100 @@
+%{
+
+torch nomenclature:
+ -- slightly confusing:
+ A "3x5" tensor, 
+
+t7> = torch.range(1,15):reshape(3,5)
+  1   2   3   4   5
+  6   7   8   9  10
+ 11  12  13  14  15
+[torch.FloatTensor of dimension 3x5]
+
+has 3 columns & 5 rows, but first dimension (element-wise) has 5 elemens,
+and the second has 3.
+
+A matlab "3x5" matrix is:
+
+>> reshape(1:15, 3, 5)
+ans =
+     1     4     7    10    13
+     2     5     8    11    14
+     3     6     9    12    15
+
+
+So if you save a .mat file with this matrix,
+
+X = reshape(1:80, 5,8,2)
+X(:,:,1) =
+     1     6    11    16    21    26    31    36
+     2     7    12    17    22    27    32    37
+     3     8    13    18    23    28    33    38
+     4     9    14    19    24    29    34    39
+     5    10    15    20    25    30    35    40
+X(:,:,2) =
+    41    46    51    56    61    66    71    76
+    42    47    52    57    62    67    72    77
+    43    48    53    58    63    68    73    78
+    44    49    54    59    64    69    74    79
+    45    50    55    60    65    70    75    80
+
+it will load in torch as follows:
+
+X : DoubleTensor - size: 2x8x5
+
+t7> =s.X
+(1,.,.) = 
+   1   2   3   4   5
+   6   7   8   9  10
+  11  12  13  14  15
+  16  17  18  19  20
+  21  22  23  24  25
+  26  27  28  29  30
+  31  32  33  34  35
+  36  37  38  39  40
+
+(2,.,.) = 
+  41  42  43  44  45
+  46  47  48  49  50
+  51  52  53  54  55
+  56  57  58  59  60
+  61  62  63  64  65
+  66  67  68  69  70
+  71  72  73  74  75
+  76  77  78  79  80
+
+
+
+option 1: I could transpose all matrices when loading / saving to
+torch/matlab.
+ + More clear which way is up.
+ - Would have to keep track of when I'm doing the transposing (perhaps: all
+ .t7 files, in torch perspective. all .mat files, in matlab perspective).
+  some extra computational overhead (probably minor)
+ - most current data files are obsolete (mostly rectangular ones, though).
+ 
+
+*******************8
+option 2: Keep all matrices in Matlab orientations. Essentially, torch is
+operating on all tensors 'sideways'.
+ - have to remember in torch that are operating 'sideways':
+   -> If I do this, how should I define 'height' and 'width' (from torch perspective, 
+      or matlab perspective?)
+
+      [currently, have been doing from torch perspective. which is ok, as torch code should
+       be able to be read by itself, as standalone code.
+    
+    only potential issue is if want to have rectangular filters, then have
+    to remember that orientaition is orthogonal to what I might expect.
+********************
+
+
+
+
+
+
+
+
+
+
+%}

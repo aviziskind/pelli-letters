@@ -1,0 +1,1 @@
+hold on;load '3degbraided24.mat';load '3degiso24.mat';load '8deg16altoffset.mat';load 'blackaltoffset4.mat';load 'blackaltoffset10.mat';load 'halfcycle4deg24.mat';load 'snakes2degA.mat';load 'snakes4degA.mat';load snakes;for i=1:4;	subplot(2, 2, i);	eval(sprintf('imshow(0.5+signal%d);',i));end

@@ -1,0 +1,7 @@
+*.eps
+Figures/
+Pelli fonts/
+__MACOSX/
+*.m~
+test/
+~old/

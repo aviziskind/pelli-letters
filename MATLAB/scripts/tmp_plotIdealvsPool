@@ -1,0 +1,33 @@
+% global allPCorrNoPool allPCorrPool
+%%
+allFontNames      = {'Braille', 'Sloan', 'Helvetica', 'Courier', 'Bookman', 'Yung', 'KuenstlerU'};
+nFonts = length(allFontNames);
+all_SNRs = [0,  1, 1.5,  2,  2.5,  3, 4];
+allPoolSizes = [2,4,6,8];
+nPoolSizes = length(allPoolSizes);
+
+        font_sz = 'med';
+        
+        for fi = 1:nFonts
+            fontName = allFontNames{fi};
+            [font_complexities(fi)] = getFontComplexity(fontName, font_sz);
+
+
+            for p_i = 1:nPoolSizes
+                pctCorrect_model_i = allPCorrPool.(fontName)(p_i,:);
+                pctCorrect_ideal_i = allPCorrNoPool.(fontName);
+
+                [model_efficiences(fi,p_i)] = ...
+                    getModelEfficiency(all_SNRs, pctCorrect_model_i, pctCorrect_ideal_i);
+            end
+
+        end
+        
+        %%
+        figure(55); clf; hold on;
+        plot(font_complexities, model_efficiences', '.-')
+        model_efficiences_expected = 9.1./font_complexities;
+        plot(font_complexities, model_efficiences_expected, 'k.-')
+
+    
+   

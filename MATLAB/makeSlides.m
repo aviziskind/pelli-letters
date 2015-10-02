@@ -1,0 +1,4 @@
+
+
+
+% psychometric function with noise

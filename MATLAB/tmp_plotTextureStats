@@ -1,0 +1,1 @@
+        signal(i).textureStats_S = textureAnalysis(double(signal(i).image), Nscl, Nori, Na, 0); 

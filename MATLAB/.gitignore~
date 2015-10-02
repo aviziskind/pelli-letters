@@ -1,0 +1,6 @@
+*.eps
+Figures/
+Pelli fonts/
+*.m~
+test/
+~old/

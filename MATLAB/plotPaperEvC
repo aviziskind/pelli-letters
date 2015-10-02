@@ -1,0 +1,14 @@
+%%
+stats = getStatsFromPaper;
+
+allFonts = fieldnames(stats);
+%%
+allC = structfun(@(s) s.complexity, stats);
+allE = structfun(@(s) s.efficiency, stats);
+%%
+
+figure(49); clf;
+plot(allC, allE, 'ko');
+hold on;
+fplot(@(x) 9./x, lims(allC, .05, [], 1), 'r:');
+set(gca, 'xscale', 'log', 'yscale', 'log');
