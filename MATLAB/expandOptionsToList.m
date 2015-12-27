@@ -8,6 +8,9 @@ function allTables = expandOptionsToList(allOptions, loopKeysOrder)
     if length(allOptions) > 1
         error('Input single struct')
     end
+    
+    loopFromFirstToLast = true;
+    
 
     % remove tbl_values that are empty cells
     allVals_C = struct2cell(allOptions);
@@ -22,13 +25,26 @@ function allTables = expandOptionsToList(allOptions, loopKeysOrder)
     
     if nargin > 1 && ~isempty(loopKeysOrder)
          %%
-         idx_loopKeys_setOrder = cellfun(@(key) find(strcmp(key, loopKeys)), loopKeysOrder);
-         loopKeys_other_idxs = setdiff(1:length(loopKeys), idx_loopKeys_setOrder);
+         idx_break = find(strcmp(loopKeysOrder, ''), 1);
+         if isempty(idx_break)
+             idx_break = length(loopKeysOrder)+1;
+         end
          
-         idx_new_order = [idx_loopKeys_setOrder, loopKeys_other_idxs];
+         idx_loopKeys_setOrder_first = cellfun(@(key) find(strcmp(key, loopKeys)), loopKeysOrder(1:idx_break-1));
+         if idx_break < length(loopKeysOrder)
+             idx_loopKeys_setOrder_last  = cellfun(@(key) find(strcmp(key, loopKeys)), loopKeysOrder(idx_break+1:end));
+         else
+             idx_loopKeys_setOrder_last = [];
+         end
+         
+         
+         loopKeys_other_idxs = setdiff(1:length(loopKeys), [idx_loopKeys_setOrder_first, idx_loopKeys_setOrder_last]);
+         
+         idx_new_order = [idx_loopKeys_setOrder_first, loopKeys_other_idxs, idx_loopKeys_setOrder_last];
         
          loopKeys_full = loopKeys_full(idx_new_order);
          loopKeys = loopKeys(idx_new_order);
+
     end
         
     
@@ -45,6 +61,16 @@ function allTables = expandOptionsToList(allOptions, loopKeysOrder)
 %     -- initialize loop variables
     nLoopFields = length(nValuesEachLoopKey);
     loopIndices = ones(1, nLoopFields);
+    
+    if loopFromFirstToLast
+        fieldIdxStart = 1;
+        fieldInc = 1;
+        fieldIdxStop = nLoopFields+1;
+    else
+        fieldIdxStart = nLoopFields;
+        fieldInc = -1;
+        fieldIdxStop = 0;
+    end
     
 %     -- loop over all the loop-variables, assign to table.
     if nTablesTotal == 0 
@@ -77,13 +103,13 @@ function allTables = expandOptionsToList(allOptions, loopKeysOrder)
         end
         allTables(j) = tbl_i; %#ok<AGROW>
         
-        curFldIdx = nLoopFields;
+        curFldIdx = fieldIdxStart;
         loopIndices(curFldIdx) = loopIndices(curFldIdx) + 1;
         while loopIndices(curFldIdx) > nValuesEachLoopKey(curFldIdx)
             loopIndices(curFldIdx) = 1;
-            curFldIdx = curFldIdx - 1;
+            curFldIdx = curFldIdx + fieldInc;
             
-            if curFldIdx == 0 
+            if curFldIdx == fieldIdxStop
                 assert(j == nTablesTotal)
                 break;
             end

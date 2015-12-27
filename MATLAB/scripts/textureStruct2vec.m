@@ -1,4 +1,4 @@
-function [textureVec, idx_use, textureStruct] = textureStruct2vec(S, idx_use, useAllStats_flag)
+function [textureVec, idx_use, textureStruct] = textureStruct2vec(S, idx_use, useAllStats_flag, imageSize)
     %%
         
     haveIdxs = exist('idx_use', 'var') && ~isempty(idx_use);
@@ -18,8 +18,28 @@ function [textureVec, idx_use, textureStruct] = textureStruct2vec(S, idx_use, us
 
     calculateIdxs = nargout > 1 || doChecks;
     
+    
+%     if nargin < 4
+%         imageSize = [32, 32];
+%     end
+    
+    useOnlyValidStatsFromImageSize = exist('imageSize', 'var') && ~isempty(imageSize);
+    
+    if useOnlyValidStatsFromImageSize
+%         sampleImage = reshape(1:prod(imageSize), imageSize);
+        sampleImage = randn(imageSize);
+%         sampleImage = randn([32, 160]);
+        if isstruct(S)
+            [Na, ~, Nsc, Nor] = size(S.autoCorrMag);
+        elseif isvector(S)
+            assert(length(S) == 3);
+            [Nsc, Nor, Na] = dealV(S);
+        end
+        S = textureAnalysis(sampleImage, Nsc, Nor, Na);
+    end
 
     [Na, ~, Nsc, Nor] = size(S.autoCorrMag);
+    
     
     Na_sqr = (Na^2+1)/2;    
     tf_use_autoCorr = mtx_selectUniqueAutocorr(Na);
@@ -67,6 +87,7 @@ function [textureVec, idx_use, textureStruct] = textureStruct2vec(S, idx_use, us
 
         tf_nans_autoCorrReal = isnan(Sv.autoCorrReal);
         if any(tf_nans_autoCorrReal(:))
+%             fprintf('Removing %d nans from autoCorrReal\n', nnz(tf_nans_autoCorrReal(:)));
             Sv.autoCorrReal(tf_nans_autoCorrReal) = [];
             if calculateIdxs
                 S_idx.autoCorrReal(tf_nans_autoCorrReal) = [];
@@ -323,8 +344,12 @@ function [textureVec, idx_use, textureStruct] = textureStruct2vec(S, idx_use, us
         if doChecks
             S_C = cellfun(@(x) x(:), struct2cell(S), 'un', 0);
             textureVec_full = vertcat(S_C{:});
-            assert(isequal(textureVec_full(idx_use), textureVec));
+            assert(isequal(textureVec_full(idx_use), nonnans(textureVec)));
         end
+        textureVec = textureVec_full(idx_use);
+    else
+        textureVec = nonnans(textureVec);
+        
     end
     
     textureStruct = Sv;

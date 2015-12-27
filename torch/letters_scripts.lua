@@ -1,108 +1,135 @@
 
-
-getNoisyLetterOptsStr = function(letterOpts)
-        
-    local oxyStr = getOriXYStr(letterOpts.OriXY)
-    
-    local targetPosition_str = ''       
-    if letterOpts.targetPosition and letterOpts.targetPosition ~= 'all' then
-        targetPosition_str = string.format('_T%d', letterOpts.targetPosition);
+getNoisyLetterOptsStr = function(noisyLetterOpts)
+    Opt = noisyLetterOpts    
+    local oxyStr = ''
+  
+    if noisyLetterOpts.expName ~= 'Crowding' then
+        oxyStr = getOriXYStr(noisyLetterOpts.OriXY) .. '-'
     end
     
-    local nLetters_str = ''
-    if letterOpts.nLetters and letterOpts.nLetters > 1 then
-        nLetters_str = string.format('_L%d', letterOpts.nLetters);
-    end
-        
     local imageSizeStr = ''
-    if not letterOpts.autoImageSize then
-        imageSizeStr = string.format('-[%dx%d]', letterOpts.imageSize[1], letterOpts.imageSize[2]);        
+    if not noisyLetterOpts.autoImageSize then
+        imageSizeStr = string.format('[%dx%d]', noisyLetterOpts.imageSize[1], noisyLetterOpts.imageSize[2]);        
     end
     
+    
+    local differentTrainTestImageSize = noisyLetterOpts.trainingImageSize and not isequal(noisyLetterOpts.trainingImageSize, 'same') 
+            and not isequal(noisyLetterOpts.trainingImageSize, noisyLetterOpts.imageSize);
+
     local trainingImageSizeStr = ''
-    if letterOpts.trainingImageSize and not isequal(letterOpts.trainingImageSize, 'same') 
-            and not isequal(letterOpts.trainingImageSize, letterOpts.imageSize) then
-        trainingImageSizeStr = string.format('_tr%dx%d', letterOpts.trainingImageSize[1], letterOpts.trainingImageSize[2]);        
+    if differentTrainTestImageSize then
+        trainingImageSizeStr = string.format('_tr%dx%d', noisyLetterOpts.trainingImageSize[1], noisyLetterOpts.trainingImageSize[2]);        
     end
 
     
-    local useBlur = letterOpts.blurStd and letterOpts.blurStd > 0
+    local useBlur = noisyLetterOpts.blurStd and noisyLetterOpts.blurStd > 0
     local blurStr = ''
     if useBlur then
-        blurStr = string.format('_blur%.0f', letterOpts.blurStd*10)
+        blurStr = string.format('_blur%.0f', noisyLetterOpts.blurStd*10)
     end
     
-    Opt = letterOpts
+    
+    local differentTrainTestFonts = noisyLetterOpts.trainingFonts and not isequal(noisyLetterOpts.trainingFonts, 'same') 
+                                and not isequal(noisyLetterOpts.trainingFonts, noisyLetterOpts.fontName) 
     local trainingFonts_str = ''
-    if letterOpts.trainingFonts and not isequal(letterOpts.trainingFonts, 'same') 
-                                and not isequal(letterOpts.trainingFonts, letterOpts.fontName) then
-        trainingFonts_str = '_trf' .. abbrevFontStyleNames(letterOpts.trainingFonts)
+    if differentTrainTestFonts then
+        local trainingFonts = table.copy(noisyLetterOpts.trainingFonts)
+        if noisyLetterOpts.doTextureStatistics and isRealDataFont(trainingFonts) then
+            trainingFonts.realData_opts.textureParams = nil
+        end
+        trainingFonts_str = '_trf' .. abbrevFontStyleNames(trainingFonts)
     end
     
     
+    local differentTrainTestWiggle = noisyLetterOpts.trainingWiggle and not isequal(noisyLetterOpts.trainingWiggle, 'same') 
+                                 and not isequal(noisyLetterOpts.trainingWiggle, noisyLetterOpts.fontName.wiggles)
     local trainingWiggle_str = ''
-    if letterOpts.trainingWiggle and not isequal(letterOpts.trainingWiggle, 'same') 
-                                 and not isequal(letterOpts.trainingWiggle, letterOpts.fontName.wiggles) then
-        trainingWiggle_str = '_trW' .. getSnakeWiggleStr(letterOpts.trainingWiggle)
+    if differentTrainTestWiggle then
+        trainingWiggle_str = '_trW' .. getSnakeWiggleStr(noisyLetterOpts.trainingWiggle)
     end
     
+    local differentTrainTestUncertainty = noisyLetterOpts.trainingOriXY and not isequal(noisyLetterOpts.trainingOriXY, 'same') 
+                                and not isequal(noisyLetterOpts.trainingOriXY, noisyLetterOpts.OriXY) 
     local trainingOriXY_str = ''
-    if letterOpts.trainingOriXY and not isequal(letterOpts.trainingOriXY, 'same') 
-                                and not isequal(letterOpts.trainingOriXY, letterOpts.OriXY) then
-        trainingOriXY_str = '_trU' .. getOriXYStr(letterOpts.trainingOriXY)
+    if differentTrainTestUncertainty  then
+        trainingOriXY_str = '_trU' .. getOriXYStr(noisyLetterOpts.trainingOriXY)
     end
     
     
-    local noiseFilter_str = noiseFilterOptStr(letterOpts)    -- includes "trained with" if appropriate
+    local noiseFilter_str = noiseFilterOptStr(noisyLetterOpts)    -- includes "trained with" if appropriate
 
+    local differentTrainTestNoise = noisyLetterOpts.trainingNoise and not isequal(noisyLetterOpts.trainingNoise, 'same') 
+                            and not (filterStr(noisyLetterOpts.noiseFilter, 1) == filterStr(noisyLetterOpts.trainingNoise, 1))
     local trainNoise_str = ''
-    if letterOpts.trainingNoise and not isequal(letterOpts.trainingNoise, 'same') 
-                                and not (filterStr(letterOpts.noiseFilter, 1) == filterStr(letterOpts.trainingNoise, 1)) then
-        trainNoise_str = '_tr' .. filterStr(letterOpts.trainingNoise, 1)
-        
+    if differentTrainTestNoise then
+        trainNoise_str = '_tr' .. filterStr(noisyLetterOpts.trainingNoise, 1)
     end
     
     
-    assert(not (letterOpts.doOverFeat and letterOpts.doTextureStatistics))
+    assert(not (noisyLetterOpts.doOverFeat and noisyLetterOpts.doTextureStatistics))
     local textureStats_str = ''
-    if letterOpts.doTextureStatistics then
-        textureStats_str = getTextureStatsStr(letterOpts)    
+    if noisyLetterOpts.doTextureStatistics then
+        textureStats_str = getTextureStatsStr(noisyLetterOpts.textureParams)    
     end
     
     local overFeat_str = '' 
-    if letterOpts.doOverFeat then
-        overFeat_str = getOverFeatStr(letterOpts)        
+    if noisyLetterOpts.doOverFeat then
+        overFeat_str = getOverFeatStr(noisyLetterOpts)        
     end
     
+    
+    if not differentTrainTestNoise and not differentTrainTestFonts and not differentTrainTestWiggle
+                and not differentTrainTestUncertainty and not differentTrainTestImageSize then
+        noisyLetterOpts.retrainFromLayer = '';
+    end
     
     local retrainFromLayer_str = ''
-    if letterOpts.retrainFromLayer and letterOpts.retrainFromLayer ~= '' then
-        retrainFromLayer_str = '_rt' .. networkLayerStrAbbrev(letterOpts.retrainFromLayer)
+    if noisyLetterOpts.retrainFromLayer and noisyLetterOpts.retrainFromLayer ~= '' then
+        retrainFromLayer_str = '_rt' .. networkLayerStrAbbrev(noisyLetterOpts.retrainFromLayer)
     end
     
-    local nPositions = letterOpts.Nori * letterOpts.Nx * letterOpts.Ny
+    local nPositions = 1
+    if noisyLetterOpts.Nori then
+        nPositions = noisyLetterOpts.Nori * noisyLetterOpts.Nx * noisyLetterOpts.Ny
+    end
+    
     local indiv_pos_str = ''
-    if letterOpts.trainOnIndividualPositions and (nPositions > 1) then
+    if noisyLetterOpts.trainOnIndividualPositions and (nPositions > 1) then
         indiv_pos_str = '_trIP'
     
-        if letterOpts.retrainOnCombinedPositions then
+        if noisyLetterOpts.retrainOnCombinedPositions then
             indiv_pos_str = indiv_pos_str .. '_rtCP'
         end
     end
                 
+                
+                
+    
+    local crowdedOpts_str = ''
+    if noisyLetterOpts.expName == 'Crowding' then
+       crowdedOpts_str = getCrowdedLetterOptsStr(noisyLetterOpts)
+    end
+    
                     
     local classifierForEachFont_str = ''
-    local nFontShapes = (getFontClassTable(letterOpts.fontName)).nFontShapes
-    if letterOpts.classifierForEachFont and (nFontShapes > 1) then
+    local nFontShapes = (getFontClassTable(noisyLetterOpts.fontName)).nFontShapes
+    if noisyLetterOpts.classifierForEachFont and (nFontShapes > 1) then
         classifierForEachFont_str = '_clsFnt'
     end    
                 
-                
-    return oxyStr .. nLetters_str .. targetPosition_str .. imageSizeStr .. blurStr ..
+    local loadOpts_str = ''
+    if noisyLetterOpts.loadOpts then
+        loadOpts_str = getLoadOptsStr(noisyLetterOpts.loadOpts)
+    end
+                    
+    return oxyStr .. imageSizeStr .. blurStr .. 
+            --oxyStr .. nLetters_str .. targetPosition_str .. imageSizeStr .. blurStr ..
             trainingOriXY_str .. trainingImageSizeStr .. trainingFonts_str .. trainingWiggle_str .. 
             noiseFilter_str .. trainNoise_str ..
             textureStats_str .. overFeat_str .. 
-            retrainFromLayer_str .. indiv_pos_str .. classifierForEachFont_str
+            retrainFromLayer_str .. indiv_pos_str .. crowdedOpts_str .. classifierForEachFont_str .. loadOpts_str
+    
+    
             
 end
 
@@ -185,9 +212,9 @@ getOriXYStr = function(OriXY)
         oxyStr = string.sub(oxyStr, 1, #oxyStr-1) -- remove trailing '_'
         
         
-        --local ori_lims_str = getLimitsStr(nOri, letterOpts.ori_range);
-        --local x_lims_str = getLimitsStr(nX, letterOpts.x_range);
-        --local y_lims_str = getLimitsStr(nY, letterOpts.y_range);        
+        --local ori_lims_str = getLimitsStr(nOri, dataOpts.ori_range);
+        --local x_lims_str = getLimitsStr(nX, dataOpts.x_range);
+        --local y_lims_str = getLimitsStr(nY, dataOpts.y_range);        
         --oxyStr = string.format('%dori%s_%dx%s_%dy%s', nOri,ori_lims_str, nX,x_lims_str, nY,y_lims_str);
     end
     
@@ -196,13 +223,13 @@ end
 
 
 
-noiseFilterOptStr = function(letterOpts)
+noiseFilterOptStr = function(dataOpts)
      
-    local useNoiseFilter = letterOpts.noiseFilter 
+    local useNoiseFilter = dataOpts.noiseFilter 
     local noiseFilter_str = ''
     if useNoiseFilter then
         
-        local testFilt_str = filterStr(letterOpts.noiseFilter)
+        local testFilt_str = filterStr(dataOpts.noiseFilter)
         -- define training noise string
         
         -- final test noise filter:
@@ -304,29 +331,20 @@ end
 
 
 
-getCrowdedLetterOptsStr = function(crowdedLetterOpts)
+getCrowdedLetterOptsStr = function(dataOpts)
             
-    local xrange = crowdedLetterOpts.xrange;
+            
+    if dataOpts.crowdingSettings then
+        dataOpts = dataOpts.crowdingSettings;
+    end
+    
+    local xrange = dataOpts.xrange;
     
     assert(#xrange == 3)
     local x_range_str = string.format('x%d-%d-%d', xrange[1], xrange[2], xrange[3])
     
+  
     
-	local blur_str = ''
-    local useBlur = crowdedLetterOpts.blurStd and  crowdedLetterOpts.blurStd > 0
-    if useBlur then
-        blur_str = string.format('_blur%.0f', crowdedLetterOpts.blurStd*10)
-    end
-    
-    local imageSizeStr = ''
-    if crowdedLetterOpts.imageSize then
-        local sz = crowdedLetterOpts.imageSize
-        imageSizeStr = string.format('-[%dx%d]', sz[1], sz[2]);        
-    end
-    
-    
-    local snr_str = get_SNR_str(crowdedLetterOpts.logSNR, '_', 1)
-        
     local targetPositionStr = function(targetPosition)
         if type(targetPosition) == 'string' then
             assert(targetPosition == 'all')
@@ -335,17 +353,15 @@ getCrowdedLetterOptsStr = function(crowdedLetterOpts)
             return 'T' .. toOrderedList(targetPosition)
         end
     end
-    
-    
-    local noiseFilter_str = noiseFilterOptStr(crowdedLetterOpts)    
+
     
     local details_str = ''
     
     local nLetters = 1
-    if crowdedLetterOpts.nLetters then
-        nLetters = crowdedLetterOpts.nLetters
-    elseif crowdedLetterOpts.nDistractors then
-        nLetters = crowdedLetterOpts.nDistractors + 1
+    if dataOpts.nLetters then
+        nLetters = dataOpts.nLetters
+    elseif dataOpts.nDistractors then
+        nLetters = dataOpts.nDistractors + 1
     end        
 
 --    if crowdedLetterOpts.nLetters and (crowdedLetterOpts.nLetters > 0) then
@@ -353,47 +369,36 @@ getCrowdedLetterOptsStr = function(crowdedLetterOpts)
     local dnr_str = ''
     local distractorSpacing_str = ''
     local curTargetPosition_str
-    local trainTargetPosition_str = ''
+    local trainPositions_str = ''
     
     local nLetters_str = string.format('%dlet', nLetters); 
 
     if nLetters == 1  then -- Training data (train on 1 letter)
 
-        --targetPosition = crowdedLetterOpts.trainTargetPosition
-        local trainTargetPosition = crowdedLetterOpts.trainTargetPosition or crowdedLetterOpts.targetPosition
-        curTargetPosition_str = '_' .. targetPositionStr ( trainTargetPosition )
+        --targetPosition = dataOpts.trainPositions
+        local trainPositions = dataOpts.trainPositions or dataOpts.targetPosition
+        curTargetPosition_str = '_' .. targetPositionStr ( trainPositions )
 
 
     elseif nLetters > 1 then -- Test on multiple letters
 
-        local testTargetPosition = crowdedLetterOpts.testTargetPosition or crowdedLetterOpts.targetPosition
-        curTargetPosition_str = '_' .. targetPositionStr ( testTargetPosition )
+        local testPositions = dataOpts.testPositions
+        curTargetPosition_str = '_' .. targetPositionStr ( testPositions )
         
-        dnr_str = string.format('_DNR%02.0f', crowdedLetterOpts.logDNR*10); -- distractor-to-noise ratio
+        dnr_str = string.format('_DNR%02.0f', dataOpts.logDNR*10); -- distractor-to-noise ratio
         
-        distractorSpacing_str = string.format('_d%d', crowdedLetterOpts.distractorSpacing); --  ie: all positions differences in X pixels
+        distractorSpacing_str = string.format('_d%d', dataOpts.distractorSpacing); --  ie: all positions differences in X pixels
        
-        if crowdedLetterOpts.testTargetPosition and crowdedLetterOpts.trainTargetPosition and not isequal(crowdedLetterOpts.trainTargetPosition, crowdedLetterOpts.testTargetPosition) then
-            trainTargetPosition_str = string.format('_tr%s', targetPositionStr( crowdedLetterOpts.trainTargetPosition ) )
+        if dataOpts.testPositions and dataOpts.trainPositions and not isequal(dataOpts.trainPositions, dataOpts.testPositions) then
+            trainPositions_str = string.format('_tr%s', targetPositionStr( dataOpts.trainPositions ) )
         end
                     
     end
     
-    details_str = string.format('__%s%s%s%s', nLetters_str, distractorSpacing_str, dnr_str, trainTargetPosition_str);
+    details_str = string.format('__%s%s%s%s', nLetters_str, distractorSpacing_str, dnr_str, trainPositions_str);
         
-    local textureStats_str = ''
-    if crowdedLetterOpts.doTextureStatistics then
-        textureStats_str = getTextureStatsStr(crowdedLetterOpts)
-        assert(not crowdedLetterOpts.doOverFeat)
-    end
-    
-    local overFeat_str = '' 
-    if crowdedLetterOpts.doOverFeat then
-        overFeat_str = getOverFeatStr(crowdedLetterOpts)        
-        assert(not crowdedLetterOpts.doTextureStatistics)
-    end
+    return '__' .. x_range_str .. curTargetPosition_str .. details_str
         
-    return x_range_str .. curTargetPosition_str .. imageSizeStr .. snr_str .. blur_str .. noiseFilter_str .. textureStats_str .. overFeat_str .. details_str
     
 end
 
@@ -439,41 +444,47 @@ getOverFeatStr = function(opts)
         
 end
 
-getTextureStatsStr = function(letterOpts)
+getTextureStatsStr = function(opts)
     
-    local Nscl = letterOpts.Nscl_txt
-    local Nori = letterOpts.Nori_txt
-    local Na = letterOpts.Na_txt    
+    if opts.textureParams then
+        opts = opts.textureParams
+    end
+    
+    local Nscl = opts.Nscl_txt
+    local Nori = opts.Nori_txt
+    local Na = opts.Na_txt    
     
     
     local textureStats_str = ''
-    if string.sub(letterOpts.textureStatsUse, 1, 2) == 'V2' then
-        local useExtraV2Stats_str = iff(letterOpts.textureStatsUse == 'V2r', '_r', '')
+    if string.sub(opts.textureStatsUse, 1, 2) == 'V2' then
+        local useExtraV2Stats_str = iff(opts.textureStatsUse == 'V2r', '_r', '')
  
         textureStats_str = string.format('_N%d_K%d_M%d%s', Nscl, Nori, Na, useExtraV2Stats_str)
-    elseif string.sub(letterOpts.textureStatsUse, 1, 2) == 'V1' then
+    elseif string.sub(dataOpts.textureStatsUse, 1, 2) == 'V1' then
         
-        textureStats_str = string.format('_N%d_K%d_%s', Nscl, Nori, letterOpts.textureStatsUse)
+        textureStats_str = string.format('_N%d_K%d_%s', Nscl, Nori, dataOpts.textureStatsUse)
             
     end
 
     
     return textureStats_str
 
---[[
-    local useSubsetOfA = letterOpts.Na_sub_txt and not (letterOpts.Na_sub_txt == 'all')  -- #(letterOpts.Na_sub_txt) > 0 
-    local subsetChar = ''
-    if useSubsetOfA then
-        Na = letterOpts.Na_sub_txt;
-        subsetChar = 'S';
-    end
-    local stat_params_str = string.format('_%dscl-%dori-%da%s',Nscl, Nori, Na, subsetChar)
---]]
-
 
 end
 
 
+getLoadOptsStr = function(loadOpts)
+    
+    local pctUse_str = ''
+    local pctUse = loadOpts.totalUseFrac * 100
+    if pctUse < 100 then
+       pctUse_str = string.format('_use%d', pctUse) 
+    end
+    
+    local loadOpts_str = pctUse_str
+    
+    return loadOpts_str
+end
 
 
 
@@ -512,87 +523,7 @@ getCrowdedLetterOptsStr = function(crowdedLetterOpts, addTestStyle)
 end
 --]]
 
-getTrainConfig_str = function(trainConfig)
-    
-    local logValueStr = function(x)
-        if x > 0 then
-            return tostring(-math.log10(x))
-        else
-            return 'X'
-        end
-    end
-    local fracPart = function(x)
-        local s = tostring(x)
-        return string.sub(s, string.find(s, '[.]')+1, #s)
-    end
 
-    if trainConfig.adaptiveMethod then
-        local adaptiveMethod = string.lower(trainConfig.adaptiveMethod);
-        local isAdadelta = adaptiveMethod == 'adadelta'
-        local isRMSprop  = adaptiveMethod == 'rmsprop'
-        local isVSGD     = adaptiveMethod == 'vsgd'
-
-        if isAdadelta or isRMSprop then
-            local rho_default = 0.95
-            local epsilon_default = 1e-6
-            
-            local rho = trainConfig.rho or rho_default
-            
-            local rho_str = ''
-            if rho ~= rho_default then
-                rho_str = '_r' .. fracPart(rho)
-            end
-            
-            local epsilon = trainConfig.epsilon or epsilon_default
-            local epsilon_str = ''
-            if epsilon ~= epsilon_default then
-                epsilon_str = '_e' .. logValueStr(epsilon)
-            end
-            if isAdadelta then
-                return '__AD' .. rho_str .. epsilon_str
-            elseif isRMSprop then
-                return '__RMS' .. rho_str .. epsilon_str
-            end
-            
-        elseif isVSGD then
-            return '__vSGD' 
-                
-        end
-    else
-        local learningRate_default = 1e-3
-        local learningRateDecay_default = 1e-4
-        local momentum_default = 0 -- 0.95
-        
-        local learningRate = trainConfig.learningRate or learningRate_default        
-        local learningRate_str = ''
-        if learningRate ~= learningRate_default then
-            learningRate_str = logValueStr (trainConfig.learningRate)
-        end
-        
-        local learningRateDecay = trainConfig.learningRateDecay or learningRateDecay_default
-        local learningRateDecay_str = ''
-        if learningRateDecay ~= learningRateDecay_default then
-            learningRateDecay_str = '_ld' .. logValueStr(trainConfig.learningRateDecay)
-        end
-        
-        
-        local momentum = trainConfig.momentum or momentum_default
-        local momentum_str = ''
-        if momentum ~= momentum_default then
-            momentum_str = '_m' .. fracPart(trainConfig.momentum)
-            
-            if trainConfig.nesterov then
-                momentum_str = momentum_str .. 'n'
-            end
-        end
-        
-        
-        return '__SGD' .. learningRate_str  .. learningRateDecay_str .. momentum_str
-        
-    end
-    
-end
-        
         
 
 
@@ -634,28 +565,6 @@ getMetamerLetterOptsStr = function(metamerLetterOpts)
 end
 
 
-getMLPstr = function(nHiddenUnits) 
-
-    if type(nHiddenUnits) == 'number' then
-        nHiddenUnits = {nHiddenUnits}
-    end
-
-    local netStr
-    local netStr_nice
-    if type(nHiddenUnits) == 'table' then
-        if #nHiddenUnits == 0 then
-            netStr = 'X'
-            netStr_nice = '(1 layer)'
-        else
-            netStr = toList(nHiddenUnits)
-            netStr_nice = string.format('(2 layers: %s HU)', toList(nHiddenUnits, nil, ','))
-        end
-        return netStr, netStr_nice     
-    end
-    
-    error('Incorrect input type')        
-        
-end
 
 getFontSizeStr = function(fontSize)
     if type(fontSize) == 'string' then
@@ -673,9 +582,9 @@ getFontSizeStr = function(fontSize)
 end
 
 
-getExpSubtitle = function(letterOpts, networkOpts, trialId)
+getExpSubtitle = function(dataOpts, networkOpts, trialId)
     
-    local letterOpts_str = getLetterOptsStr(letterOpts)
+    local dataOpts_str = getDataOptsStr(dataOpts)
     
     local network_str = '__' .. getNetworkStr(networkOpts)
     
@@ -686,8 +595,8 @@ getExpSubtitle = function(letterOpts, networkOpts, trialId)
     end
         
     
-    --local str = fontName_str .. sizeStyle_str .. snr_train_str .. letterOpts_str  .. network_str .. classesSep_str .. gpu_str .. trialId_str
-    local str = letterOpts_str  .. network_str .. trialId_str
+    --local str = fontName_str .. sizeStyle_str .. snr_train_str .. dataOpts_str  .. network_str .. classesSep_str .. gpu_str .. trialId_str
+    local str = dataOpts_str  .. network_str .. trialId_str
     return str
 end
 
@@ -800,73 +709,117 @@ end
 
 
 
+getDataOptsStr = function(dataOpts)
+    
+    assert(type(dataOpts.fontName) == 'table')
+    
+    if isRealDataFont(dataOpts.fontName) then
+        local realDataName_str = dataOpts.fontName.fonts
+        return realDataName_str .. getRealDataOptsStr(dataOpts.fontName.realData_opts)
+        
+    else
+        return getLetterOptsStr(dataOpts)
+    end 
+    
+    
+    
+end
+
+
 getLetterOptsStr = function(letterOpts)
         
     assert(type(letterOpts.fontName) == 'table')
     local fontName_str = abbrevFontStyleNames(letterOpts.fontName)
     
-    if string.find(fontName_str, 'SVHN') then
-        return 'SVHN' .. getSVHNOptsStr(letterOpts.fontName.svhn_opts)
-    end 
-    
     local sizeStyle_str = '-' .. getFontSizeStr(letterOpts.sizeStyle)
-
     
     local snr_train_str = '_SNR' .. toOrderedList(letterOpts.SNR_train)
         
     local opt_str
     
-
-    if table.anyEqualTo(letterOpts.expName, {'ChannelTuning', 'Complexity', 'Grouping', 'TrainingWithNoise', 'TestConvNet'})  then          
-    --if table.any({'ChannelTuning', 'Complexity', 'Grouping', 'TrainingWithNoise'}, function(s) return (s == letterOpts.expName))
-        opt_str = getNoisyLetterOptsStr(letterOpts)
-    elseif letterOpts.expName == 'Crowding' then
-        opt_str = getCrowdedLetterOptsStr(letterOpts)
-    --elseif letterOpts.expName == 'NoisyLettersTextureStats' then
-    --    opt_str = getNoisyLettersTextureStatsOptsStr(letterOpts)
-    elseif letterOpts.expName == 'Metamer' then
+    if letterOpts.expName == 'Metamer' then
         opt_str = getMetamerLetterOptsStr(letterOpts)
-        
     else
-        error(string.format('Unknown type: %s', letterOpts.expName))
+        opt_str = getNoisyLetterOptsStr(letterOpts)
     end
-    
     
     return  fontName_str .. sizeStyle_str .. snr_train_str .. '__' .. opt_str
     
+    
 end
 
-getSVHNOptsStr = function(svhn_opts)
+getRealDataOptsStr = function(realDataOpts)
     
-    local useExtra_str = ''
-    if svhn_opts.useExtraSamples then
+    local orig_rgb = realDataOpts.orig and opts.orig == true
+    
+    local gray_suffix_fileStr = '_gray'
+    if orig_rgb then
+        gray_suffix_fileStr = '';
+    end  
+        
+    
+    local useExtra_str = ''   -- for SVHN extra samples
+    if realDataOpts.useExtraSamples then
         useExtra_str = 'x'
     end
     
     local globalNorm_str = ''
-    if not svhn_opts.globalNorm then
+    local globalNorm_fileStr = '_gnorm'
+    if not realDataOpts.globalNorm then
         globalNorm_str = 'u' -- ="unnnormalized" (no global normalization) (default: global normalized)
+        globalNorm_fileStr = ''
     end
     
     local localContrastNorm_str = ''
-    if svhn_opts.localContrastNorm then
+    local localContrastNorm_fileStr = ''
+    if realDataOpts.localContrastNorm then
         localContrastNorm_str = 'c' -- ="contrast" normalization (default: not contrast normalized)
+        localContrastNorm_fileStr = '_lcnorm'
     end
     
     local imageSize_str = ''
     local imageSize = {32, 32}
-    if svhn_opts.imageSize then
-        imageSize = svhn_opts.imageSize
+    if realDataOpts.imageSize then
+        imageSize = realDataOpts.imageSize
     end
+    
     if type(imageSize) == 'number' then
         imageSize = {imageSize, imageSize}
     end
-    if imageSize[1] ~= 32 or imageSize[2] ~= 32 then
+    if (imageSize[1] ~= 32 or imageSize[2] ~= 32) or realDataOpts.showSize then
         imageSize_str = string.format('_%dx%d', imageSize[1], imageSize[2])
     end
+    local imageSize_fileStr = string.format('_%dx%d', imageSize[1], imageSize[2])
     
     
-    return globalNorm_str .. localContrastNorm_str .. useExtra_str .. imageSize_str
+    
+    local scaleMethod_str = '';
+    local scaleMethod_fileStr = '';
+    if (imageSize[1] ~= 32 or imageSize[2] ~= 32) and realDataOpts.scaleMethod then
+        local scaleMethod = string.lower(realDataOpts.scaleMethod)
+        if     scaleMethod == 'fourier' then  scaleMethod_str = ''; scaleMethod_fileStr = '';
+        elseif scaleMethod == 'pad'     then  scaleMethod_str = 'p'; scaleMethod_fileStr = '_pad';
+        elseif scaleMethod == 'tile'    then  scaleMethod_str = 't'; scaleMethod_fileStr = '_tile';
+        else    error('Unknown scaling method');
+        end
+    end
+
+
+    local textureStats_str = ''
+    if realDataOpts.textureParams then
+        textureStats_str = getTextureStatsStr(realDataOpts.textureParams)    
+    end
+
+    local loadOpts_str = ''
+    if realDataOpts.loadOpts then
+        loadOpts_str = getLoadOptsStr(realDataOpts.loadOpts)
+    end
+
+
+    local realData_opt_str      = globalNorm_str  .. localContrastNorm_str .. useExtra_str .. imageSize_str .. scaleMethod_str .. textureStats_str .. loadOpts_str
+    local realData_opt_fileStr = imageSize_fileStr .. scaleMethod_fileStr .. gray_suffix_fileStr  .. globalNorm_fileStr .. localContrastNorm_fileStr  .. textureStats_str
+    
+    return realData_opt_str, realData_opt_fileStr
     
 end
 
@@ -952,31 +905,6 @@ getSnakeWiggleStr = function ( wiggleSettings_orig )
 end
 
 
-getNetworkStr = function(networkOpts)
-    
-    local netStr, netStr_nice
-    if networkOpts.netType == 'ConvNet' then
-        local convStr, convStr_nice = getConvNetStr(networkOpts)
-        netStr      = 'Conv_' .. convStr
-        netStr_nice = 'ConvNet: ' ..  convStr_nice 
-    elseif networkOpts.netType == 'MLP' then
-        local MLP_str, MLP_str_nice = getMLPstr(networkOpts.nHiddenUnits)    
-        netStr      = 'MLP_' .. MLP_str
-        netStr_nice = 'MLP: ' .. MLP_str_nice
-        
-    else
-        error('Unknown network type : ' .. networkOpts.netType)
-    end
-    
-    local trainConfig_str = '';
-    if networkOpts.trainConfig then
-        trainConfig_str = getTrainConfig_str(networkOpts.trainConfig)
-        netStr = netStr .. trainConfig_str
-    end
-        
-    return  netStr, netStr_nice
-
-end
 
 
 basename = function(fn, nrep)
@@ -996,155 +924,6 @@ basename = function(fn, nrep)
     return str
 end
 
-expandOptionsToList = function(allOptions, loopKeysOrder)
-    --print(allOptions)
-    local baseTable = {}
-    local loopKeys = {}
-    local loopKeys_full = {}
-    local loopValues = {}
-    local nValuesEachLoopKey = {}
-    local nTablesTotal = 1
-    local debug = false
-    
-    -- find which variables are to be looped over, and gather in a separate table
-    for key_full,val in pairs(allOptions) do
-        if string.sub(key_full, 1, 4) == 'tbl_' then
-            local key = string.sub(key_full, 5, #key_full)
-            
-            table.insert(loopKeys_full, key_full)
-            table.insert(loopKeys, key)
-            
-            --loopValues[keyName] = v
-            if #val == 0 then
-                print('val', val)
-                print('options', allOptions)
-                
-                error(string.format('Key %s has 0 array entries\n', key))
-            end
-            if debug then
-                print(string.format('key %s has %d entries', key, #val))
-            end
-            
-            table.insert(nValuesEachLoopKey, #val)
-            nTablesTotal = nTablesTotal * (#val)
-        else
-            baseTable[key_full] = val
-        end        
-    end
-    if debug then
-        print('NTotal = ', nTablesTotal)
-    end
-    
-    if loopKeysOrder then
-        if type(loopKeysOrder) == 'string' then
-            loopKeysOrder = {loopKeysOrder}
-        end
-        if (#table.unique(loopKeysOrder) ~= #loopKeysOrder) then
-            error('Loop keys order table should have not have duplicate entries')
-        end
-        
-        local idx_loopKeys_setOrder = {}
-        for i,key in ipairs(loopKeysOrder) do
-            local idx = table.find(loopKeys, key)
-            if not idx then   error(string.format('No such field %s in table', key))  end
-            idx_loopKeys_setOrder[i] = idx
-        end
-         
-         local loopKeys_other_idxs = table.setdiff(table.range(1, #loopKeys), idx_loopKeys_setOrder)         
-         --print('other=', loopKeys_other_idxs)
-         local idx_new_order = table.merge(idx_loopKeys_setOrder, loopKeys_other_idxs)
-                 
-         loopKeys_full = table.subsref(loopKeys_full, idx_new_order)
-         loopKeys = table.subsref(loopKeys, idx_new_order)
-         nValuesEachLoopKey = table.subsref(nValuesEachLoopKey, idx_new_order)
-        
-            --print(loopKeys)
-            --return;
-    end
-    
-    -- initialize loop variables
-    local nLoopFields = #nValuesEachLoopKey
-    local loopIndices = {}
-    for i = 1, nLoopFields do
-        loopIndices[i] = 1
-    end
-    
-    -- loop over all the loop-variables, assign to table.
-
-    local allTables = {}
-    for j = 1, nTablesTotal do
-        local tbl_i = table.copy(baseTable)
-        
-        table.insert(allTables, tbl_i)
-        
-        if #loopIndices == 0 then
-            break
-        end
-        
-        for i = 1, nLoopFields do
-            
-            if type(allOptions[loopKeys_full[i]]) ~= 'table' then
-                error(string.format('Field %s is not a table', loopKeys_full[i]))
-            end
-            local vals_field_i = table.copy( allOptions[loopKeys_full[i]] )
-            
-            if not string.find(loopKeys[i], '_and_') then
-            
-                tbl_i[loopKeys[i]] = vals_field_i[loopIndices[i]]
-            else
-                local sub_fields = {}
-                for sub_fld in string.gmatch(string.gsub(loopKeys[i], '_and_', ','), "%a+") do 
-                    table.insert(sub_fields, sub_fld)
-                end                
-                
-                for k = 1,#sub_fields do
-                    tbl_i[sub_fields[k]] = vals_field_i[loopIndices[i]][k];
-                end
-            end
-        end
-        
-        local curFldIdx = 1
-        
-        loopIndices[curFldIdx] = loopIndices[curFldIdx] + 1
-        while loopIndices[curFldIdx] > nValuesEachLoopKey[curFldIdx] do
-            loopIndices[curFldIdx] = 1
-            curFldIdx = curFldIdx + 1
-            
-            if curFldIdx > nLoopFields then
-                assert(j == nTablesTotal)
-                break;
-            end
-            loopIndices[curFldIdx] = loopIndices[curFldIdx]+1
-        end
-        
-    end
-    
-    return allTables
-    
-end
-
-
-testExpandOptionsToList = function()
-    options_test = { netType = 'ConvNet', 
-               poolStrides = 2,
-               tbl_doPooling = {false, true},
-               tbl_allNStates = { 1, 2 },
-               --tbl_allNStates_and_test = { { 1 , 'B'}, {2, 'C'}  },
-               tbl_filtsizes = { {6, 16}, {12, 32} }
-               }
-
-    list_test = expandOptionsToList(options_test)
-    
-    print('Initial options table');
-    print(options_test)
-    
-    print('\n\nFinal list of tables:');
-    for i,v in ipairs(list_test) do
-        print(string.format('-- Table #%d --', i))
-        print(v)
-    end
-    
-end
 
 --testExpandOptionsToList()
 --[[
@@ -1156,10 +935,27 @@ length = function(x)
     end
 end
 --]]
+isRealDataFont = function(font)
+    if not font then
+        return false
+    end
+    
+    local font_str = abbrevFontStyleNames(font)
+    local realDataFontList = getRealDataFontList()
+    for k,realFontName in ipairs(realDataFontList) do
+        if string.find(font_str, realFontName)  then
+            return true
+        end
+    end
+    
+    return false
+   
+end
 
 
+   
 
-fixNoisyLetterOpts = function(opt)
+fixDataOpts = function(opt)
     
     if (opt.OriXY) then   
         for k,v in pairs(opt.OriXY) do
@@ -1171,12 +967,13 @@ fixNoisyLetterOpts = function(opt)
     if type(opt.fontName) == 'string' then
         opt.fontName = {opt.fontName}
     end
-    if type(opt.trainingFonts) == 'string' then
+    if type(opt.trainingFonts) == 'string' and opt.trainingFonts ~= 'same' then
         opt.trainingFonts = {opt.trainingFonts}
     end
     
     -- remove 'retrainFromLayer' if trainNoise is same as testNoise, and trainFonts = testFonts
     local differentTrainTestNoise = opt.trainingNoise and (opt.trainingNoise ~= 'same') and (filterStr(opt.noiseFilter, 1) ~= filterStr(opt.trainingNoise, 1))
+    OO = opt
     local differentTrainTestFonts = opt.trainingFonts and (opt.trainingFonts ~= 'same') and (abbrevFontStyleNames(opt.trainingFonts) ~=  abbrevFontStyleNames(opt.fontName) )
             
     if not differentTrainTestNoise and not differentTrainTestFonts then
@@ -1185,19 +982,43 @@ fixNoisyLetterOpts = function(opt)
     
     
     
-    -- if training on SVHN, make sure trainingImageSize matches size of SVHN training set
-    if opt.trainingFonts and string.find(abbrevFontStyleNames(opt.trainingFonts), 'SVHN') and
-        opt.trainingFonts.svhn_opts and opt.trainingFonts.svhn_opts.imageSize then
-        opt.trainingImageSize = opt.trainingFonts.svhn_opts.imageSize
+    -- copy SVHN/CIFAR image size --> trainingImageSize 
+    if isRealDataFont(opt.trainingFonts) then
+        if opt.trainingFonts.realData_opts.imageSize then
+            opt.trainingImageSize = opt.trainingFonts.realData_opts.imageSize
+        end
         --print(' --- updated ---')
     end
+    
+    
+    if opt.doTextureStatistics then  -- copy textureParams over to any SVHN/CIFAR training or testing fonts.
+        if isRealDataFont( opt.trainingFonts ) then
+            opt.trainingFonts.realData_opts.textureParams = opt.textureParams
+        end
+        
+        if isRealDataFont(opt.fontName) then
+            opt.fontName.realData_opts.textureParams      = opt.textureParams
+        end        
+    end
+
+    if opt.loadOpts then
+        if isRealDataFont( opt.trainingFonts ) then
+            opt.trainingFonts.realData_opts.loadOpts = opt.loadOpts
+        end
+        
+        if isRealDataFont(opt.fontName) then
+            opt.fontName.realData_opts.loadOpts      = opt.loadOpts
+        end                
+    end
+    
+    
     
     -- if is crowded opts, expand multi-letter-opts
     
     if opt.allMultiLetterTestOpts_tbl then
         local nDistractorsMAX = table.max(opt.allMultiLetterTestOpts_tbl.tbl_nDistractors)
         local fontWidth = getFontAttrib(opt.fontName[1], opt.sizeStyle, 'width')
-        local tbl_distractorSpacing = getAllDistractorSpacings(opt.xrange, fontWidth, nDistractorsMAX, opt.allMultiLetterTestOpts_tbl.testTargetPosition)
+        local tbl_distractorSpacing = getAllDistractorSpacings(opt.xrange, fontWidth, nDistractorsMAX, opt.allMultiLetterTestOpts_tbl.testPositions)
         opt.allMultiLetterTestOpts_tbl.tbl_distractorSpacing = tbl_distractorSpacing
         opt.allMultiLetterTestOpts = expandOptionsToList(opt.allMultiLetterTestOpts_tbl)
         
@@ -1219,343 +1040,8 @@ fixNoisyLetterOpts = function(opt)
 
 end
 
-fixConvNetParams = function(networkOpts)
-     
-    if (#networkOpts > 1) or networkOpts[1] then
-        for j = 1,#networkOpts do
-            networkOpts[j] = fixConvNetParams(networkOpts[j])
-        end
-        return networkOpts
-    end
-            
-     
-    local defaultParams = getDefaultConvNetParams()
-    
-    local allowPoolStrideGreaterThanPoolSize = false
-    --NetworkOpts = networkOpts
-    
-    local nStates, nStatesConv, nStatesFC
-    local nConvLayers, nFCLayers
-    if not networkOpts.nStatesConv then
 
-        nStates = networkOpts.nStates
-        networkOpts.nStatesConv = {}
-        networkOpts.nStatesFC = {}
-        for i,v in ipairs(nStates) do
-            if v > 0 then
-                table.insert(networkOpts.nStatesConv, v)
-            elseif v < 0 then
-                table.insert(networkOpts.nStatesFC, -v)
-            end
-        end    
-        
-    end
-    
-    nStatesConv = networkOpts.nStatesConv
-    nStatesFC =   networkOpts.nStatesFC 
 
-    nConvLayers = #nStatesConv
-    nFCLayers   = #nStatesFC
-
-    --local nStates = networkOpts.nStates
-    --print(networkOpts)
-    --print(nStates)
-    local nStatesConv_ext = table.copy( nStatesConv )
-    
-    nStatesConv_ext[0] = 1   --- this assumes grayscale input (if rgb input, this should be 3)        
-    --print('nConvLayers', nConvLayers)
-        
-    -- if there are any parameters not defined, assume they are the default parameters
-    for k,v in pairs(defaultParams) do
-        if (networkOpts[k] == nil) then
-            networkOpts[k] = v
-        end
-    end
-        
-    
-    local makeSureFieldIsCorrectLength = function(fieldName)
-        -- make sure is in table format (if was a number)
-        --NetworkOpts = networkOpts
-        --FieldName = fieldName
-        --print(networkOpts[fieldName])
-        
-        if type(networkOpts[fieldName]) == 'number' or type(networkOpts[fieldName]) == 'string' then   -- num2tbl
-            networkOpts[fieldName] = {networkOpts[fieldName]}
-        end
-                
-        -- handle case where length is shorter than number of convolutional layers (repeat)
-        local nInField = #(networkOpts[fieldName])
-    
-        if nInField < nConvLayers  then
-            assert(nInField == 1)
-            networkOpts[fieldName] = table.rep(networkOpts[fieldName], nConvLayers, 1)
-        end
-    
-        -- handle case where length is longer than number of convolutional layers (truncate)
-        if nInField > nConvLayers then
-            for j = nConvLayers+1,nInField do
-                networkOpts[fieldName][j] = nil
-            end
-        end
-        
-        -- for 'max' pooling, make sure is uppercase ('MAX')
-        for i = 1,nConvLayers do
-            if type(networkOpts[fieldName][i]) == 'string' then
-                networkOpts[fieldName][i] = string.upper(networkOpts[fieldName][i])
-            end
-        end
-
-        
-    end
-    
-    
-    makeSureFieldIsCorrectLength('filtSizes')
-    
-    
-    -- if any filtSizes == 0, set corresponding nStates equal to the number of states in the previous layer.
-    
-    for i = 1,nConvLayers do
-        if networkOpts.filtSizes[i] == 0 then
-            --print(io.write('setting state %d = %d', i, nStates_ext[i-1]))
-            nStatesConv[i] = nStatesConv_ext[i-1]
-        end        
-    end
-    
-
-    -- (2) pooling
-    local skipAllPooling = not networkOpts.doPooling 
-    
-        
-    if skipAllPooling then
-        networkOpts.poolSizes = table.rep(0, nConvLayers)
-        networkOpts.poolStrides = table.rep(0, nConvLayers)
-        networkOpts.poolTypes = table.rep(0, nConvLayers)
-        
-    else
-        --- (1) poolSizes
-        makeSureFieldIsCorrectLength('poolSizes')
-        
-        --- (2) poolStrides
-        if networkOpts.poolStrides == 'auto' then
-            networkOpts.poolStrides = networkOpts.poolSizes
-        end
-        
-        makeSureFieldIsCorrectLength('poolStrides')
-        
-        --- (3) poolTypes        
-        makeSureFieldIsCorrectLength('poolTypes')        
-        
-        -- if any layer has no pooling (poolSize == 0), set the stride & type to 0
-        for i = 1, nConvLayers do  
-            if (networkOpts.poolSizes[i] == 0) or (networkOpts.poolSizes[i] == 1) then
-                networkOpts.poolStrides[i] = 0
-                networkOpts.poolTypes[i] = 0
-            end
-            if not allowPoolStrideGreaterThanPoolSize and (networkOpts.poolStrides[i] > networkOpts.poolSizes[i]) then
-                networkOpts.poolStrides[i] = networkOpts.poolSizes[i]
-            end
-            
-        end
-        
-    end    
-    
-    local poolingInAnyLayers = false
-    for i = 1,nConvLayers do
-        if (networkOpts.poolSizes[i] > 0) then
-            poolingInAnyLayers = true
-        end
-    end
-    if not poolingInAnyLayers then
-        networkOpts.poolSizes = table.rep(0, nConvLayers)
-        networkOpts.poolStrides = table.rep(0, nConvLayers)
-        networkOpts.poolTypes = table.rep(0, nConvLayers)
-    end
-    networkOpts.doPooling = poolingInAnyLayers
-
-       
-    return networkOpts
-    
-    
-end
-
-getConvNetStr = function(networkOpts, niceOutputFields)
-    
-    local defaultParams = getDefaultConvNetParams()
-    
-    local defaultPoolStrideIsAuto = true
-    
-    niceOutputFields = niceOutputFields or 'all'
-    
-    --[[
-    defaultParams.fanin = {1,4,16}
-    defaultParams.filtSizes = {5,4}
-
-    defaultParams.doPooling = true
-    defaultParams.poolSizes = {4,2}
-    defaultParams.poolTypes = 2
-    defaultParams.poolStrides = {2,2}
-    --]]    
-    --print('----Before-------\n')
-    --print(networkOpts)
-    networkOpts = fixConvNetParams(networkOpts)
-    --print('----After-------\n\n\n')
-    --print(networkOpts)
-    
-    local nConvLayers = (#networkOpts.nStatesConv)
-    local nFCLayers = (#networkOpts.nStatesFC)
-
-    local convFunction = networkOpts.convFunction
-    --local trainOnGPU = networkOpts.trainOnGPU
-    
-    local convFcn_str = ''
-    if convFunction == 'SpatialConvolutionMap' then -- or convFunction == 'SpatialConvolutionMM' then
-        convFcn_str = ''
-    elseif convFunction == 'SpatialConvolution' then 
-        convFcn_str = 'f'  -- F = 'fully connected'
-    elseif convFunction == 'SpatialConvolutionCUDA' then 
-        convFcn_str = 'c'  -- F = 'fully connected'
-    else
-        error(string.format('Unknown spatial convolution function : %s', tostring(convFunction)) )
-    end
-    
-    local nStates_str = table.concat(networkOpts.nStatesConv, '_') 
-    local nStates_str_nice = 'nStates=' .. table.concat(networkOpts.nStatesConv, ',') .. ';' 
-    if nFCLayers > 0 then
-        nStates_str  = nStates_str  ..  '_F' .. table.concat(networkOpts.nStatesFC, '_')
-        nStates_str_nice = nStates_str_nice .. 'FC=' .. table.concat(networkOpts.nStatesFC, ',') .. '; ' 
-    end
-    
-    -- (1) filtsizes
-    
-    local filtSizes_str = ''
-    local filtSizes_str_nice = '';
-    if not isequal(networkOpts.filtSizes, defaultParams.filtSizes, nConvLayers) then        
-        if isequal(networkOpts.filtSizes, table.rep(0, nConvLayers), nConvLayers) then
-            filtSizes_str = '_nofilt'
-        else
-            filtSizes_str = '_fs' .. toList(networkOpts.filtSizes, nConvLayers)
-        end
-    end
-    if niceOutputFields == 'all' or tableContains(niceOutputFields, 'filtSizes') then
-        if isequal(networkOpts.filtSizes, table.rep(0, nConvLayers), nConvLayers) then
-            filtSizes_str_nice = ' No Filter.'
-        else
-            filtSizes_str_nice = ' FiltSz=' .. toList(networkOpts.filtSizes, nConvLayers, ',') .. '.'
-        end
-    end
-
-    -- (2) pooling
-    local skipAllPooling = not networkOpts.doPooling
-    local nLayersWithPooling = 0
-    for i = 1,nConvLayers do
-        if (networkOpts.poolSizes[i] > 0) and (not skipAllPooling) then 
-            nLayersWithPooling = nLayersWithPooling + 1 
-        end
-    end
-    skipAllPooling = skipAllPooling or (nLayersWithPooling == 0)
-                    
-    
-    local doPooling_str = ''    
-    local doPooling_str_nice = ''
-    local poolSizes_str = ''
-    local poolSizes_str_nice = ''
-    local poolTypes_str = ''
-    local poolTypes_str_nice = ''
-    local poolStrides_str = ''
-    local poolStrides_str_nice = ''
-    
-    
-    if skipAllPooling then
-        doPooling_str = '_nopool'
-        if niceOutputFields == 'all' or tableContains(niceOutputFields, 'doPooling') then
-            doPooling_str_nice = ' No Pooling'
-        end
-        
-    else
-        -- assuming that the default is to do pooling.
-        
-        -- 2a. Pooling Present in each layer 
-        if niceOutputFields == 'all' or tableContains(niceOutputFields, 'doPooling') then            
-            doPooling_str_nice = ' Pooling: '
-        end
-        if nLayersWithPooling < nConvLayers then
-                            
-            for layer_i = 1, nConvLayers do
-                local doPooling_i = (networkOpts.poolSizes[layer_i] == 0) 
-                --doPooling_str = doPooling_str .. iff(doPooling_i, '_pool', '_nopool') 
-                
-                if niceOutputFields == 'all' or tableContains(niceOutputFields, 'doPooling') then    
-                    --doPooling_str_nice = doPooling_str_nice .. iff(doPooling_i, 'Yes', 'No') .. iff(layer_i < nConvLayers, '/', '')
-                end
-            end
-                
-        end
-                    
-                
-        -- 2b. Pool Size(s)
-        if not isequal(networkOpts.poolSizes, defaultParams.poolSizes, nConvLayers) then
-            poolSizes_str = '_psz' .. toList(networkOpts.poolSizes, nConvLayers)
-        end
-        if niceOutputFields == 'all' or tableContains(niceOutputFields, 'poolSizes') then
-            poolSizes_str_nice = ' PoolSz=' .. toList(networkOpts.poolSizes, nConvLayers, ',') .. '.'
-        end
-        
-        -- 2b. Pool Type(s) (pnorm)
-        if not isequal(networkOpts.poolTypes, defaultParams.poolTypes, nConvLayers) then            
-            --print('filtSizes', networkOpts.filtSizes, filtSizes_default)
-            if table.nUnique(networkOpts.poolTypes) > 1 then
-                poolTypes_str = '_pt' .. toList(networkOpts.poolTypes,nConvLayers)
-            else
-                poolTypes_str = '_pt' .. tostring(networkOpts.poolTypes[1])
-            end
-        end       
-        if niceOutputFields == 'all' or tableContains(niceOutputFields, 'poolTypes') then            
-            if table.nUnique(networkOpts.poolTypes) > 1 then
-                poolTypes_str_nice = ' Pnorm=' .. toList(networkOpts.poolTypes, nConvLayers, ',') .. '.'
-            else
-                poolTypes_str_nice = ' Pnorm=' .. tostring(networkOpts.poolTypes[1]) .. '.'
-            end
-        
-        end
-        
-        -- 2c. PoolStrides(s)
-        
-        assert(defaultPoolStrideIsAuto)
-        --[[        
-        local defaultPoolStrides = defaultParams.poolStrides
-        if defaultPoolStrides == 'auto' then
-            defaultPoolStrides = networkOpts.poolSizes -- use poolSize of current network
-        end
-        
-        local currentPoolStrides = networkOpts.poolStrides
-        if currentPoolStrides == 'auto' then
-            currentPoolStrides = networkOpts.poolSizes
-        end
-        --]]
-        if not isequal(networkOpts.poolSizes, networkOpts.poolStrides, nConvLayers) then
-            poolStrides_str = '_pst' .. toList(networkOpts.poolStrides, nConvLayers)
-        end
-        poolStrides_str_nice = ' PoolStrd=' .. toList(networkOpts.poolStrides, nConvLayers, ',') .. '.'
-        
-    end
-    
-    
-    local gpu_str = ''
-    local useCUDAmodules = string.find(networkOpts.convFunction, 'CUDA')
-    if networkOpts.trainOnGPU  then
-        gpu_str = '_GPU'
-        if useCUDAmodules and (GPU_BATCH_SIZE > 1) then
-            gpu_str = '_GPU' .. tostring(GPU_BATCH_SIZE)
-        end
-    end
-    
-    
-
-    local convNet_str      = convFcn_str .. nStates_str      .. filtSizes_str      .. doPooling_str      .. poolSizes_str      .. poolTypes_str      .. poolStrides_str .. gpu_str
-    local convNet_str_nice = convFcn_str .. nStates_str_nice .. filtSizes_str_nice .. doPooling_str_nice .. poolSizes_str_nice .. poolTypes_str_nice .. poolStrides_str_nice  .. gpu_str
-    return convNet_str, convNet_str_nice
-    
-end
 
     
 
@@ -1618,19 +1104,19 @@ uniqueNetworks = function(allNetworks)
 end
 
 
-uniqueOpts = function(allLetterOpts)
+uniqueOpts = function(allDataOpts)
 
     local tbl_opts = {}
-    for i,opt in ipairs(allLetterOpts) do
-        local opt_str = getLetterOptsStr(opt)
+    for i,opt in ipairs(allDataOpts) do
+        local opt_str = getDataOptsStr(opt)
         
         tbl_opts[i] = opt_str
     end
-    LetOpts = allLetterOpts
+    DataOpts = allDataOpts
 
     local uniqueOptStrs, idx_unique = table.unique(tbl_opts)
     
-    local uniqueOpts = table.subsref(allLetterOpts, idx_unique)
+    local uniqueOpts = table.subsref(allDataOpts, idx_unique)
 
     return uniqueOpts, uniqueOptStrs
 
@@ -1714,6 +1200,8 @@ getAllDistractorSpacings = function(xrange, fontWidth, nDistractors, targetPosit
    
     local minTargetPos, maxTargetPos
     
+    assert(targetPosition)
+    
     if type(targetPosition) == 'string' then
         assert(targetPosition == 'all') 
         minTargetPos, maxTargetPos = 1, Nx
@@ -1750,10 +1238,16 @@ end
 
 abbrevFontStyleNames = function(names_orig, fontOrStyle)
     --print(names_orig)
-   
+   Names_orig = names_orig
     -- Book[M]an, Brai[L]le, [C]heckers4x4, Cou[R]ier, [H]elvetica, [K]uenstler  [S]loan, [Y]ung, 
     
+    if not names_orig then
+        error('Input was nil')
+    end
     assert(names_orig)
+    if names_orig == 'same' then
+        return 'same', 'same', 'same'
+    end
     
     local skipAbbrevIfOneFont = true
     
@@ -1771,6 +1265,7 @@ abbrevFontStyleNames = function(names_orig, fontOrStyle)
                                   
                                   SVHN =        'N',
                                   
+                                  
                                   Snakes =      'G',   -- '=Gabor'
                                  }
     
@@ -1786,7 +1281,9 @@ abbrevFontStyleNames = function(names_orig, fontOrStyle)
                                       Sloan       = 'Sln',
                                       Yung        = 'Yng',
                                       
-                                      SVHN = 'SVHN', 
+                                      SVHN        = 'SVHN',
+                                      CIFAR10     = 'CFR10',
+                                      CIFAR100    = 'CFR100',
                                       
                                       Snakes = 'Snk',
                                  }
@@ -1815,7 +1312,7 @@ abbrevFontStyleNames = function(names_orig, fontOrStyle)
     end
     
     
-    if names_orig.fonts or names_orig.styles or names_orig.wiggles or names_orig.svhn_opts then
+    if names_orig.fonts or names_orig.styles or names_orig.wiggles or names_orig.realData_opts then
        local fontName_str_short,   fontName_str_medium,  fontNames_full   = '', '', ''
        local styleName_str_short,  styleName_str_medium, styleNames_full  = '', '', ''
        local pre_full, join_short, join_med, join_full,  post_full        = '', '', '', '', ''
@@ -1838,9 +1335,9 @@ abbrevFontStyleNames = function(names_orig, fontOrStyle)
             styleName_str_short, styleName_str_medium, styleNames_full = wiggle_str, wiggle_str, wiggle_str
        end
        
-       if names_orig.svhn_opts then            
-            local svhn_opt_str = getSVHNOptsStr(names_orig.svhn_opts) 
-            styleName_str_short, styleName_str_medium, styleNames_full = svhn_opt_str, svhn_opt_str, svhn_opt_str
+       if names_orig.realData_opts then            
+            local realData_opt_str = getRealDataOptsStr(names_orig.realData_opts) 
+            styleName_str_short, styleName_str_medium, styleNames_full = realData_opt_str, realData_opt_str, realData_opt_str
        end
        
        if names_orig.fonts and (names_orig.styles or names_orig.wiggles) then
@@ -1866,7 +1363,7 @@ abbrevFontStyleNames = function(names_orig, fontOrStyle)
     
     if not fontOrStyle then
         --print(names_orig[1])
-        if allFontName_abbrevs[ getRawFontName( names[1]) ] then
+        if allFontName_abbrevs_med[ getRawFontName( names[1]) ] then
             fontOrStyle = 'font'
         elseif allStyleName_abbrevs[ names[1] ] then
             fontOrStyle = 'style'
@@ -2062,9 +1559,11 @@ getNumClassesForFont = function(fontName, sumIfMultipleFonts)
         return 35
         
         
-    elseif (font== 'SVHN') or (font == 'Snakes') then
+    elseif (font== 'SVHN') or (font== 'CIFAR10') or (font == 'Snakes') then
         return 10
-    else
+    elseif (font== 'CIFAR100') then
+        return 100
+    else    
         error(string.format('Unknown font : %s', font))
     end
     
@@ -2076,11 +1575,17 @@ end
 
 getRawFontName = function(fontName, keepUpperCaseFlag)
 
+
     local rawFontName = fontName
     local fontAttrib = {upper_tf = false, bold_tf = false, italic_tf = false}
     if not fontName or #rawFontName == 0 then
-        return '', false, false, false
+        return '', fontAttrib
     end   
+    
+    if table.anyEqualTo(fontName, getRealDataFontList())  then
+        return fontName, fontAttrib
+    end
+
     
     local LastChar = function(s) return string.sub(s, #s, #s) end
     local lastChar = LastChar(rawFontName)
@@ -2094,6 +1599,12 @@ getRawFontName = function(fontName, keepUpperCaseFlag)
         elseif lastChar == 'I' then
             fontAttrib.italic_tf = true;
         elseif lastChar == 'U' and keepUpperCaseFlag then
+            break;
+        end
+        
+        local n = #rawFontName
+        local last3 = string.sub(rawFontName, n-2, n)
+        if (last3 == '4x4' or last3 == '5x7') then
             break;
         end
         
@@ -2197,7 +1708,7 @@ fileExistsInSisterSubdirs = function(mainExperimentDir, subdir, filename, checkI
     -- 3. Check in any other sister subdirs of this folder
     --   (e.g. ChannelTuning/NoisyLetters/filename, Grouping/NoisyLetters/filename, etc)
     if checkInAllSisterSubdirs then
-        
+        -- resultsMainDir = (e.g) /f/nyu/letters/data/TrainedNetworks/ + [
         local resultsMainDir = paths.dirname(mainExperimentDir)  .. '/'
         local subfolder_names = subfolders(resultsMainDir)
         for i,subfolder_name in ipairs(subfolder_names) do
@@ -2206,11 +1717,15 @@ fileExistsInSisterSubdirs = function(mainExperimentDir, subdir, filename, checkI
                  (alsoCheckNYU_folder and (subfolder_name == mainExperimentDir_NYU))
             
             if not checkedAlready then 
-                local fullFileName = resultsMainDir .. subfolder_name .. '/' .. subdir .. filename
+                local pathToTry = resultsMainDir .. subfolder_name .. '/' .. subdir .. '/'
+                local fullFileName =  pathToTry.. filename
                 if paths.filep(fullFileName) then
                     return true, fullFileName, foldersChecked
+                else
+                    --io.write(string.format('Not present : %s\n', fullFileName))
                 end
-                table.insert(foldersChecked, resultsMainDir .. subfolder_name .. subdir)
+                
+                table.insert(foldersChecked, pathToTry)
             end
             
         end
@@ -2287,83 +1802,30 @@ getBestWeightsAndOffset = function(inputMatrix, labels, nClasses)
 end
 
 
-torch.copyTensorValues = function(t1, t2)
-    T1 = t1
-    T2 = t2
-    local iter1 = torch.tensorIterator(t1)
-    local iter2 = torch.tensorIterator(t2)
+
+getDatasetSubfolder = function(letterOpts)
+    local subfolder
     
-    local s1 = t1:storage()
-    local s2 = t2:storage()
-    
-    while true do
-        local i1, v1 = iter1()
-        local i2, v2 = iter2()
-        
-        if not v1 or not v2 then
-            break
-        end
-        --printf('[%d(%.1f)->%d(%.1f)]\n', i1, v1, i2, v2)
-        s2[i2] = v1
-        
+    subfolder = letterOpts.stimType
+    ---[[
+    if letterOpts.expName == 'Crowding' then
+        subfolder = 'Crowding/' .. subfolder
     end
+    --]]
+
+    --[[
+    if letterOpts.expName == 'ChannelTuning' or letterOpts.expName == 'Complexity' then
+        subfolder = letterOpts.stimType        
+    else
+        error('Unhandled case')
+    end 
+    --]]
     
-    
+    return subfolder
 end
 
 
-torch.tensorIterator = function(x)
-    
-    local nDims = x:nDimension()
-    local sizeX = x:size()
-    local idxs = torch.Tensor(nDims):fill(1)
-    local storage = x:storage()
-    local stride = x:stride()
-    local nElementsInTensor = x:numel()
-    local nElementsInStorage = #storage
-    
-    local storageOffset = x:storageOffset()
-    
-    return function()
-    
-        -- get index of current element
-        local curStorageIdx = storageOffset
-        for dim = 1,nDims do
-            curStorageIdx = curStorageIdx + (idxs[dim] - 1)*stride[dim]
-        end
-        
-        if curStorageIdx > nElementsInStorage then
-            return 
-        end
-                
-        local curElement = storage[curStorageIdx]
-        
-        -- increment the idxs appropriately along each dimension
-        local dim = nDims
-        idxs[dim] = idxs[dim]+1
-        while (idxs[dim] > sizeX[dim]) and (dim > 1) do
-            idxs[dim] = 1
-            idxs[dim-1] = idxs[dim-1]+1
-            dim = dim-1            
-        end
-        
-        return curStorageIdx, curElement
-        --print('idxs = ', idxs1[1], idxs1[2])
-        
-    end
-    
-    
-end
-
-iterateOverTensor = function(X)
-    for i,v in torch.tensorIterator(X) do 
-        printf('%d : %.1f\n', i,v)
-    end    
-    
-end
-
-
-getDataSubfolder = function(letterOpts)
+getResultsSubfolder = function(letterOpts)
     local subfolder
     
     subfolder = letterOpts.stimType
@@ -2385,7 +1847,8 @@ getDataSubfolder = function(letterOpts)
 end
 
 
-checkFolderExists = function(dirname)
+
+verifyFolderExists = function(dirname)
     if string.find(  string.sub(dirname, #dirname - 5, #dirname), '[.]') then  -- ie. has filename at end
         dirname = paths.dirname(dirname)
     end
@@ -2394,6 +1857,9 @@ checkFolderExists = function(dirname)
     end        
 end
 
+getRealDataFontList = function()
+    return {'SVHN', 'MNIST', 'CIFAR10', 'CIFAR100'};
+end
 
 
 

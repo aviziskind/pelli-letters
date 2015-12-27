@@ -1,8 +1,7 @@
-
-function str = getExpSubtitle(letterOpts, networkOpts, trialId_arg)
+function str = getExpSubtitle(dataOpts, networkOpts, trialId_arg)
     
     
-    letterOpts_str = [getLetterOptsStr(letterOpts)];
+    dataOpts_str = getDataOptsStr(dataOpts);
     
 
     network_str = ['__' getNetworkStr(networkOpts)];
@@ -21,7 +20,7 @@ function str = getExpSubtitle(letterOpts, networkOpts, trialId_arg)
     end
 
     
-    str = [letterOpts_str  network_str   trialId_str];
+    str = [dataOpts_str  network_str   trialId_str];
     
 end
 

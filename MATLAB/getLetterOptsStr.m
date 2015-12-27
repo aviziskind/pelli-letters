@@ -10,18 +10,14 @@ function [let_opt_str, let_opt_str_nice] = getLetterOptsStr(letterOpts, niceStrF
     makeNiceStr = nargout >= 2;
     let_opt_str_nice = '';
     
+    assert(~isRealDataFont(letterOpts.fontName));
+
     [fontName_str, fontName_str_nice] = abbrevFontStyleNames(letterOpts.fontName);
     if any(strcmp( letterOpts.fontName, 'SVHN')) || ~isempty(strfind(fontName_str, 'SVHN'))
         [let_opt_str, let_opt_str_nice] = deal(fontName_str, fontName_str_nice);
         return
     end
-        
-    isSVHN = @(fontName) ~isempty(strfind(abbrevFontStyleNames(fontName, 'font'), 'SVHN'));
-    if isSVHN(letterOpts.trainingFonts)
-        niceStrFields = setdiff(niceStrFields, 'trainingImageSize');
-        niceStrFields = [niceStrFields, 'svhn_imageSize'];
-    end
-        
+            
     
     fontName = letterOpts.fontName;
     if isfield(letterOpts, 'fullFontSet') && ~isequal(letterOpts.fullFontSet, 'same') && ~isequal(letterOpts.fullFontSet, letterOpts.fontName)    
@@ -61,15 +57,12 @@ function [let_opt_str, let_opt_str_nice] = getLetterOptsStr(letterOpts, niceStrF
         let_opt_str_nice = appendToStr(let_opt_str_nice, SNR_train_str_nice);
     end
           
-    
-    if any(strcmp(letterOpts.expName, {'Complexity', 'Grouping', 'ChannelTuning', 'TrainingWithNoise'}))
-        [opt_str, opt_str_nice] = getNoisyLetterOptsStr(letterOpts, niceStrFields);
-    elseif strcmp(letterOpts.expName, 'Crowding') 
-        [opt_str, opt_str_nice] = getCrowdedLetterOptsStr(letterOpts, niceStrFields);
-%     elseif strcmp(letterOpts.expTitl, 'NoisyLettersTextureStats')
-%         [opt_str, opt_str_nice] = getNoisyLettersTextureStatsOptsStr(letterOpts, niceStrFields);
-    elseif strcmp(letterOpts.expName, 'MetamerLetters')
+        
+    if strcmp(letterOpts.expName, 'MetamerLetters')
         [opt_str, opt_str_nice] = getMetamerLetterOptsStr(letterOpts, niceStrFields);
+    else
+%         if any(strcmp(letterOpts.expName, {'Complexity', 'Grouping', 'ChannelTuning', 'TrainingWithNoise', 'Uncertainty', 'Crowding'}))
+        [opt_str, opt_str_nice] = getNoisyLetterOptsStr(letterOpts, niceStrFields);
     end
     
     

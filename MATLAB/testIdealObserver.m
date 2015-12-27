@@ -7,14 +7,20 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
      checkIfLowerSNRsGot100pct = 1;
      lockAllSNRs = true;
 
- %      fontNames_orig = fontNameSet;
+% %       fontNames_orig = fontNameSet;
 %      if iscell(fontNames) || isstruct(fontNames)
 %          fontNames_orig = fontNames;
 %      end
+     if ischar(fontNameSet)
+         fontNameSet = {fontNameSet};
+     end
      
      fontNames_list = getFontList(fontNameSet);
      fontNames_list = sort(fontNames_list);
+
      
+     idealFileFields = {'fontNames', 'propCorrectLetter', 'propCorrectEachLetter'};
+
      
      classifierForEachFont = iscell(fontNameSet) && length(fontNameSet)>1  && letterOpts.classifierForEachFont ;
      if classifierForEachFont
@@ -98,7 +104,8 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
                  %%
                  [ideal_file_name_lower, ideal_folder_lower] = getIdealObserverFileName(fontNameSet, snr_chk, letterOpts);
                  if exist([ideal_folder_lower ideal_file_name_lower], 'file')
-                    s_chk = load([ideal_folder_lower ideal_file_name_lower]);
+                    s_chk = tryLoad([ideal_folder_lower ideal_file_name_lower], [], idealFileFields);
+                                        
                     if s_chk.propCorrectLetter == 1
                         fprintf('[Ideal for snr = %.1f had 100%% correct --> assuming ideal is 100%% correct also for snr = %.1f]\n', snr_chk, snr);
                         save([ideal_folder, ideal_file_name], '-struct', 's_chk');
@@ -141,6 +148,7 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
              
                  if lockAllSNRs
                      lock_name = ideal_file_name_noSNR;
+%                      lock_name = ['calcIdeal__' ideal_file_name_noSNR];
                  else
                      lock_name = idealSubFile;
                  end
@@ -163,6 +171,7 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
                          
                         fprintf('    => Loading %s ... ', data_file_name{di})
                         S_data = load(data_file_name_full{di});
+                        
 
                         if ~isempty(S_data.signalMatrix)
                             signal_data = S_data.signalMatrix;
@@ -228,7 +237,7 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
                 useParPool = false; % default
 
                 tryParPool = false;
-                tryParPool = tryParPool && ~strncmp(getHostname, 'XPS', 3); % && false;
+                tryParPool = tryParPool && ~onLaptop; % strncmp(getHostname, 'XPS', 3); % && false;
 
                 if tryParPool
                     useParPool = lock_createLock('ParPool');
@@ -305,7 +314,7 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
 
                  fprintf('   Combining the results from all the subfiles ==> %s : ', ideal_file_name)
                  for fi = 1:nDataFiles
-                     Si = load(idealSubFiles_full{fi});
+                     Si = tryLoad(idealSubFiles_full{fi}, [], idealFileFields);
                      [propCorrectLetter_C{fi}, propCorrectEachLetter_C{fi}] = deal(Si.propCorrectLetter, Si.propCorrectEachLetter);
                  end
                  propCorrectLetter_eachFont = [propCorrectLetter_C{:}];
@@ -334,7 +343,7 @@ function [propCorrectLetter, propCorrectEachLetter, S_ideal] = testIdealObserver
      else
         
         
-         S_ideal = tryLoad(ideal_file_name_full);
+         S_ideal = tryLoad(ideal_file_name_full, [], idealFileFields);
          [propCorrectLetter, propCorrectEachLetter] = deal(S_ideal.propCorrectLetter, S_ideal.propCorrectEachLetter);
          
          fprintf('[%s : Already computed : %.2f%%]\n', ideal_file_name, propCorrectLetter*100);

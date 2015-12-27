@@ -26,7 +26,13 @@ function [fn, f_path] = getNoisyLetterFileName(fontName, logSNR, noisyLetterOpts
         noisyOpt_str, snr_str, userName_str);
     
     if nargout > 1
-        f_path = [datasetsPath noisyLetterOpts.stimType filesep fontName filesep];
+        if strcmp(noisyLetterOpts.expName, 'Crowding')
+            datasets_subpath = ['Crowding' filesep];
+        else
+            datasets_subpath = '';
+        end
+        
+        f_path = [datasetsPath datasets_subpath noisyLetterOpts.stimType filesep fontName filesep];
     end
     
 end

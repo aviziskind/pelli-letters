@@ -34,7 +34,8 @@ function [allStrings_diff, string_common] = extractCommonStrings(allStrings, del
         
         if ~isempty(strExclude)
             n = min(cellfun(@length, strExclude));
-            if any(strncmp(string_element, strExclude, n))
+%             if any(strncmp(string_element, strExclude, n))
+            if any(strcmp(string_element, strExclude))
                 continue;
             end
         end

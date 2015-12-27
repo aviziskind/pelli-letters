@@ -1,15 +1,19 @@
-function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, ys, imageSize, blurStd, noiseFilter, textureSettings, nLettersEachImage, targetPosition, set_idx)
+function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, ys, imageSize, blurStd, noiseFilter, textureSettings, crowdingSettings, set_idx)
 
 %     global CPU_id allPCorrNoPool allPCorrPool
 %     allFontNames = {'Braille', 'Sloan', 'Helvetica', 'Georgia', 'Yung', 'Kuenstler'};
 %     allFontNames      = {'Braille', 'Sloan', 'Helvetica', 'Courier', 'Bookman', 'BookmanB', 'BookmanU', 'Georgia', 'Yung', 'Kuenstler'};
     % pelli complexity:    28,            65         67          100,       107         57          139                        199       451  
-
     
     
-    global host
-    showAnyFigures = strcmp(host, 'XPS'); 
-
+%     global host
+    global ID
+    if isempty(ID)
+        startup;
+    end
+    showAnyFigures = onLaptop; 
+    lock_removeMyLocks
+    
     applyFourierMaskGainFactor_band = 1;
     applyFourierMaskGainFactor_pink = 1;
     applyFourierMaskGainFactor_hiLo = 0;
@@ -32,20 +36,54 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 
     precision = 'single'; precision_func = @single;
 
-    expName = 'ChannelTuning';
-%     expName = 'Complexity';
-%     expName = 'Grouping';
-%     expName = 'TestConvNet';
 
-    doOverFeat          = 0 && 1;
-    doTextureStatistics = 1 && 1;
+%     expName = 'ChannelTuning';
+%     expName = 'Complexity';
+    expName = 'Grouping';
+%     expName = 'TestConvNet';
+%     expName = 'Uncertainty';
+%     expName = 'Crowding';
+
+    if nargin == 1
+        expName = fontName;
+    end
+
+%     allExpNames = {'ChannelTuning', 'Complexity', 'Uncertainty', 'Grouping'};
+    allExpNames = {'Complexity', 'Uncertainty', 'Grouping'};
+    if strcmp(expName, 'all')
+        expName = allExpNames;
+    end
     
+    if iscellstr(expName)
+        for i = 1:length(expName)
+            createNoisyLettersDatafile(expName{i});
+        end
+        return;
+    end
+    
+    
+    doOverFeat          = 0 && 1;
+    doTextureStatistics = 0 && 1;
+
+    
+    loopKeysOrder = {};
 
     redoFilesIfExist = 0;
-        redoFilesIfOlderThan = 735865.504580; %735768.686739; %735767.913364; % sprintf('%.6f', now)
+%         redoFilesIfOlderThan = 736210.540042; % 9/3/2015 %735768.686739; %735767.913364; % sprintf('%.6f', now)
+%         redoFilesIfOlderThan = 736252.049851; % 9/3/2015 %735768.686739; %735767.913364; % sprintf('%.6f', now)
+%         redoFilesIfOlderThan = 736275.929786; % 11/7/2015     
+        redoFilesIfOlderThan = 736288.165278; % 11/20/2015 
+        
+        
+        redoFilesIfOlderThan = 736291.993269; % 11/23/2015 
+        
+        
+        
+    if doTextureStatistics
+%         redoFilesIfOlderThan = 736252.422052;
+    end
         
         checkContentsOfFile = 0;
-        redoIdealObserver = 0;
     
 %     fontSizeStyle = 'dflt';     marginPixels = 1;
 %     fontSizeStyle = 'sml';   ch
@@ -55,6 +93,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     showLetters = 0             && showAnyFigures;        
     showSamplesWithNoise = 1    && showAnyFigures;
 
+    
     %%%%%%%%%% FONTS %%%%%%%%%%%%%%%%
 
 %     allFontNames      = {'KuenstlerU', 'Bookman', 'Braille', 'Sloan', 'Helvetica', 'Courier', 'Yung', };
@@ -67,11 +106,22 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %     allFontNames      = {'Bookman', 'Courier', 'Helvetica'};
 %     allFontNames      = {'Sloan'};
 %     allFontNames      = {'KuenstlerU'};
-
+    allowLettersToFallOffImage = strcmp(expName, 'Crowding');
+    
+    
+    
+% (16)
+% add: BookmanB, BookmanU, Hebrew, Devanagari, Armenian, 4x Checkers, Courier, (7)  
+% have: 2x3 Check, Helvetica,  Sloan, Bookman, Kustler, Yung (6)
+% skip: Arabic, 3letter, 5-letter (3)
+    
     switch expName
         case 'Complexity',
 %             allFontNames      = {'Bookman', 'BookmanU', 'Sloan', 'Helvetica', 'Courier', 'KuenstlerU', 'Braille', 'Yung'};              
-            allFontNames      = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'};
+
+%             allFontNames      = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'};
+            allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Devanagari', 'Checkers4x4', 'Courier'};
+%             allFontNames      = {'Braille', 'BookmanB', 'Courier', 'KuenstlerU'};
 %             allFontNames      = {'Bookman', 'KuenstlerU'};
 %             allFontNames      = {'Bookman', 'Courier'};   
             if ~doTextureStatistics 
@@ -88,7 +138,13 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             
         case 'TestConvNet',
             allFontNames = {'Bookman'};
+
+        case 'Uncertainty',
+            allFontNames      = {'Bookman'};
             
+        case 'Crowding', 
+            allFontNames      = {'Bookman', 'Sloan'};
+
     end
 %     allFontNames      = {'Bookman', 'BookmanU', 'Courier'};
 %     allFontNames      = {'KuenstlerU'};
@@ -98,21 +154,17 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 
 
 
-
-
     switch expName
         case 'Complexity',
             all_SNRs = [0 : 0.5 : 5 ];
             
 %             all_SNRs = [1, 2, 3, 4];
             if onLaptop
-                all_SNRs = all_SNRs(1) : 1 : all_SNRs(end);
+                all_SNRs = all_SNRs(1) : .5 : all_SNRs(end);
             end
 
         case 'ChannelTuning',
             
-
-
             if onLaptop
                 dSNR = 1;
             else
@@ -127,17 +179,26 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         %     all_SNRs = [-3, -2, -1, 0, 1, 2, 3, 4, 5];
         %     all_SNRs = [4];
 %             all_SNRs = [-1, 0, 1, 2, 3, 4, 5, 6];
+            all_SNRs = all_SNRs_norm;
         case 'Grouping',
             all_SNRs = [-1 : 0.5 : 5];
 %             all_SNRs = [0 : 0.5 : 5];
             
-            if onLaptop
+            if onLaptop && 0
 %                 all_SNRs = all_SNRs(1) : 1 : all_SNRs(end);
                 all_SNRs = [0, 1, 2, 3, 3.5, 4, 5];
+                all_SNRs = [0 : 0.5 : 5];
+                all_SNRs = [0];
             end
         case 'TestConvNet',
             all_SNRs = [0 : 1 : 5];
 %             all_SNRs = [4];
+
+        case 'Uncertainty',
+            all_SNRs = [0 : 0.5 : 5 ];
+
+        case 'Crowding',
+            all_SNRs = [0 : 0.5 : 5 ];
     end
               
 
@@ -146,52 +207,14 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     
     %% span, spacing, nLetters
     
-    if (nargin < 1) || strcmp(fontName, 'all')
-        
-        
-         if strcmp(expName, 'Grouping')
-             
-      
-%             oriXYSet_21x21y21o = struct('oris', [-20:2:20], 'xs', [0:2:40], 'ys', [0:2:40]); % for 128x128
-            
-            
-%             allUncertaintySets = { oriXYSet_10x10y21o, oriXYSet_10x10y11o, oriXYSet_1pos };
-%             allUncertaintySets = { oriXYSet_10x10y21o };
+    if (nargin < 2) || strcmp(fontName, 'all')
 
-%             allUncertaintySets = {  oriXYSet_19x19y21o, oriXYSet_10x10y21o  };
-%             
-%             allUncertaintySets = { oriXYSet_1pos };
 
-%             NoiseFilters = [whiteNoiseFilter];
-     
-            %%
-            no_wiggle = [1];
-            ori_wiggles = [5:5:90];
-            offset_wiggles = [5:5:60];
-            phase_wiggles = [1];
-            doNoWiggles = false;
-            doOriWiggles = true;
-            doOffsetWiggles = true;
-            doPhaseWiggles = true;
-            if ~doNoWiggles, no_wiggle = []; end
-            if ~doOriWiggles, ori_wiggles = []; end
-            if ~doOffsetWiggles, offset_wiggles = []; end
-            if ~doPhaseWiggles, phase_wiggles = []; end
-                
-            
-            allWiggleSettings = [{struct('none', no_wiggle)}, ...
-                                 num2cell( struct('orientation', num2cell(ori_wiggles))    ), ...
-                                 num2cell( struct('offset',      num2cell(offset_wiggles)) ), ...
-                                 num2cell( struct('phase',       num2cell(phase_wiggles))  ) ];
-            
-            allFontNames  = cellfun(@(w) struct('fonts', {'Snakes'}, 'wiggles', w), allWiggleSettings);
-            allFontNames = num2cell(allFontNames);
-            
-%             allFontNames = {'Snakes'};
-%             allFontNames = {'SloanO2'};
+         lock_removeMyLocks;
 
-            
-        end
+         fprintf(' ==== Creating Noisy Letters datafiles for "%s" experiment... ==== \n', expName);
+
+         
         
 %         allFontNames      = {'Bookman'};
         allXrange = {[0]};
@@ -309,12 +332,31 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         
         oriXYSet_2x_d4 = struct('oris', [0], 'xs', [0, 4], 'ys', [0] );  % for complexity
         oriXYSet_2x2y_d4 = struct('oris', [0], 'xs', [0, 4], 'ys', [0, 4] );  % for complexity
+        
         oriXYSet_2x4y_d4 = struct('oris', [0], 'xs', [0, 4], 'ys', [0, 4, 8, 12] );  % for complexity
+        oriXYSet_2x4y_d2 = struct('oris', [0], 'xs', [0, 2], 'ys', [0, 2, 4, 6] );  % for complexity
+        oriXYSet_2x4y_d1 = struct('oris', [0], 'xs', [0, 1], 'ys', [0, 1, 2, 3] );  % for complexity
+        oriXYSet_3x7y_d2 = struct('oris', [0], 'xs', [0:2:4], 'ys', [0 : 2 : 12] );  % for complexity
+        oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [0:1:4], 'ys', [0 : 1 : 12] );  % for complexity
+
+        oriXYSet_21o_d2 = struct('oris', [-20:2:20], 'xs', [0], 'ys', [0] );  % for complexity
+        oriXYSet_21o_d2_2x4y_d4 = struct('oris', [-20:2:20], 'xs', [0, 4], 'ys', [0, 4, 8, 12] );  % for complexity
+        oriXYSet_21o_d2_2x4y_d2 = struct('oris', [-20:2:20], 'xs', [0, 2], 'ys', [0, 2, 4, 6] );  % for complexity
+        oriXYSet_21o_d2_3x7y_d2 = struct('oris', [-20:2:20], 'xs', [0:2:4], 'ys', [0 : 2 : 12] );  % for complexity
+        oriXYSet_21o_d2_5x13y_d1 = struct('oris', [-20:2:20], 'xs', [0:1:4], 'ys', [0 : 1 : 12] );  % for complexity
+        
+        allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, ...
+                        oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
+%         oriXYSet_7o_d5 = struct('oris', [-20:2:20], 'xs', [0], 'ys', [0] );  % for complexity
+%         oriXYSet_7o_d5_2x4y_d4 = struct('oris', [-20:2:20], 'xs', [0, 4], 'ys', [0, 4, 8, 12] );  % for complexity
+%         oriXYSet_7o_d5_2x4y_d2 = struct('oris', [-20:2:20], 'xs', [0, 2], 'ys', [0, 2, 4, 6] );  % for complexity
+%         oriXYSet_7o_d5_3x7y_d2 = struct('oris', [-20:2:20], 'xs', [0:2:4], 'ys', [0 : 2 : 12] );  % for complexity
+%         oriXYSet_7o_d5_5x13y_d1 = struct('oris', [-20:2:20], 'xs', [0:1:4], 'ys', [0 : 1 : 12] );  % for complexity
+        
         
         oriXYSet_3o_d5 = struct('oris', [-5,0,5], 'xs', [0], 'ys', [0] );  % for complexity
         oriXYSet_7o_d5 = struct('oris', [-15:5:15], 'xs', [0], 'ys', [0] );  % for complexity
         oriXYSet_11o_d4 = struct('oris', [-20:4:20], 'xs', [0], 'ys', [0] );  % for complexity
-        oriXYSet_21o_d2 = struct('oris', [-20:2:20], 'xs', [0], 'ys', [0] );  % for complexity
         
         oriXYSet_13o_d5 = struct('oris', [-30:5:30], 'xs', [0], 'ys', [0] );  % for complexity        
         oriXYSet_19o_d5 = struct('oris', [-45:5:45], 'xs', [0], 'ys', [0] );  % for complexity
@@ -322,7 +364,40 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         oriXYSet_37o_d5 = struct('oris', [-90:5:90], 'xs', [0], 'ys', [0] );  % for complexity
         
         
-        3;
+
+ 
+        
+        oriXYSet_7x18y_d1_3o_d5 = struct('oris', [-5 : 5 : 5], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18*3    = 126
+        oriXYSet_7x18y_d1_7o_d5 = struct('oris', [-15 : 5 : 15], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18*3    = 126
+        oriXYSet_7x18y_d1_11o_d3 = struct('oris', [-15 : 3 : 15], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18*3    = 126
+%         oriXYSet_7x18y_d1_11o_d4 = struct('oris', [-20 : 4 : 20], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18*3    = 126
+
+        
+       oriXYSet_2x2y_d1 = struct('oris', [0], 'xs', [0 : 1 ], 'ys', [0 : 1 ] );  % for channels 2*2 = 4
+       oriXYSet_3x3y_d1 = struct('oris', [0], 'xs', [0 : 2 ], 'ys', [0 : 2 ] );  % for channels 3*3 = 9
+       oriXYSet_4x4y_d1 = struct('oris', [0], 'xs', [0 : 3 ], 'ys', [0 : 3 ] );  % for channels 4*4 = 16
+       oriXYSet_5x6y_d1 = struct('oris', [0], 'xs', [0 : 4 ], 'ys', [0 : 5 ] );  % for channels 5*6 = 32
+       oriXYSet_8x8y_d1 = struct('oris', [0], 'xs', [0 : 7 ], 'ys', [0 : 7 ] );  % for channels 8*8 = 64
+       oriXYSet_13x11y_d1 = struct('oris', [0], 'xs', [0 : 1 : 12], 'ys', [0 : 1 : 10] );  % for channels 13*11 = 143
+         
+
+       oriXYSet_4x4y_d1 = struct('oris', [0], 'xs', [0 : 3 ], 'ys', [0 : 3 ] );  % for channels 4*4 = 16
+       oriXYSet_4x4y_d1_3o_d5 = struct('oris', [-5:5:5], 'xs', [0 : 3 ], 'ys', [0 : 3 ] );  % for channels 4*4 = 16
+       oriXYSet_4x4y_d1_7o_d5 = struct('oris', [-15:5:15], 'xs', [0 : 3 ], 'ys', [0 : 3 ] );  % for channels 4*4 = 16
+       oriXYSet_4x4y_d1_11o_d1 = struct('oris', [-5:1:5], 'xs', [0 : 3 ], 'ys', [0 : 3 ] );  % for channels 4*4 = 16
+       
+%        oriXYSet_5x6y_d1 = struct('oris', [0], 'xs', [0 : 4 ], 'ys', [0 : 5 ] );  % for channels 5*6 = 32
+       
+               oriXYSet_3x1y_d1 = struct('oris', [0], 'xs', [1 : 3], 'ys', [0] );   % for uncertainty
+               oriXYSet_5x1y_d1 = struct('oris', [0], 'xs', [1 : 5], 'ys', [0] );  
+               oriXYSet_15x1y_d1 = struct('oris', [0], 'xs', [1 : 15], 'ys', [0] );  
+               oriXYSet_30x1y_d1 = struct('oris', [0], 'xs', [1 : 30], 'ys', [0] );  
+               oriXYSet_15x2y_d1 = struct('oris', [0], 'xs', [1 : 15], 'ys', [1:2] ); 
+               oriXYSet_3x5y_d1 = struct('oris', [0], 'xs', [1:3], 'ys', [1:5] );  
+               oriXYSet_5x3y_d1 = struct('oris', [0], 'xs', [1 : 5], 'ys', [1:3] );  
+               oriXYSet_2x15y_d1 = struct('oris', [0], 'xs', [1 : 2], 'ys', [1:15] ); 
+               oriXYSet_1x30y_d1 = struct('oris', [0], 'xs', [1], 'ys', [1:30] );  
+       3;
         %%
                
                                                    
@@ -454,7 +529,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %         allF_exps = {[1, 0], [1.5, 0], [1.7, 0], [2 0]};
 %         allF_exps_pink = {[1, 0], [1.7, 0],  [1.6, 0]};
         allF_exps_pink_1_2 = {[1.0, 0], [1.2, 0], [1.4, 0], [1.6, 0], [1.8, 0], [2.0, 0]};
-        allF_exps_pink = {[1.0, 0], [1.6, 0]};
+%         allF_exps_pink = {[1.0, 0], [1.6, 0]};
+        allF_exps_pink = {[1.0, 0], [1.6, 0], [2.0, 0]};
         allF_exps_pink_wide = {[1.0, 0.3], [1.0, 0.2],   [1.0, 0.0], ...
                                [1.6, 0.3], [1.6, 0.2],   [1.6, 0.0], ...
                                [2.0, 0.3], [2.0, 0.2],   [2.0, 0.0]};
@@ -487,18 +563,31 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 
 %         NoiseFilters = [whiteNoiseFilter];
         NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter];
+
+
+                
+%         all_trainPositions = {'all'};
+%         all_testPositions = {'all'};
+%         allNDistractors = [0];
+%         allLogDNRs = [0];
+        allCrowdingSettings = { [] };
+
+%         allXranges = {[]};  allTrainPositions = {[]}; allTestPositions = {[]}; % = binarySearch(15:4:87, [15, 39, 51])  
+%         allNDistractors = [0];
         
 %         NoiseFilters = allBandNoiseFilters;
 %         NoiseFilters = allHighPassNoiseFilters;
         switch expName
             case 'ChannelTuning'
 %                 if applyFourierMaskGainFactor
-%                 NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter, allBandNoiseFilters, allLowPassNoiseFilters, allHighPassNoiseFilters];
+%                  NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter, allBandNoiseFilters, allLowPassNoiseFilters, allHighPassNoiseFilters];
 %                 NoiseFilters = [allPinkOrWhiteNoiseFilters, allPinkPlusWhiteNoiseFilters, whiteNoiseFilter, allPinkNoiseFilters ];
 
 %                 NoiseFilters = allPinkWideNoiseFilters;
-                NoiseFilters = [allBandNoiseFilters, whiteNoiseFilter, allPinkNoiseFilters_1_2];
-%                    NoiseFilters = allPinkPlusWhiteNoiseFilters;
+%                 NoiseFilters = [allBandNoiseFilters, whiteNoiseFilter, allPinkNoiseFilters_1_2];
+%                 NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter, allBandNoiseFilters];
+                NoiseFilters = [whiteNoiseFilter, allBandNoiseFilters];
+% %                    NoiseFilters = allPinkPlusWhiteNoiseFilters;
 %                    NoiseFilters = [allPinkNoiseFilters(1), whiteNoiseFilter];
 %                 NoiseFilters = [allPinkNoiseFilters_1_2, whiteNoiseFilter]; 
                 
@@ -516,18 +605,33 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 allSizeStyle_imageSizes = {  {'k15', [30, 30]}  };
 %                 allSizeStyle_imageSizes = {  {'k15', [45, 45]}  };
 %                 allSizeStyle_imageSizes = {  {'k30', [45, 45]}  };
-                allSizeStyle_imageSizes = {  {'k30', [64, 64]}  };
+%                 allSizeStyle_imageSizes = {  {'k30', [64, 64]}  };
+                allSizeStyle_imageSizes = {  {'k36', [64, 64]}  };
          
 %                 allUncertaintySets = {oriXYSet_4x4y7o, oriXYSet_6x6y11o,  oriXYSet_6x5y21o, oriXYSet_1pos};
-                allUncertaintySets = {oriXYSet_1pos, oriXYSet_3o_d5};
+%                 allUncertaintySets = {oriXYSet_1pos, oriXYSet_3o_d5};
+                
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, ...
+%                         oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
+
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x2y_d1,    oriXYSet_3x3y_d1, oriXYSet_4x4y_d1, oriXYSet_5x6y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
+
+                    if doTextureStatistics
+                        allUncertaintySets = { oriXYSet_1pos };
+                    end
+                    
+
+                
 %                 allUncertaintySets = {oriXYSet_2x2y3o, oriXYSet_4x4y7o, oriXYSet_1pos};
                                 
-            case 'Crowding',
-                NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter];
+                  loopKeysOrder = {'noiseFilter'};   % { 'textureSettings', 'OriXY',  'fontName',  ,} 
+           
             
             case 'Complexity',     
 %                 allSizeStyle_imageSizes = {  {'k30', [64, 64]}  };
-                allSizeStyle_imageSizes = {  {'k15', [56, 56]}  };
+%                 allSizeStyle_imageSizes = {  {'k15', [56, 56]}  };
+                allSizeStyle_imageSizes = {  {'k15', [64, 64]}, {'k24', [64, 64]} };
 %                 allSizeStyle_imageSizes = {  {'k30', [80, 80]}  };
 %                 NoiseFilters = [whiteNoiseFilter, allPinkNoiseFilters];
 %                 NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter];
@@ -544,7 +648,41 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 
 %                 allUncertaintySets = { oriXYSet_2x_d4, oriXYSet_2x2y_d4, oriXYSet_2x4y_d4, oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, oriXYSet_1pos};
                 
-                allUncertaintySets = { oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5, oriXYSet_1pos};
+%                 allUncertaintySets = { oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5, oriXYSet_1pos};
+                
+                
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5, oriXYSet_1pos};
+                             
+        
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, ...
+%                         oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
+
+%                 oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [0 : 1 : 4], 'ys', [0 : 1 : 12] );  % for complexity  5*13   = 65
+%                 oriXYSet_7x18y_d1 = struct('oris', [0], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18    = 126
+%                 oriXYSet_10x26y_d1 = struct('oris', [0], 'xs', [0 : 1 : 9], 'ys', [0 : 1 : 25] );  % for complexity 10*26  = 260
+%                 oriXYSet_14x37y_d1 = struct('oris', [0], 'xs', [0 : 1 : 13], 'ys', [0 : 1 : 36] );  % for complexity 14*37  = 518
+%                 oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
+                
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1};
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3};
+
+                allSizeStyle_imageSizes = {  {'k15', [64, 64]}  };
+%                 allUncertaintySets = { oriXYSet_1pos };
+
+                oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65                
+                oriXYSet_5x13y_d1_3ori_d5 = struct('oris', [-5:5:5], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65
+                oriXYSet_5x13y_d1_3ori_d10 = struct('oris', [-10:10:10], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65
+                oriXYSet_5x13y_d1_3ori_d15 = struct('oris', [-15:15:15], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65
+                oriXYSet_5x13y_d1_3ori_d30 = struct('oris', [-30:30:30], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65
+                
+                allUncertaintySets = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_5x13y_d1_3ori_d5, oriXYSet_5x13y_d1_3ori_d10, oriXYSet_5x13y_d1_3ori_d15, oriXYSet_5x13y_d1_3ori_d30};
+
+                
+                oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65                
+                oriXYSet_6x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 6], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65                
+                oriXYSet_5x14y_d1 = struct('oris', [0], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 14] );  % for complexity  5*13   = 65                
+                
+                allUncertaintySets = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_6x13y_d1, oriXYSet_5x14y_d1};
                 
                  if doTextureStatistics
 %                      allUncertaintySets = { oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, oriXYSet_1pos};
@@ -552,47 +690,271 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                        allSizeStyle_imageSizes = {  {'k15', [64, 64]}  };
                  end
 
-%                 
-            case 'Grouping',
+                 loopKeysOrder = {'fontName'}; 
+            case 'Grouping', 
 %                 NoiseFilters = [whiteNoiseFilter, allPinkNoiseFilters];
                 NoiseFilters = [whiteNoiseFilter];
+            
                 
 %                 allSizeStyle_imageSizes = { {'k48', [96, 96]} };
-                allSizeStyle_imageSizes = { {'k32', [64, 64]} };
 %                 allSizeStyle_imageSizes = { {'k32', [64, 64]} };
+                allSizeStyle_imageSizes = { {'k32', [80, 80]} };
+%                 allSizeStyle_imageSizes = { {'k27', [64, 64]} };
+%                 allSizeStyle_imageSizes = { {'k48', [64, 64]} };
 %                 allSizeStyle_imageSizes = { {'k32', [40, 40]} };
+%                 allSizeStyle_imageSizes = { {'k32', [96, 96]} };
                 
 %                 allUncertaintySets = { oriXYSet_30x30y21o  };
 %                 allUncertaintySets = {  oriXYSet_10x10y21o };
                 if doTextureStatistics
-                    allUncertaintySets = {  oriXYSet_1x1y21o }; % for texture
+                    allUncertaintySets = {oriXYSet_1pos,  oriXYSet_3o_d5, oriXYSet_13o_d5, oriXYSet_21o_d2,   oriXYSet_25o_d5 }; % for texture
                 else
 %                     allUncertaintySets = {  oriXYSet_10x10y21o,  oriXYSet_5x5y11o, oriXYSet_1pos };
                     
-                    allUncertaintySets = {oriXYSet_5x5y11o_d2, oriXYSet_41o, oriXYSet_7x7y};
-                    
+%                     allUncertaintySets = {oriXYSet_5x5y11o_d2, oriXYSet_41o, oriXYSet_7x7y};
+            
+                   oriXYSet_2x2y_d1 = struct('oris', [0], 'xs', [0 : 1 ], 'ys', [0 : 1 ] );  % for complexity 2*2 = 4
+                   oriXYSet_4x4y_d1 = struct('oris', [0], 'xs', [0 : 3 ], 'ys', [0 : 3 ] );  % for complexity 4*4 = 16
+                   oriXYSet_8x8y_d1 = struct('oris', [0], 'xs', [0 : 7 ], 'ys', [0 : 7 ] );  % for complexity 8*8 = 64
+                   oriXYSet_16x16y_d1 = struct('oris', [0], 'xs', [0 : 15 ], 'ys', [0 : 15 ] );  % for complexity 16*16 = 256
+                   
+                   
+                   
+                   
+                   %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x2y_d1,    oriXYSet_4x4y_d1, oriXYSet_8x8y_d1, oriXYSet_16x16y_d1, oriXYSet_22x22y_d1};
+
+
+                   oriXYSet_15x15y_d1 = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 15 ] );  % for complexity 15*15 = 225
+                   oriXYSet_7x7y_d2 = struct('oris', [0], 'xs', [1 : 2: 15 ], 'ys', [1 : 2 : 15 ] );  % for complexity 7*7 = 49
+
+                   oriXYSet_21x21y_d1 = struct('oris', [0], 'xs', [1 :    21 ], 'ys', [1 : 21 ] );  % for complexity 21*21 = 225
+                   oriXYSet_10x10y_d2 = struct('oris', [0], 'xs', [1 : 2: 21 ], 'ys', [1 : 2 : 21 ] );  % for complexity 15*15 = 225
+
+                   oriXYSet_11o_15x15y_d1 = struct('oris', [-10:2:10], 'xs', [1 : 1: 15 ], 'ys', [1 : 15 ] );  % for complexity 15*15 = 225
+                   oriXYSet_11o_7x7y_d2   = struct('oris', [-10:2:10], 'xs', [1 : 2: 15 ], 'ys', [1 : 2 : 15 ] );  % for complexity 15*15 = 225
+
+                   oriXYSet_11o_21x21y_d1 = struct('oris', [-10:2:10], 'xs', [1 : 1:  21 ], 'ys', [1 : 21 ] );     % for complexity 15*15 = 225
+                   oriXYSet_11o_10x10y_d2 = struct('oris', [-10:2:10], 'xs', [1 : 2: 21 ], 'ys', [1 : 2 : 21 ] );  % for complexity 15*15 = 225
+
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x15y_d1,    oriXYSet_7x7y_d2, oriXYSet_21x21y_d1, oriXYSet_10x10y_d2, ...
+                       oriXYSet_11o_15x15y_d1, oriXYSet_11o_7x7y_d2,  oriXYSet_11o_21x21y_d1, oriXYSet_11o_10x10y_d2 };
+
+
+                   
+                   oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+                   oriXYSet_15x19y_d1_3o_d5       = struct('oris', [-5:5:5], 'xs', [1 : 15 ], 'ys', [1 : 19 ] ); 
+                   oriXYSet_15x19y_d1_7o_d5       = struct('oris', [-15:5:15], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+                   oriXYSet_15x19y_d1_21o_d2       = struct('oris', [-20:2:20], 'xs', [1 : 15 ], 'ys', [1 : 19 ] ); 
+                   oriXYSet_15x19y_d1_11o_d1       = struct('oris', [-5:1:5], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+                   oriXYSet_15x19y_d1_31o_d1       = struct('oris', [-15:1:15], 'xs', [1 : 15 ], 'ys', [1 : 19 ] ); 
+
+                   
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
+%                                            oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
+                                           oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
                     
 %                     allUncertaintySets = {  oriXYSet_1pos  };
         
-                
+                   oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+                   oriXYSet_22x26y_d1             = struct('oris', [0], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
+                   oriXYSet_22x26y_d1_21o_d1      = struct('oris', [-10:1:10], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
+                   oriXYSet_22x26y_d1_41o_d1      = struct('oris', [-20:1:20], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
+                   
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_22x26y_d1_21o_d1, ...
+                                           oriXYSet_22x26y_d1_41o_d1};
+
+                                       
+                                       
+                   oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+                   oriXYSet_22x26y_d1             = struct('oris', [0], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
+                   oriXYSet_31x36y_d1             = struct('oris', [0], 'xs', [1 : 31 ], 'ys', [1 : 36 ] ); 
+                   oriXYSet_45x47y_d1             = struct('oris', [0], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
+                   oriXYSet_45x47y_d1_21o_d1      = struct('oris', [-10:1:10], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
+                   oriXYSet_45x47y_d1_41o_d1      = struct('oris', [-20:1:20], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
+                   
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_31x36y_d1, ...
+                                           oriXYSet_45x47y_d1, oriXYSet_45x47y_d1_21o_d1, oriXYSet_45x47y_d1_41o_d1};
+
+                    allUncertaintySets = { oriXYSet_1pos };
+
+                     oriXYSet_2x_d1 = struct('oris', [0], 'xs', [0 : 1 : 1], 'ys', [0] );  
+                     oriXYSet_2x_d2 = struct('oris', [0], 'xs', [0 : 2 : 2], 'ys', [0] );  
+                     oriXYSet_2x_d3 = struct('oris', [0], 'xs', [0 : 3 : 3], 'ys', [0] );  
+                     oriXYSet_2x_d4 = struct('oris', [0], 'xs', [0 : 4 : 4], 'ys', [0] );  
+                     oriXYSet_2x_d6 = struct('oris', [0], 'xs', [0 : 6 : 6], 'ys', [0] );  
+                     oriXYSet_2x_d8 = struct('oris', [0], 'xs', [0 : 8 : 8], 'ys', [0] );  
+                     oriXYSet_2x_d16= struct('oris', [0], 'xs', [0 : 16 : 16], 'ys', [0] );  
+
+                     allUncertaintySets = {oriXYSet_2x_d1, oriXYSet_2x_d2, oriXYSet_2x_d3, oriXYSet_2x_d4, oriXYSet_2x_d6, oriXYSet_2x_d8, oriXYSet_2x_d16};
+                    
+                     oriXYSet_24x24y_d1             = struct('oris', [0], 'xs', [1 : 24], 'ys', [1 : 24]);
+                     oriXYSet_26x26y_d1             = struct('oris', [0], 'xs', [1 : 26], 'ys', [1 : 26]);
+                     oriXYSet_28x28y_d1             = struct('oris', [0], 'xs', [1 : 28], 'ys', [1 : 28]);
+
+                     oriXYSet_12x12y_d2             = struct('oris', [0], 'xs', [1 : 2 : 24], 'ys', [1 : 2 : 24]);
+                     oriXYSet_6x6y_d4               = struct('oris', [0], 'xs', [1 : 4 : 24], 'ys', [1 : 4 : 24]);
+                     oriXYSet_4x4y_d6               = struct('oris', [0], 'xs', [1 : 6 : 24], 'ys', [1 : 6 : 24]);
+
+                     allUncertaintySets = {oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, oriXYSet_12x12y_d2, oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
+
+%                      allUncertaintySets = {oriXYSet_26x26y_d1};
+      
+                   oriXYSet_38x38y_d1             = struct('oris', [0], 'xs', [1 : 38 ], 'ys', [1 : 38 ] ); 
+                   oriXYSet_39x39y_d1             = struct('oris', [0], 'xs', [1 : 39 ], 'ys', [1 : 39 ] ); 
+                   oriXYSet_40x40y_d1             = struct('oris', [0], 'xs', [1 : 40 ], 'ys', [1 : 40 ] ); 
+                   oriXYSet_41x41y_d1             = struct('oris', [0], 'xs', [1 : 41 ], 'ys', [1 : 41 ] ); 
+                   oriXYSet_42x42y_d1             = struct('oris', [0], 'xs', [1 : 42 ], 'ys', [1 : 42 ] ); 
+                   oriXYSet_43x43y_d1             = struct('oris', [0], 'xs', [1 : 43 ], 'ys', [1 : 43 ] ); 
+                   
+                    allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_42x42y_d1};
+                    
+                    allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, ...
+                        oriXYSet_39x39y_d1, oriXYSet_41x41y_d1, oriXYSet_43x43y_d1};
+                                         
                 end
                 
+                loopKeysOrder = {'fontName'}; 
+                
+            case 'Uncertainty',
+                allFontNames = {'Bookman', 'Sloan'};
+                
+%                 allSizeStyle_imageSizes = {  {'k15', [64, 64]} };
+                 allSizeStyle_imageSizes = {  {'k15', [32, 160]} };
+               NoiseFilters = [whiteNoiseFilter];
+               
+               oriXYSet_3x1y_d1 = struct('oris', [0], 'xs', [1 : 3], 'ys', [0] );  
+               oriXYSet_5x1y_d1 = struct('oris', [0], 'xs', [1 : 5], 'ys', [0] );  
+               oriXYSet_15x1y_d1 = struct('oris', [0], 'xs', [1 : 15], 'ys', [0] );  
+               oriXYSet_30x1y_d1 = struct('oris', [0], 'xs', [1 : 30], 'ys', [0] );  
+               oriXYSet_15x2y_d1 = struct('oris', [0], 'xs', [1 : 15], 'ys', [1:2] ); 
+               oriXYSet_3x5y_d1 = struct('oris', [0], 'xs', [1:3], 'ys', [1:5] );  
+               oriXYSet_5x3y_d1 = struct('oris', [0], 'xs', [1 : 5], 'ys', [1:3] );  
+               oriXYSet_2x15y_d1 = struct('oris', [0], 'xs', [1 : 2], 'ys', [1:15] ); 
+               oriXYSet_1x30y_d1 = struct('oris', [0], 'xs', [1], 'ys', [1:30] );  
+               
+%                allUncertaintySets = {oriXYSet_1pos, oriXYSet_3x1y_d1, oriXYSet_5x1y_d1, oriXYSet_15x1y_d1, oriXYSet_30x1y_d1, oriXYSet_15x2y_d1, oriXYSet_3x5y_d1, oriXYSet_5x3y_d1, oriXYSet_2x15y_d1, oriXYSet_1x30y_d1 };
 
+               
+               oriXYSet_3x_d3 = struct('oris', [0], 'xs', [1  : 3 : 3*3], 'ys', [0] );  
+               oriXYSet_7x_d3 = struct('oris', [0], 'xs', [1  : 3 : 7*3], 'ys', [0] );  
+               oriXYSet_15x_d3 = struct('oris', [0], 'xs', [1 : 3 : 15*3], 'ys', [0] );  
+               oriXYSet_20x_d3 = struct('oris', [0], 'xs', [1 : 3 : 20*3], 'ys', [0] );  
+               oriXYSet_30x_d3 = struct('oris', [0], 'xs', [1 : 3 : 30*3], 'ys', [0] );  
+               oriXYSet_45x_d3 = struct('oris', [0], 'xs', [1 : 3 : 45*3], 'ys', [0] );  
+               
+               allUncertaintySets = {oriXYSet_1pos, oriXYSet_3x_d3, oriXYSet_7x_d3, oriXYSet_15x_d3, oriXYSet_20x_d3, oriXYSet_30x_d3, oriXYSet_45x_d3};
+               
+                loopKeysOrder = {'OriXY'}; 
             case 'TestConvNet',
                 NoiseFilters = [whiteNoiseFilter];
                 
+                
+            case 'Crowding',
+%                 NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter];
+                allUncertaintySets = {oriXYSet_1pos};
+                NoiseFilters = [whiteNoiseFilter];
+                
+%                 allSizeStyle_imageSizes = {  {'k16', [32, 160]} };
+                allSizeStyle_imageSizes = {  {'k15', [32, 160]} };
+
+                if doOverFeat
+                    allImageSizes = {[231, 231]};
+                end
+                
+                
+%                 oriXYSet_xrange = struct('oris', [0], 'xs', [-16 : 12 : 176], 'ys', [0] );  
+%                 allTrainPositions = {}; allTestPositions = {9}; % = binarySearch(15:4:87, [15, 39, 51])  
+%                 allXranges = {[-16, 12, 176]};  
+%                 allNDistractors = [2, 1];
+
+                
+                all_xrange_and_trainPositions_and_testPositions = {...
+                    {[-16, 12, 176], [3:15], 9}, ...    (-16 -4) 8 20 32 44 56 68 [[80]] 92 104 116 128 140 152 (164 176)
+                    {[-16, 8, 176],  [3:23], 13} ...      (-16 -8) 0 8 16 24 32 40 48 56 64 72 [80] 88 96 104 112 120 128 136 144 152 160 (168 176)
+                 };
+
+             
+%  {[-16, 8, 176], [3:15], 9} ...   
+%                 all_trainPositions = {[3:15]};
+%                 all_testPositions = {9};
+                allNDistractors = [2, 1];
+                allLogDNRs = [2.5, 2.9]; 
+                
+%                 allCrowdingOpts = (struct('tbl_trainPositions', {all_trainPositions}, ...
+%                                           'tbl_testPositions', {all_testPositions}, ...
+%                                           'xrange', [-16, 12, 176], ...
+%                                           'allNDistractors',   allNDistractors, ...
+%                                           'allLogDNRs',        allLogDNRs, ...
+%                                           'absHorizPosition',  true ...
+%                                           ) );
+                allCrowdingOpts = (struct('tbl_xrange_and_trainPositions_and_testPositions', {all_xrange_and_trainPositions_and_testPositions}, ...
+                                          'allNDistractors',   allNDistractors, ...
+                                          'allLogDNRs',        allLogDNRs, ...
+                                          'absHorizPosition',  true ...
+                                          ) );
+                allCrowdingSettings = num2cell(  expandOptionsToList (allCrowdingOpts)  );
+                
+                
+                loopKeysOrder = {'textureSettings'};   % { 'textureSettings', 'OriXY',  'fontName',  ,}       
         end
 
+        
         
 %         NoiseFilters = [allHighPassNoiseFilters, allLowPassNoiseFilters];
 %         NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter, allBandNoiseFilters];
 %         NoiseFilters = [allPinkOrWhiteNoiseFilters];
 %         num2cell( };
-        
-        if doTextureStatistics
+         if strcmp(expName, 'Grouping')
+             
+      
+%             oriXYSet_21x21y21o = struct('oris', [-20:2:20], 'xs', [0:2:40], 'ys', [0:2:40]); % for 128x128
             
-%             allNScales = {3, 4};
-            allNScales = {4};
+            
+%             allUncertaintySets = { oriXYSet_10x10y21o, oriXYSet_10x10y11o, oriXYSet_1pos };
+%             allUncertaintySets = { oriXYSet_10x10y21o };
+
+%             allUncertaintySets = {  oriXYSet_19x19y21o, oriXYSet_10x10y21o  };
+%             
+%             allUncertaintySets = { oriXYSet_1pos };
+
+%             NoiseFilters = [whiteNoiseFilter];
+     
+            %%
+            dWiggle = 15;
+            no_wiggle = [1];
+            ori_wiggles = [dWiggle:dWiggle:90];
+            offset_wiggles = [dWiggle:dWiggle:60];
+            phase_wiggles = [1];
+            doNoWiggles = false;
+            doOriWiggles = true;
+            doOffsetWiggles = false;
+            doPhaseWiggles = false;
+            if ~doNoWiggles, no_wiggle = []; end
+            if ~doOriWiggles, ori_wiggles = []; end
+            if ~doOffsetWiggles, offset_wiggles = []; end
+            if ~doPhaseWiggles, phase_wiggles = []; end
+                
+            
+            allWiggleSettings = [{struct('none', no_wiggle)}, ...
+                                 num2cell( struct('orientation', num2cell(ori_wiggles))    ), ...
+                                 num2cell( struct('offset',      num2cell(offset_wiggles)) ), ...
+                                 num2cell( struct('phase',       num2cell(phase_wiggles))  ) ];
+            
+            allFontNames  = cellfun(@(w) struct('fonts', {'Snakes'}, 'wiggles', w), allWiggleSettings);
+            allFontNames = num2cell(allFontNames);
+            
+%             allFontNames = {'Snakes'};
+%             allFontNames = {'SloanO2'};
+
+            
+         end
+         
+         
+         if doTextureStatistics
+            
+            allNScales = {3};
+%             allNScales = {4, 3};
             allNOrientations = {4}; %3,4};
             allNa = {7}; %5};
             %         allNa_sub = {0,1,3,5,7,9};
@@ -607,7 +969,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                                     'tbl_Na_txt',   {allNa}, ...
                                     'tbl_statsUse', {allTextureStatsUse} ) );
             allTextureSettings = num2cell(  expandOptionsToList (allTextureOpts)  );
-%             allTextureSettings = [{[]}, allTextureSettings];
+            allTextureSettings = [allTextureSettings, {[]}];
             
             %%
         else
@@ -616,11 +978,6 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         end
 
 %         all_nLettersEachImage = {1};
-        all_targetPosition = {'all'};
-        all_nLettersEachImage = {1};
-        
-        
-        
         
         
         if strcmp(expName, 'TestConvNet')
@@ -650,14 +1007,52 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                            'tbl_blurStd', {allBlurStd}, ...
                            'tbl_noiseFilter', {NoiseFilters}, ...
                            'tbl_textureSettings', { allTextureSettings}, ...
-                           'tbl_nLettersEachImage', {all_nLettersEachImage}, ...
-                           'tbl_targetPosition', {all_targetPosition} ...;
+                           ...
+                           ...'tbl_nLettersEachImage', {all_nLettersEachImage}, ...
+                           ...'tbl_targetPosition', {all_targetPosition}, ...;
                            ...'tbl_wiggleSettings', {allWiggleSettings} ...
+                           ...'tbl_xrange', {allXranges}, ...
+                           'tbl_crowdingSettings', { allCrowdingSettings } ...
                         );
                     
-        allSetsToDo = expandOptionsToList( allSetOptions, {'fontName', 'noiseFilter'} );
-        displayOptions(allSetOptions);
+                        
+                    
+%                             allSetsToDo = expandOptionsToList( struct( 'tbl_fontName', {allFontNames}, ... 
+%                                                    'tbl_sizeStyle', {allSizeStyles}, ...
+%                                                    'tbl_imageSize', {allImageSizes}, ...
+%                                                    'tbl_xrange', {allXranges}, ...
+%                                                    'tbl_trainPosition', {allTrainPositions}, ...
+%                                                    'tbl_testPosition', {allTestPositions}, ...
+%                                                    'allNDistractors', allNDistractors, ...    
+%                                                    'allLogDNRs', all_logDNRs, ...
+%                                                    'tbl_blurStd', {allBlurStds}, ...
+%                                                    'tbl_noiseFilter', {NoiseFilters}, ...
+%                                                    'tbl_textureSettings', {allTextureSettings} ...
+% 
+                    
+                    
+                    
+            
+        totalSize_MB = 0;
+        setSize = 10000;
+        nSNRs = 12;
+        allSetsToDo = expandOptionsToList( allSetOptions, loopKeysOrder );
+        for i = 1:length(allSetsToDo)
+            totalSize_MB = totalSize_MB + (nSNRs*prod(allSetsToDo(i).imageSize)*setSize)/(1024^2);    
+        end
         
+        
+        displayOptions(allSetOptions);
+%%
+        fprintf('Uncertainty Sets : \n');
+        for i = 1:length(allUncertaintySets)
+            fprintf(' (%d)  %s\n', i, getOriXYStr(allUncertaintySets{i}));
+        end
+  %%      
+        fprintf('\n=== Total Size for all %d sets (assuming 13 SNR levels, and 10,000 samples in each file) : %.1f MB (%.2f GB) ===\n', length(allSetsToDo), totalSize_MB, totalSize_MB/1024);
+        if onLaptop
+            keyboard
+        end
         3;
         
 
@@ -688,9 +1083,13 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             end
                                
             blur_str = iff(S.blurStd == 0, 'No Blur', sprintf('Blur = %.1f', S.blurStd));
-            nLet_str = sprintf('%d letter(s), target pos = %s', S.nLettersEachImage, num2str(S.targetPosition)); 
-            fprintf('\n\n======== Set %d / %d === %s, %s  %s ===== %s ========= \n', set_i, length(allSetsToDo), abbrevFontStyleNames( S.fontName), getFontSizeStr( S.sizeStyle ), blur_str, nLet_str);
-            createNoisyLettersDatafile(S.fontName, S.sizeStyle, oris_i, xs_i, ys_i, S.imageSize, S.blurStd, S.noiseFilter, S.textureSettings,  S.nLettersEachImage, S.targetPosition, [set_i, length(allSetsToDo)]);
+            Cr = S.crowdingSettings;
+            crowding_str = '';
+            if ~isempty(Cr) 
+                crowding_str = sprintf('%s letter(s), train pos = %s; test pos = %s', num2str(Cr.allNDistractors), num2str(Cr.trainPositions), num2str(Cr.testPositions) ); 
+            end
+            fprintf('\n\n======== %s === Set %d / %d === %s, %s  %s ===== %s ========= \n', expName, set_i, length(allSetsToDo), abbrevFontStyleNames( S.fontName), getFontSizeStr( S.sizeStyle ), blur_str, crowding_str);
+            createNoisyLettersDatafile(S.fontName, S.sizeStyle, oris_i, xs_i, ys_i, S.imageSize, S.blurStd, S.noiseFilter, S.textureSettings,  S.crowdingSettings, [set_i, length(allSetsToDo)]);
         
             3;
         end
@@ -721,6 +1120,26 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         return;
     end
     
+    tryGetLocks = ~onLaptop; % strcmp(host, 'XPS'); % && (doTextureStatistics_now || doOverFeat || true);
+                     
+    if isempty(crowdingSettings)
+          crowdingSettings = struct('xrange', [],  'trainPositions', 'all', 'testPositions', 'all', ...
+                                    'allNDistractors', [0], 'allLogDNRs', [0], 'absHorizPosition', false);
+    end
+    
+    trainPositions = crowdingSettings.trainPositions;
+    testPositions = crowdingSettings.testPositions;
+    allNDistractors = crowdingSettings.allNDistractors;
+    allLogDNRs = crowdingSettings.allLogDNRs;
+    absHorizPosition = crowdingSettings.absHorizPosition;
+    xrange = crowdingSettings.xrange;
+        
+    if ~isempty(xrange)
+        xs = xrange(1) : xrange(2): xrange(3);
+    end
+
+
+                                      
     if strcmp(fontSizeStyle, 'dflt')
         marginPixels = 1;
     else
@@ -739,7 +1158,10 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         end
         
     end
+
     
+    nSNRs = length(all_SNRs);
+
     if viewSampleLettersOnLaptop
         all_SNRs = [3];
     end
@@ -831,6 +1253,18 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     nY = length(ys);
     
     
+    fontWidth = fontData.size(2);
+    halfLetterWidth = ceil(fontWidth / 2);
+    
+    if absHorizPosition && ~allowLettersToFallOffImage
+        assert(xs(1)   > halfLetterWidth );
+        assert(xs(end) <  ceil(fontWidth / 2) );
+    end    
+
+    
+    
+    
+    
     marginPixels = 2;
     if autoImageSize
         [imageHeight, imageWidth] = getBestImageSize(orientations, xs, ys, allFontNames, fontSizeStyle, marginPixels);
@@ -884,8 +1318,14 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 
     
     dataSets_subfolder = stimType;    
+    if strcmp(expName, 'Crowding')
+        datasets_subpath = ['Crowding' filesep];
+    else
+        datasets_subpath = '';
+    end
     
-    noisyLettersPath = [datasetsPath dataSets_subfolder filesep]; % 'sz32x32' filesep];
+    
+    noisyLettersPath = [datasetsPath datasets_subpath  dataSets_subfolder filesep]; % 'sz32x32' filesep];
     noisyLettersPath_thisFont = [noisyLettersPath fontNameStr filesep];
     if ~exist(noisyLettersPath_thisFont, 'dir')
         mkdir(noisyLettersPath_thisFont)
@@ -904,7 +1344,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     nNoiseSamples = 1e5;
 
     if onLaptop
-        setSize = 1000;
+        setSize = 2000;
 %         setSize = 200;
         if doOverFeat 
             setSize = 250;
@@ -929,6 +1369,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             
     end
     
+    crowdingTrainSetFrac = 0.9;
+    
     if strcmp(expName, 'ChannelTuning')
         ns_filter_seed = any(strcmpi(noiseFilter.filterType, {'white', '1/f'}))+1; % have different seed for (1) white/pink noise [train] (2) band/hi/lo pass noise [test]
     else
@@ -942,7 +1384,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         fontName_seed = fontNameStr;
     end
     
-    rand_seed = hashvariable({fontName_seed, fontSizeStyle, (nOris+1), (Dx+1),  (Dy+1), imageSize, blurStd, ns_filter_seed, nLettersEachImage, targetPosition} );
+    rand_seed = hashvariable({fontName_seed, fontSizeStyle, (nOris+1), (Dx+1),  (Dy+1), imageSize, blurStd, ns_filter_seed, crowdingSettings} );
+    
 %     fprintf('[Seed=%.1f]', rand_seed);
     
 
@@ -955,13 +1398,27 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     
     logEstimatedEOverNIdealThreshold=-2.6- -3.60; % We could use a fancier formula from my 2006 paper that takes rho into account. But this is fine for typical fonts.
     OriXY = struct('oris', orientations, 'xs', xs_orig, 'ys', ys_orig);
+    
+    nPositions = length(orientations) * length(xs_orig) * length( ys_orig );
 %     logEOverNs = all_SNRs;
    %%
-    noisy_letter_opts_image = struct('expName', expName, 'stimType', stimType, 'sizeStyle', fontSizeStyle, 'OriXY', OriXY, 'tf_pca', 0, ...
+   crowdingSettings.nDistractors = 0;
+    noisy_letter_opts_image = struct('expName', expName, 'stimType', stimType, 'sizeStyle', fontSizeStyle, 'OriXY', OriXY, 'tf_pca', 0, ... 'nLetters', 1, ...
         'autoImageSize', autoImageSize, 'imageSize', [imageHeight imageWidth], 'blurStd', blurStd, ...
-        'noiseFilter', noiseFilter, 'nLetters', nLettersEachImage, 'targetPosition', targetPosition, 'doOverFeat', doOverFeat, 'overFeatImageFile', doOverFeat, ...
+        'noiseFilter', noiseFilter, 'crowdingSettings', crowdingSettings, 'doOverFeat', doOverFeat, 'overFeatImageFile', doOverFeat, ...
         'doTextureStatistics', doTextureStatistics_now, textureFields{:}); 
     %%
+    
+%      crowdedLetterOpts_1let = struct('expName', 'Crowding',   'stimType', stimType, 'sizeStyle', sizeStyle, 'imageSize', imageSize, ...
+%         'nLetters', 1, 'trainTargetPosition', trainTargetPosition,  'testTargetPosition', testTargetPosition, 'blurStd', blurStd, 'noiseFilter', noiseFilter, ...
+%         'doTextureStatistics', doTextureStatistics, 'Nscl_txt', Nscl_txt, 'Nori_txt', Nori_txt, 'Na_txt', Na_txt, 'textureStatsUse', textureStatsUse, ...
+%         'doOverFeat', doOverFeat); % , 'distSpacing', distractorSpacing
+%     fprintf('\n=========== font = %s. Size = %s.  Opts = %s. =================\n', fontName, sizeStyle, getCrowdedLetterOptsStr(crowdedLetterOpts_1let));
+    
+%     [~, crowdedLettersPath] = getFileName(fontName, 0, crowdedLetterOpts_1let);
+    
+    
+    
     noisy_letter_opts_pca = noisy_letter_opts_image;
     noisy_letter_opts_pca.tf_pca = 1;
         
@@ -971,7 +1428,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     %%
     
     if ~redoFilesIfExist && ~showLetters
-        for i = 1:length(all_SNRs)
+        for i = 1:nSNRs
             fn_i_im  = [noisyLettersPath_thisFont getFileName(fontNameStr, all_SNRs(i), noisy_letter_opts_image) ];
             imageFileExists = exist(fn_i_im, 'file') && ~fileOlderThan(fn_i_im, redoFilesIfOlderThan);
             fn_i_pca = [noisyLettersPath_thisFont getFileName(fontNameStr, all_SNRs(i), noisy_letter_opts_pca) ];
@@ -1003,20 +1460,51 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     end
         
     
-    all_SNRs_toDo_im  = ~all_SNRs_done_im  | redoIdealObserver;
-    all_SNRs_toDo_pca = ~all_SNRs_done_pca | redoIdealObserver;
+    all_SNRs_toDo_im  = ~all_SNRs_done_im;
+    all_SNRs_toDo_pca = ~all_SNRs_done_pca;
 
     all_SNRs_toDo = all_SNRs_toDo_im | all_SNRs_toDo_pca;
     
+    
+    
     if ~any(all_SNRs_toDo)
         fprintf('[Already Completed (in %s)]\n', noisyLettersPath_thisFont);
-        return;
+        if ~strcmp(expName, 'Crowding')
+            return;
+        end
     else
         fprintf('   => SNRs still to do: %s\n', toOrderedList( all_SNRs( all_SNRs_toDo), [], ', ', 100 ) );
+                
+        if tryGetLocks
+            
+            gotLock = false;
+            for snr_i = find( all_SNRs_toDo )
+                logSNR = all_SNRs(snr_i);
+                if nPositions > 1000
+                    logSNR = 0; % lock all of them 
+                end
+                filename_image_base = getFileName(fontNameStr, logSNR, noisy_letter_opts_image);        
+                lock_name = ['create_' filename_image_base];
+
+                [gotLock, otherPID] = lock_createLock(lock_name);
+
+                if gotLock 
+                    fprintf('We got a lock!!\n');
+                    break;
+                end
+
+            end
+            
+            if ~gotLock 
+                fprintf('All files to be created have been locked by other processes....\n')
+                return;
+            end
+            
+        end        
+        
     end
         
     
-    tryGetLocks = ~strcmp(host, 'XPS') && (doTextureStatistics_now || doOverFeat || true);
 %     tryGetLocks = true;
 
     
@@ -1058,22 +1546,24 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %%
     pixPerDeg = 1;
     
-    letter_params = struct('pixPerDeg', pixPerDeg, 'imageHeight', imageHeight, 'imageWidth', imageWidth, 'horizPosition', 'centered', 'vertPosition', 'centered');
+    letter_params = struct('pixPerDeg', pixPerDeg, 'imageHeight', imageHeight, 'imageWidth', imageWidth, ...
+        'horizPosition', 'centered', 'vertPosition', 'centered', 'allowLettersToFallOffImage', allowLettersToFallOffImage);
     signal = generateLetterSignals(allLetters_rotated, xs, ys, orientations, letter_params);
     
     if doTextureStatistics_now
-        [signal, idx_textureStats_use] = addTextureStatisticsToSignal(signal, Nscl_txt, Nori_txt, Na_txt, textureStatsUse);
+%         [signal, idx_textureStats_use] = addTextureStatisticsToSignal(signal, Nscl_txt, Nori_txt, Na_txt, textureStatsUse);
+        [~, idx_textureStats_use] = addTextureStatisticsToSignal(signal(1), Nscl_txt, Nori_txt, Na_txt, textureStatsUse);
     end
     
      
     
     %%
-    allSignalImages= cat(3, signal.image);
     
     %%
     3;
     if 0
         %%
+        allSignalImages= cat(3, signal.image);
         4;
         figure(11); clf;
 %     	subplotGap(1,1,1,1); imagesc(tileImages(allSignalImages, 7, 4, 1, 0.5)); colormap('gray'); axis equal tight; ticksOff; 
@@ -1182,7 +1672,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         fontName_seed = fontNameStr;
     end
     
-    rand_seed = hashvariable({fontName_seed, fontSizeStyle, (nOris+1), (Dx+1),  (Dy+1), imageSize, blurStd, ns_filter_seed, nLettersEachImage, targetPosition} );
+    rand_seed = hashvariable({fontName_seed, fontSizeStyle, (nOris+1), (Dx+1),  (Dy+1), imageSize, blurStd, ns_filter_seed, crowdingSettings} );
 %     fprintf('%.1f', rand_seed);
     rand_seed = randi(10000);
 
@@ -1233,13 +1723,18 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     
 %     all_SNRs = [3];
     nRows = length(all_SNRs);
+    
+    curSetSizeFrac = 1;
+    if strcmp(expName, 'Crowding')
+        curSetSizeFrac = crowdingTrainSetFrac;
+    end
 
     params.logE1 = logE1;
     params.signalContrast = signalContrast;
     params.logEstimatedEOverNIdealThreshold = logEstimatedEOverNIdealThreshold;
     params.background = background;
     params.pixPerDeg = pixPerDeg;
-    params.setSize = setSize;
+    params.setSize = round(setSize * curSetSizeFrac);
     params.noiseSamples = noiseSamples;
     
     params.orientations = orientations;
@@ -1250,8 +1745,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     params.blurStd = blurStd;
 %     params.bandNoise = bandNoise;
     params.noiseFilter = noiseFilter;
-    params.targetPosition = targetPosition;
-    params.nDistractors = nLettersEachImage - 1;
+    params.targetPositions = trainPositions;
+    params.nDistractors = 0;
     params.distractorSpacing = 1;
     params.logTDR = 0;
     params.applyFourierMaskGainFactor = noiseFilter.applyFourierMaskGainFactor;
@@ -1280,7 +1775,9 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         
     end
     
-    sizeOfSignalData_MB = numel(allSignalImages)*4/(1024^2);
+%     allSignalImages= cat(3, signal.image);
+%     sizeOfSignalData_MB = numel(allSignalImages)*4/(1024^2);
+    sizeOfSignalData_MB = numel(signal(1).image)*numel(signal) *4/(1024^2);
     if sizeOfSignalData_MB < 25
         signalData = concatSignalImages(signal, 'single');
     else
@@ -1293,13 +1790,18 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %     computeMiniSets = ~isempty(CPU_id);
     firstTime = 1;
 
-    for cond_i = find( all_SNRs_toDo )
-        logSNR = all_SNRs(cond_i);
+    for snr_i = find( all_SNRs_toDo )
+        logSNR = all_SNRs(snr_i);
         
-        fprintf('\n -------- Now computing set #%d / %d (SNR = %.1f) -------- \n', cond_i, length(all_SNRs_toDo), logSNR);
+        fprintf('\n -------- Now computing set #%d / %d (SNR = %.1f) -------- \n', snr_i, nSNRs, logSNR);
 
+        logSNR_lock = logSNR;
+        if nPositions > 1000
+            logSNR_lock = 0; % lock all of them 
+        end
 
         filename_image_base = getFileName(fontNameStr, logSNR, noisy_letter_opts_image);        
+        filename_image_base_lock = getFileName(fontNameStr, logSNR_lock, noisy_letter_opts_image);        
         filename_image = [noisyLettersPath_thisFont filename_image_base];
         
         
@@ -1310,7 +1812,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         end
          
         
-        lock_name = ['create_' filename_image_base];
+        lock_name = ['create_' filename_image_base_lock];
         if tryGetLocks
             [gotLock, otherPID] = lock_createLock(lock_name);
         else
@@ -1325,7 +1827,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         
         
         
-        if ~all_SNRs_done_im(cond_i)  
+        if ~all_SNRs_done_im(snr_i)  
             params.logSNR = logSNR;
 %             noisySet = generateSetOfNoisyLetters(signal, params);
             noisySet = generateSetOfLetters(signal, params);
@@ -1341,7 +1843,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         3; 
         assert( isequalToPrecision(logSNR, noisySet.logEOverN, 1e-5) );
              
-        if createPcaFiles && all_SNRs_done_pca(cond_i)           
+        if createPcaFiles && all_SNRs_done_pca(snr_i)           
             noisySet = addPCAscoresToSet(noisySet, meanImageVec, coeff);
 
             show = 0 && showAnyFigures;
@@ -1386,14 +1888,16 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %         drawnow;
         3;
         fprintf('Set %d. logSNR %5.2f, logEOverN (logSNR) %5.2f, signalContrast %.2f, noiseContrast %.3f\n', ...
-            cond_i, logSNR, noisySet.logEOverN, noisySet.signalContrast,noisySet.noiseContrast);
+            snr_i, logSNR, noisySet.logEOverN, noisySet.signalContrast,noisySet.noiseContrast);
 
         ideal_fields = {};
         ideal_combinedFields = {};
         ideal_multFields = {};
-        if createImageFiles && all_SNRs_toDo_im(cond_i) && doCalculateIdealPerformance_withFile
+        if createImageFiles && all_SNRs_toDo_im(snr_i) && doCalculateIdealPerformance_withFile
             %%
-            noisySet.targetPosition = targetPosition; noisySet.nLettersEachImage = nLettersEachImage;
+            noisySet.trainPositions    = trainPositions; 
+            noisySet.testPositions     = testPositions; 
+            noisySet.nLettersEachImage = nLettersEachImage;
             [propLetterCorrect_ideal, propEachLetterCorrect_ideal, propOrientationCorrect_ideal, propXYCorrect_ideal] = ...
                 calcIdealPerformanceForNoisySet(noisySet); %#ok<ASGLU,NASGU>
             
@@ -1421,7 +1925,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %             fprintf('On Full Image: correctLetter %.3f, correctOrientation %.3f, correctXY %.3f\n', ...
 %                 noisySet.propLetterCorrect_ideal,noisySet.propOrientationCorrect_ideal,noisySet.propXYCorrect_ideal);
         end
-%         allPCorrNoPool.(fontName)(cond_i) = propLetterCorrect_ideal;
+%         allPCorrNoPool.(fontName)(snr_i) = propLetterCorrect_ideal;
         3;
         
         addIdealOfPooledImages = 0;
@@ -1431,7 +1935,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             for p_i = 1:length(poolSizes)
                 pCorr = calcIdealPerformanceForNoisySet(noisySet, struct('test', 'pooledImage', 'poolSize', poolSizes(p_i)));
                 ss.(['propLetterCorrect_ideal_pool' num2str(poolSizes(p_i))]) = pCorr;
-                allPCorrPool.(fontNameStr)(p_i,cond_i) = pCorr;
+                allPCorrPool.(fontNameStr)(p_i,snr_i) = pCorr;
             end
         
         end
@@ -1439,7 +1943,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     
         
 
-%         if createPcaFiles && all_SNRs_toDo_pca(cond_i)
+%         if createPcaFiles && all_SNRs_toDo_pca(snr_i)
 %             [propLetterCorrect_ideal_PCA, propEachLetterCorrect_ideal_PCA, propOrientationCorrect_ideal_PCA, propXYCorrect_ideal_PCA] = ...
 %                 calcIdealPerformanceForNoisySet(noisySet, struct('test', 'PCA')); %#ok<NASGU,ASGLU>
 %         end
@@ -1521,7 +2025,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             3;
         end
         
-        if createImageFiles && all_SNRs_toDo_im(cond_i) && ~viewSampleLettersOnLaptop
+        if createImageFiles && all_SNRs_toDo_im(snr_i) && ~viewSampleLettersOnLaptop
 %             setToSave.inputMatrix = noisySet.inputMatrix;
 %             setToSave.propLetterCorrect_ideal     = propLetterCorrect_ideal;        
 %             setToSave.propEachLetterCorrect_ideal = propEachLetterCorrect_ideal;        
@@ -1548,8 +2052,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 
 %%
             
-            
-            fprintf('   => Saving Noisy Image data to : %s ... ', filename_image_base)
+            sz = size(setToSave.inputMatrix);
+            fprintf('   => Saving Noisy Image data to : %s (%d inputs of size %dx%d) ... ', filename_image_base, sz(3), sz(1), sz(2) )
             save(filename_image, '-struct', 'setToSave', '-v6');
             file_s = dir(filename_image);
             fprintf(' done (%.1f MB)\n ', file_s.bytes / (1024^2));
@@ -1558,7 +2062,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                 
         
         
-        if createPcaFiles && all_SNRs_toDo_pca(cond_i)
+        if createPcaFiles && all_SNRs_toDo_pca(snr_i)
  
             scoreSize = size(noisySet.stimulusScores,2);
             setToSave_PCA = setToSave;
@@ -1574,7 +2078,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         
         
         
-        if showSamplesWithNoise && createImageFiles && 0 %%&& all_SNRs_done_im(cond_i)
+        if showSamplesWithNoise && createImageFiles && 0 %%&& all_SNRs_done_im(snr_i)
             %%
             % Show the stimulus, signal, and stimulus minus signal, which should be just noise. One for each noisySet. 
             if ~isempty(font_loc_idx)
@@ -1593,7 +2097,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             
 %             sample_idx = find(noisySet.labels == double(lower(fontName(1)))-96, 1 ); % take the very first image in the set.
             sample_idx = 1;
-            row_start=3*(cond_i-1);
+            row_start=3*(snr_i-1);
             rows=nRows;
             snImage=noisySet.inputMatrix(:,:,sample_idx);
             
@@ -1608,7 +2112,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             end
             3;
             %%
-            h_ax(cond_i,1) = subplot(rows,3,row_start+1,'align'); imagesc(snImage); xlabel(filename_image_base, 'interp', 'none'); axis equal tight; %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
+            h_ax(snr_i,1) = subplot(rows,3,row_start+1,'align'); imagesc(snImage); xlabel(filename_image_base, 'interp', 'none'); axis equal tight; %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
             let_idx=noisySet.labels(sample_idx); % stimulus(1).whichSignal;
             ori_idx=noisySet.targetOri_idx(sample_idx);
             x_idx=noisySet.targetX_idx(sample_idx);
@@ -1616,13 +2120,13 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             %%
             sImage=noisySet.signal(let_idx,x_idx,y_idx,ori_idx).image;
             
-            h_ax(cond_i,2) = subplot(rows,3,row_start+2,'align'); imagesc(sImage); axis equal tight; %set(gca, 'xtick', [], 'ytick', []);
+            h_ax(snr_i,2) = subplot(rows,3,row_start+2,'align'); imagesc(sImage); axis equal tight; %set(gca, 'xtick', [], 'ytick', []);
             nImage=snImage-sImage;
-            h_ax(cond_i,3) = subplot(rows,3,row_start+3,'align'); imagesc(nImage); axis equal tight; %set(gca, 'xtick', [], 'ytick', []);
+            h_ax(snr_i,3) = subplot(rows,3,row_start+3,'align'); imagesc(nImage); axis equal tight; %set(gca, 'xtick', [], 'ytick', []);
 %             energy=sum(sum((sImage-1).^2));
 %             noiseLevel=var(nImage(:));
             caxis auto
-            set(h_ax(cond_i,:), 'xtick', [], 'ytick', []);
+            set(h_ax(snr_i,:), 'xtick', [], 'ytick', []);
             colormap('gray')
             
             
@@ -1630,7 +2134,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %         fprintf('cond %d, log E/N nominal %.2f, actual %.2f\n',cond,set.logEOverN,log10(energy/noiseLevel));
         end
 
-        all_sets(cond_i) = setToSave;
+        all_sets(snr_i) = setToSave;
         
         
         showExampleNoise = 0;
@@ -1647,7 +2151,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             end
             sample_idx = 1; % take the very first image in the set.
             snImage=noisySet.inputMatrix(:,:,sample_idx);
-            %                 h_ax(cond_i,1) = subplot(rows,3,row_start+1,'align'); imagesc(snImage); xlabel(filename_image, 'interp', 'none'); axis equal tight; %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
+            %                 h_ax(snr_i,1) = subplot(rows,3,row_start+1,'align'); imagesc(snImage); xlabel(filename_image, 'interp', 'none'); axis equal tight; %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
             let_idx=noisySet.labels(sample_idx); % stimulus(1).whichSignal;
             ori_idx=noisySet.targetOri_idx(sample_idx);
             x_idx=noisySet.targetX_idx(sample_idx);
@@ -1655,7 +2159,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             sImage=noisySet.signal(let_idx,x_idx,y_idx,ori_idx).image;
             nImage= (snImage-sImage) / noiseContrast;
             [~, filt_str] = filterStr( noiseFilter);
-            %                 h_ax(cond_i,3) = subplot(rows,3,row_start+3,'align');
+            %                 h_ax(snr_i,3) = subplot(rows,3,row_start+3,'align');
             subplotGap(2,nSets, 1, set_idx);
             if isfield(noisySet, 'fourierMask')
                 imagesc(noisySet.fourierMask);
@@ -1673,7 +2177,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             %             energy=sum(sum((sImage-1).^2));
             %             noiseLevel=var(nImage(:));
             caxis([-2.5, 2.5]);
-            %                 set(h_ax(cond_i,:), 'xtick', [], 'ytick', []);
+            %                 set(h_ax(snr_i,:), 'xtick', [], 'ytick', []);
             colormap('gray');
 %             imageToScale;
 %             h = colorbar('EastOutside');
@@ -1694,17 +2198,234 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         firstTime = 0;
     end
     
+      
+     if showSamplesWithNoise && createImageFiles && any(all_SNRs_done_im)
+         imageToScale
+     end
   
+     
+     
+    
+    if strcmp(expName, 'Crowding')        
+       
+        params.setSize = round( setSize * (1-curSetSizeFrac) );
+    %     testTargetPosition = 'all';
+        params.targetPosition = testPositions;
+
+        nDNRs = length(allLogDNRs);
+
+        fprintf('======= Now computing all multiple-letter sets \n');
+
+        nnDistractors = length(allNDistractors);
+
+        crowdingSettings_i = noisy_letter_opts_image.crowdingSettings;
+
+        for ndist_i = 1:nnDistractors
+            nDistractors = allNDistractors(ndist_i);
+            nLettersTest = nDistractors + 1;
+
+
+            [allDistractSpacings_pix, allDistractSpacings] = getAllDistractorSpacings(xrange, fontWidth, nDistractors, testPositions);
+    % %         allDistractSpacings_pix = allDistractSpacings_pix([1, end]);
+    % %         allDistractSpacings = allDistractSpacings([1, end]);
+
+            nSpacings = length(allDistractSpacings);
+
+            params.nDistractors = nDistractors;
+            params.allDistractSpacings = allDistractSpacings;
+
+
+            for dnr_i = 1:nDNRs
+                logDNR = allLogDNRs(dnr_i);
+
+                for ds_i = 1:nSpacings
+                    distractorSpacing = allDistractSpacings(ds_i);
+                    distractorSpacing_pix = allDistractSpacings_pix(ds_i);
+
+                    crowdingSettings_i.logDNR = logDNR;
+                    crowdingSettings_i.nDistractors = nDistractors;
+                    crowdingSettings_i.testPositions = testPositions;
+                    crowdingSettings_i.trainPositions = testPositions;  % so don't label file with 'TrainedWithX'
+                    crowdingSettings_i.distractorSpacing = distractorSpacing_pix;
+
+                    params.logDNR = logDNR;
+                    params.nDistractors = nDistractors;
+                    params.distractorSpacing = distractorSpacing;
+                    
+                    noisy_letter_opts_image.crowdingSettings = crowdingSettings_i;
+                    
+                    all_SNRs_toDo = false(size(all_SNRs));
+                    if ~redoFilesIfExist 
+                        for i = 1:nSNRs
+
+                            fn_i_im  = [noisyLettersPath_thisFont getFileName(fontNameStr, all_SNRs(i), noisy_letter_opts_image) ];
+                            imageFileExists = exist(fn_i_im, 'file') && ~fileOlderThan(fn_i_im, redoFilesIfOlderThan);
+                                          
+                            all_SNRs_toDo (i) = ~imageFileExists;                            
+                        end
+
+                    else
+                        all_SNRs_toDo  = true(size(all_SNRs));
+                    end
+%                     all_SNRs_toDo  = true(size(all_SNRs));
+                    
+                    
+                    
+                    
+                    
+                    for snr_i = find( all_SNRs_toDo )
+                        logSNR = all_SNRs(snr_i);
+                        params.logSNR = logSNR;
+
+                        
+%                         testing_filename = getCrowdedLetterFileName(fontName, logSNR, noisy_letter_opts_image);
+                        testing_filename = getFileName(fontNameStr, logSNR, noisy_letter_opts_image);
+                        
+                        fprintf('\n nDistract %d/%d.  DNR %d/%d.   Spacing %d/%d. SNR: %d/%d [ logSNR = %.2f] \n   === FileName = %s === : ', ...
+                            ndist_i, nnDistractors,   dnr_i, nDNRs,  ds_i, nSpacings, snr_i, nSNRs, logSNR, testing_filename)
+
+                        haveFileAlready = exist([noisyLettersPath_thisFont testing_filename], 'file') && ~redoFilesIfExist && ...
+                            ~fileOlderThan([noisyLettersPath_thisFont testing_filename], redoFilesIfOlderThan);
+                        if ~haveFileAlready 
+                            %%
+
+                            if tryGetLocks
+                                [gotLock, otherProcessID] = lock_createLock(testing_filename);
+                            else
+                                gotLock = true;
+                            end
+
+                            if ~gotLock
+                                fprintf('Another process (%s) has a lock on this file...\n', otherProcessID);
+
+                            else
+
+  
+                                %%%%%%% Generate the dataset %%%%%%%%%%%%%%%%%%5
+                                crowdedSet = generateSetOfLetters(signal, params);
+
+                                if doTextureStatistics
+                                    inputMatrix = crowdedSet.textureStats;
+                                else
+                                    inputMatrix = crowdedSet.inputMatrix;
+                                end
+
+                                if nDistractors == 2
+                                    labels2_C = {'labels_distract2', crowdedSet.labels_distract2};
+                                else
+                                    labels2_C = {};
+                                end
+
+        %                         [propLetterCorrect_ideal, propEachLetterCorrect_ideal] = calcIdealPerformanceForNoisySet(crowdedSet, 'RawImage', 'AnyLetter');
+
+                                crowdedSet.targetPosition = testPositions;
+                                crowdedSet.nLettersEachImage = nLettersTest;
+        %                         [propLetterCorrect_ideal_target, propEachLetterCorrect_ideal_target] = calcIdealPerformanceForNoisySet(crowdedSet, 'RawImage', 'OnlyTarget');
+                                3;
+
+                                S_test = struct('inputMatrix', inputMatrix, 'labels', crowdedSet.labels, 'labels_distract', crowdedSet.labels_distract, labels2_C{:}, ...
+                                    'xs', xs, 'ys', ys, 'orientations', orientations, 'fontName', fontName, 'fontSize', fontSize, ...
+                                    'logSNR', logSNR, 'logDNR', logDNR, 'distractorSpacing', distractorSpacing, 'distractorSpacing_pix', distractorSpacing_pix, 'nClasses', nLetters, ...
+                                    'x_dist', crowdedSet.x_dist, 'dist_sign', crowdedSet.dist_sign, ...
+                                    'OverFeat', doOverFeat ...
+                                    ...'propLetterCorrect_ideal', propLetterCorrect_ideal, 'propEachLetterCorrect_ideal', propEachLetterCorrect_ideal, ...
+                                    ...'propLetterCorrect_ideal_target', propLetterCorrect_ideal_target, 'propEachLetterCorrect_ideal_target', propEachLetterCorrect_ideal_target
+                                    );  %#ok<NASGU>
+
+                                if ~skipSave
+                                    save([noisyLettersPath_thisFont testing_filename], '-struct', 'S_test', '-v6')
+                                end
+
+%                                 all_S_test(ds_i) = S_test;
+
+                                if tryGetLocks
+                                    lock_removeLock(testing_filename);
+                                end
+
+                            end
+
+
+                        else
+
+                            fprintf('Already completed \n');
+                        end
+
+                        showTestingSet = 0 && ~haveFileAlready;
+                        if showTestingSet && showAnyFigures
+                            %%
+                            tmp = 0;
+                            if tmp;
+                                figure(678);
+                                imagesc(snImage); colormap(gray(256));
+                                imageToScale;
+                                ticksOff;    
+
+                            end
+
+
+
+                            fig_id2 = 250 + set_idx*10 + (ndist_i *nDNRs) + dnr_i;
+                            figure(fig_id2); 
+                            if snr_i == 1 && ds_i == 1
+                                clf;
+                            end
+
+                            h_ax = subplotGap(nSNRs, nSpacings, find(logSNR == sort(all_SNRs)), ds_i);
+    %                         [subM, subN] = deal(14,10);
+
+
+                            [subM, subN] = deal(1,1);
+                            nTot = subM*subN;
+
+                            idx_rand = randperm(length(crowdedSet.labels));
+                            idx_use = idx_rand(1:nTot);
+
+                            imagesc(tileImages(crowdedSet.inputMatrix(:,:,idx_use), subM, subN, 3, 1));
+                            %         imagesc(tileImages(trainingSetSamples(:,:,1)))
+                            axis equal tight;
+                            colormap('gray');
+    %                         set(gca, 'xtick', [], 'ytick', [], 'position', [0.01 0.01 .8 .8]);
+                            ticksOff;
+                            xlabel(sprintf('ds = %d, snr = %.1f', distractorSpacing, logSNR)); %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
+                            3;
+                        end
+                        3;
+
+                %%
+
+
+
+
+                    end
+
+                end
+
+                tmp = 0;
+                if tmp
+                    %%
+                    figure(93); clf;
+                    for i = 1:nSpacings-1
+                        subplotGap(nSpacings-1, 1, i, 1);
+                        idx = randi( length(all_S_test(i).labels) );
+                        imagesc(all_S_test(i).inputMatrix(:,:,idx))
+                        ticksOff;
+                    end
+                    colormap(gray(256));
+                    imageToScale;
+
+                end
+
+
+            end
+        end 
+
+
+        
+    end
     
     
 
     
-    3;
-     if showSamplesWithNoise && createImageFiles && any(all_SNRs_done_im)
-         imageToScale
-     end
-    
-%     fprintf('%s',readme);  
     fprintf('Done.\n');
     
 

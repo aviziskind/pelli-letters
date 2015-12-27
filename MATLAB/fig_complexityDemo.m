@@ -5,25 +5,29 @@ nFonts = length(fontNames);
 
 nLetVert = 7;
 
-fontSize = 'large';
+% fontSize = 'large';
+fontSize = 'k32';
 fontComplexities = zeros(1, nFonts);
 for i = 1:nFonts
     efficiencies(i) = getStatsFromPaper(fontNames{i}, 'efficiency');
     th_human(i) = 10^getStatsFromPaper(fontNames{i}, 'th_human');
-    fontComplexities(i) = getFontComplexity(fontNames{i}, fontSize);
+    fontComplexities(i) = getFontComplexity(fontNames{i}, fontSize, 'closest');
 end
 
 %%
 allSNRs_test = [0, 1, 1.5, 2, 2.5, 3, 4];
-noisyLetterOpt = struct( 'oris', 0, 'xs', 0, 'ys', 0, 'stimType', 'NoisyLetters', 'tf_pca', 0, ...
-                            'sizeStyle', fontSize, 'autoImageSize', 1);
+noisyLetterOpt = struct( 'expName', 'Complexity', 'OriXY', struct('oris', 0, 'xs', 0, 'ys', 0), 'stimType', 'NoisyLetters', 'tf_pca', 0, ...
+                            'sizeStyle', fontSize, 'autoImageSize', 0, 'imageSize', [64,64]);
 
-braille_ok_letters = [4,5,6,9,11,15,16,17,21, 23, 24, 25, 26];                                
+braille_ok_letters = [4,5,6,9,11,15,16,17,21, 23, 24, 25, 26];          
+ideal_opt.skipIfDontHaveIdealFile = false;
+
 for fi = 1:nFonts
-    [allLet{fi}, fontData{fi}] = loadLetters(fontNames{fi}, fontSize);
+    [allLet{fi}, fontData{fi}] = loadLetters(fontNames{fi}, fontSize, 'closest');
     allSignals{fi} = generateLetterSignals(allLet{fi}, 0, 0, 0);
     
-    [pCorr_ideal_i] = getIdealPerformance(fontNames{fi}, allSNRs_test, noisyLetterOpt); 
+    noisyLetterOpt.fontName = fontNames{fi};
+    [pCorr_ideal_i] = getIdealPerformance(noisyLetterOpt, allSNRs_test, ideal_opt); 
     th_ideal(fi) = getSNRthreshold(allSNRs_test, pCorr_ideal_i);
     
 end
@@ -55,7 +59,7 @@ logCmp = log10(fontComplexities);
     noiseType = 'gaussian';    nNoiseSamples = 1e5; rand_seed = 0;
     noiseSamples = generateNoiseSamples(nNoiseSamples, noiseType, rand_seed);
     noiseSamples.noiseSize=[M,N];
-    noiseImage = RandSample(noiseSamples.noiseList, noiseSamples.noiseSize);
+    noiseImage = qRandSample(noiseSamples.noiseList, noiseSamples.noiseSize);
 
 
     efficiencies = fliplr( logspace(log10(.01), log10(1), nLetVert) );

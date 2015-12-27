@@ -72,16 +72,16 @@ function createCrowdedLettersDatafile(fontName, sizeStyle, imageSize, xrange, tr
 %         allXranges = {[20,35,90]}; %, [for big letters
 %         allTargetPositions = {[1:9]};
 
-%         allXranges = {[15,5,55]};  allTrainTargetPositions = {'all'};
-%         allXranges = {[15,5,85]};  allTrainTargetPositions = {[1:9]};
-%         allXranges = {[15,12,87]};  allTrainTargetPositions = {[1,3,4]};
-%         allXranges = {[15,3,87]};  allTrainTargetPositions = {[1,9,13]}; % = binarySearch(15:4:87, [15, 39, 51]) 
+%         allXranges = {[15,5,55]};  allTrainPositions = {'all'};
+%         allXranges = {[15,5,85]};  allTrainPositions = {[1:9]};
+%         allXranges = {[15,12,87]};  allTrainPositions = {[1,3,4]};
+%         allXranges = {[15,3,87]};  allTrainPositions = {[1,9,13]}; % = binarySearch(15:4:87, [15, 39, 51]) 
         
-%         allXranges = {[14, 10, 144]};  allTrainTargetPositions = {[1:12]}; % = binarySearch(15:4:87, [15, 39, 51])  
-        allXranges = {[-16, 12, 176]};  allTrainTargetPositions = {[3:15]}; allTestTargetPositions = {9}; % = binarySearch(15:4:87, [15, 39, 51])  
+%         allXranges = {[14, 10, 144]};  allTrainPositions = {[1:12]}; % = binarySearch(15:4:87, [15, 39, 51])  
+        allXranges = {[-16, 12, 176]};  allTrainPositions = {[3:15]}; allTestPositions = {9}; % = binarySearch(15:4:87, [15, 39, 51])  
 
          if doOverFeat
-             allXranges = {[-34, 15, 266]};  allTrainTargetPositions = {[4:18]}; allTestTargetPositions = {11}; % = binarySearch(15:4:87, [15, 39, 51])  
+             allXranges = {[-34, 15, 266]};  allTrainPositions = {[4:18]}; allTestPositions = {11}; % = binarySearch(15:4:87, [15, 39, 51])  
          end
 %         -44:16:276
         
@@ -89,12 +89,12 @@ function createCrowdedLettersDatafile(fontName, sizeStyle, imageSize, xrange, tr
         
 %         binarySearch(15:2:100, [15, 39, 51])
         
-%         allTestTargetPositions = {1};
+%         allTestPositions = {1};
         
 
 %         allXranges = {[15,5,55]};
-%         allTrainTargetPositions = {'all'};
-%         allTestTargetPositions = {1};
+%         allTrainPositions = {'all'};
+%         allTestPositions = {1};
         
         
         allNDistractors = [2, 1];
@@ -170,8 +170,8 @@ function createCrowdedLettersDatafile(fontName, sizeStyle, imageSize, xrange, tr
                                                    'tbl_sizeStyle', {allSizeStyles}, ...
                                                    'tbl_imageSize', {allImageSizes}, ...
                                                    'tbl_xrange', {allXranges}, ...
-                                                   'tbl_trainTargetPosition', {allTrainTargetPositions}, ...
-                                                   'tbl_testTargetPosition', {allTestTargetPositions}, ...
+                                                   'tbl_trainTargetPosition', {allTrainPositions}, ...
+                                                   'tbl_testTargetPosition', {allTestPositions}, ...
                                                    'allNDistractors', allNDistractors, ...    
                                                    'allLogDNRs', allLogDNRs, ...
                                                    'tbl_blurStd', {allBlurStds}, ...

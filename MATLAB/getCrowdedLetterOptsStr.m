@@ -1,51 +1,28 @@
-function [crowdedOpts_str, crowdedOpts_str_nice] = getCrowdedLetterOptsStr(crowdedLetterOpts, niceStrFields)
+function [crowdedOpts_str, crowdedOpts_str_nice] = getCrowdedLetterOptsStr(letterOpts, niceStrFields)
     if nargin < 2
         niceStrFields = {};
     end
     makeNiceStr = ~isempty(niceStrFields);
     crowdedOpts_str_nice = '';
     
-    xrange = crowdedLetterOpts.xrange;
+    if isfield(letterOpts, 'crowdingSettings')
+        letterOpts = letterOpts.crowdingSettings;
+    end
+    
+    xrange = letterOpts.xrange;
     if iscell(xrange)
         xrange = [xrange{:}];
     end
     assert(length(xrange) == 3);
     x_range_str = sprintf('x%d-%d-%d',  xrange);
     
-    blur_str = '';
-    useBlur = isfield(crowdedLetterOpts, 'blurStd') && ~isempty(crowdedLetterOpts.blurStd) && crowdedLetterOpts.blurStd > 0;
-    if useBlur
-        blur_str = sprintf('_blur%.0f', crowdedLetterOpts.blurStd*10);
-    end
-    
-    
-    imageSizeStr = '';
-    if isfield(crowdedLetterOpts, 'imageSize')
-        sz = crowdedLetterOpts.imageSize;
-        if length(sz) == 1
-            sz = [sz, sz];
-        end
-        imageSizeStr = sprintf('-[%dx%d]', sz);                
-    end
-    
-    snr_str = '';
-    addNoise = isfield(crowdedLetterOpts, 'logSNR') && ~isnan(crowdedLetterOpts.logSNR);
-    if addNoise
-        snr_str = strrep( sprintf('_SNR%02.0f',  crowdedLetterOpts.logSNR*10), '-', 'n') ;            
-    end
-    
-    
-    [noiseFilter_str, noiseFilter_str_nice] = noiseFilterOptStr(crowdedLetterOpts, niceStrFields);
-    if makeNiceStr && any(strcmpi(niceStrFields, 'NoiseFilter'))
-        crowdedOpts_str_nice = appendToStr(crowdedOpts_str_nice, noiseFilter_str_nice);
-    end
 
         
     dnr_str = '';
     distractorSpacing_str = '';
-    testTargetPosition_str = '';
+    testPositions_str = '';
 
-    nLetters = crowdedLetterOpts.nLetters;
+    nLetters = letterOpts.nDistractors + 1; % nLetters;
     nLetters_str = sprintf('%dlet', nLetters);
     
     if makeNiceStr && any(strcmpi(niceStrFields, 'nLetters'))
@@ -53,45 +30,38 @@ function [crowdedOpts_str, crowdedOpts_str_nice] = getCrowdedLetterOptsStr(crowd
     end
     
     
+    
+    
     if nLetters == 1 %  Training data (train on 1 letter)
         
 %         train_test_str = sprintf('Train_%s', targetPos_str);
 
-        curTargetPosition_str = ['_' targetPositionStr( crowdedLetterOpts.trainTargetPosition) ];
+        curTargetPosition_str = ['_' targetPositionStr( letterOpts.trainPositions) ];
 %         train_test_str = sprintf('Train_%s', targetPos_str);
 
     elseif nLetters > 1 % Test on multiple letters
 
-        curTargetPosition_str = ['_' targetPositionStr( crowdedLetterOpts.testTargetPosition) ];
+        curTargetPosition_str = ['_' targetPositionStr( letterOpts.testPositions) ];
 
-        dnr_str = sprintf('_DNR%02.0f', crowdedLetterOpts.logDNR*10); % distractor-to-noise ratio
+        dnr_str = sprintf('_DNR%02.0f', letterOpts.logDNR*10); % distractor-to-noise ratio
         if makeNiceStr && any(strcmpi(niceStrFields, 'DNR'))
-            crowdedOpts_str_nice = appendToStr(crowdedOpts_str_nice, sprintf('DNR = %.1f', crowdedLetterOpts.logDNR));
+            crowdedOpts_str_nice = appendToStr(crowdedOpts_str_nice, sprintf('DNR = %.1f', letterOpts.logDNR));
         end
-        distractorSpacing_str = sprintf('_d%d', crowdedLetterOpts.distractorSpacing); % ie: all positions differences in X pixels
+        if ~isnan(letterOpts.distractorSpacing)
+            distractorSpacing_str = sprintf('_d%d', letterOpts.distractorSpacing); % ie: all positions differences in X pixels
+        end
 
-        if isfield(crowdedLetterOpts, 'testTargetPosition') && isfield(crowdedLetterOpts, 'trainTargetPosition')  && ~isempty(crowdedLetterOpts.trainTargetPosition) && ...
-                ~isequal(crowdedLetterOpts.trainTargetPosition, crowdedLetterOpts.testTargetPosition)
-            testTargetPosition_str = ['_tr' targetPositionStr( crowdedLetterOpts.trainTargetPosition )];
+        if isfield(letterOpts, 'testPositions') && isfield(letterOpts, 'trainPositions')  && ~isempty(letterOpts.trainPositions) && ...
+                ~isequal(letterOpts.trainPositions, letterOpts.testPositions)
+            testPositions_str = ['_tr' targetPositionStr( letterOpts.trainPositions )];
         end
 
     end
         
-    details_str = sprintf('__%s%s%s%s', nLetters_str, distractorSpacing_str, dnr_str, testTargetPosition_str);
-    
-    textureStats_str = '';
-    if crowdedLetterOpts.doTextureStatistics
-        textureStats_str = getTextureStatsStr(crowdedLetterOpts);        
-    end
+    details_str = sprintf('__%s%s%s%s', nLetters_str, distractorSpacing_str, dnr_str, testPositions_str);
 
-    overFeat_str = '';
-    if crowdedLetterOpts.doOverFeat
-        overFeat_str = getOverFeatStr(crowdedLetterOpts);        
-    end
-
+    crowdedOpts_str = ['__' x_range_str, curTargetPosition_str, details_str ];    
     
-    crowdedOpts_str = [x_range_str, curTargetPosition_str, imageSizeStr, snr_str, blur_str, noiseFilter_str, textureStats_str, overFeat_str, details_str ];    
-%     crowdedOpts_str = sprintf('x%d-%d-%d_T%s%s%s%s%s%s',  xrange, curTargetPosition_str, imageSizeStr, snr_str, blur_str,   details_str, textureStats_str);    
 end
 
 
@@ -105,6 +75,19 @@ function targetStr = targetPositionStr(targetPosition)
     targetStr = ['T' posStr];
 end
 
+
+%     targetPosition_str = '';
+%     if isfield(noisyLetterOpts, 'targetPosition') &&  ~strcmpi(noisyLetterOpts.targetPosition, 'all') 
+%         targetPosition_str = sprintf('_T%d', noisyLetterOpts.targetPosition);
+%     end
+% 
+%     nLetters_str = '';
+%     if  isfield(noisyLetterOpts, 'nLetters') && noisyLetterOpts.nLetters > 1
+%         nLetters_str = sprintf('_L%d', noisyLetterOpts.nLetters);
+%     end
+% 
+%     
+%     
 %{
 
 

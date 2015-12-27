@@ -11,7 +11,7 @@ print('-Loading common scripts ... ')
 dofile (paths.home .. '/Code/scripts/torch/load_all_torch_scripts.lua')
 
 hostname = os.getenv('hostname') 
-onLaptop = (hostname == 'XPS')
+onLaptop = (hostname == 'cortex')
 
 -- creating session file
 local sessionFolder =  paths.home .. '/Code/~locks/session/'

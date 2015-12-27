@@ -15,6 +15,7 @@ function [str_short, str_med, str_long] = abbrevFontStyleNames(names_orig, fontO
     %  Book[M]an, Brai[L]le, [C]heckers4x4, Cou[R]ier, [H]elvetica, [K]uenstler  [S]loan, [Y]ung, 
     skipAbbrevIfOneFont = true;
     %%
+    
     allFontName_abbrevs = struct('Armenian', 'A', ...
                                  'Bookman', 'M', ...
                                  'Braille', 'L', ...
@@ -70,7 +71,7 @@ function [str_short, str_med, str_long] = abbrevFontStyleNames(names_orig, fontO
     
 
     
-    if isstruct(names_orig) && (isfield(names_orig, 'fonts') || isfield(names_orig, 'styles') || isfield(names_orig, 'wiggles') || isfield(names_orig, 'svhn_opts'))
+    if isstruct(names_orig) && (isfield(names_orig, 'fonts') || isfield(names_orig, 'styles') || isfield(names_orig, 'wiggles') || isfield(names_orig, 'realData_opts'))
        [fontName_str_short,   fontName_str_medium,  fontNames_full]   = deal('');
        [styleName_str_short,  styleName_str_medium, styleNames_full]  = deal('');
        [pre_full, join_short, join_med, join_full,  post_full]        = deal('');
@@ -93,10 +94,10 @@ function [str_short, str_med, str_long] = abbrevFontStyleNames(names_orig, fontO
            [styleName_str_short, styleName_str_medium, styleNames_full] = deal(wiggle_str);
        end
        
-       if isfield(names_orig, 'svhn_opts')
+       if isfield(names_orig, 'realData_opts')
            assert(~isfield(names_orig, 'styles'))
-           [svhn_opt_str, svhn_opt_str_nice] =  getSVHNOptsStr(names_orig.svhn_opts, niceStrFields);
-           [styleName_str_short, styleName_str_medium, styleNames_full] = deal(svhn_opt_str, svhn_opt_str_nice, svhn_opt_str_nice);
+           [realData_opt_str, realData_opt_str_nice] =  getRealDataOptsStr(names_orig.realData_opts, niceStrFields);
+           [styleName_str_short, styleName_str_medium, styleNames_full] = deal(realData_opt_str, realData_opt_str_nice, realData_opt_str_nice);
        end
        
        
@@ -113,7 +114,7 @@ function [str_short, str_med, str_long] = abbrevFontStyleNames(names_orig, fontO
        
     end
     
-    if ~exist('fontOrStyle', 'var') 
+    if ~exist('fontOrStyle', 'var')  || isempty(fontOrStyle);
         % print(names_orig[1])
         if isfield(allFontName_abbrevs, getRawFontName( names_orig{1}) )  
             fontOrStyle = 'font';

@@ -6,14 +6,16 @@
 %     nstates = [6,50];
 %     nstates = [6, 16, 128, 120];
 
-      nstates = [16, 64, 512, 120];  filtsizes = [5, 5, 3];  poolsizes = [2, 2, 3];
+%       nstates = [16, 64, 512, 120];  filtsizes = [5, 5, 3];  poolsizes = [2, 2, 3];
 %     nstates = [6, 16, 64, 120]; filtsizes = [5, 3, 3]; poolsizes = [2, 2, 2];
 
 
 
 %           nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3];  poolsizes = [2, 2, 2];
 %         nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 2];
-        nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
+%         nstates = [16, 64, 256, 120];  filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
+        nstates = [16, 128, 512, 240];  filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
+%         nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
 
 
         
@@ -21,7 +23,7 @@
 %         nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
 %         nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3]; poolsizes = [2, 2, 3];
 %         nstates = [6, 16, 64, 120];    filtsizes = [5, 3, 3]; poolsizes = [2, 2, 2];
-        nstates = [6, 16, 64, 120];    filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
+%         nstates = [6, 16, 64, 120];    filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
         
         
     nfeats = 1; 

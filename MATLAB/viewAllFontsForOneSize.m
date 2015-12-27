@@ -6,6 +6,10 @@ function viewAllFontsForOneSize(fontSize)
 %         'Hebraica', 'Yung', 'KuenstlerU', 'Sloan', 'Braille', 'Checkers4x4', 'Devanagari', 'Armenian'};
 %     allFontNames  = {'BookmanU', 'Bookman', 'KuenstlerU', 'Braille'};
     allFontNames  = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'};
+
+    allFontNames  = {'BookmanU', 'Bookman',  'BookmanB',  'Helvetica', 'Courier',  ...
+                        'Hebraica', 'Yung', 'KuenstlerU', 'Sloan', 'Braille', 'Checkers4x4', 'Devanagari', 'Armenian'};
+
     includeKuenstler = 1;
     if ~includeKuenstler
         allFontNames = allFontNames( ~strncmp(allFontNames, 'Kuenstler', 9) );

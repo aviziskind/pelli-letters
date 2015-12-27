@@ -42,7 +42,8 @@ function [rawFontName, fontAttrib] = getRawFontName(fontName, keepFlags)
 %     isCourier = strncmp(fontName, 'Courier', 7);
     
     charsToAddBack = '';
-    while any(rawFontName(end) == ['U', 'B', 'I'])  || (isKuenstler && (rawFontName(end) == 'i') ) || (~isnan(str2double(rawFontName(end))) && ~isSnakes)
+    while any(rawFontName(end) == ['U', 'B', 'I'])  || (isKuenstler && (rawFontName(end) == 'i') ) ...
+            || ((~isnan(str2double(rawFontName(end))) && isreal(str2double(rawFontName(end)))) && ~isSnakes)
 
         if rawFontName(end) == 'U'
             fontAttrib.upper_tf = true;

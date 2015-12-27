@@ -1,8 +1,10 @@
 function generateSnakesFonts
 
-
-    wiggleAngles.orientation = [5:5:90];
-    wiggleAngles.offset = [5:5:60];
+%     dWiggle = 10;
+    dWiggle = 5;
+    wiggleAngles.orientation = [dWiggle:dWiggle:90];
+%     wiggleAngles.orientation = [60];
+    wiggleAngles.offset = [dWiggle:dWiggle:60];
     wiggleAngles.phase = [1];
     wiggleAngles.none = 0;
     
@@ -10,12 +12,13 @@ function generateSnakesFonts
 %     allWiggleTypes = {'none', 'offset', 'orientation', 'phase'};
     allWiggleTypes = {'none', 'orientation', 'none', 'offset', 'none', 'phase'};
 %     allWiggleTypes = {'none'};
+%     allWiggleTypes = {'orientation'};
     
 %     height_deg = 4;
 %     allKHeights = [40, 50, 60];
     
-    saveFontsToFile = false;
-%     saveFontsToFile = true;
+%     saveFontsToFile = false;
+    saveFontsToFile = true;
 
 %     opts.pixPerDegree = 7; % k32
     opts.pixPerDegree = 9;
@@ -51,14 +54,20 @@ function generateSnakesFonts
 
     allFontData = {};
     fig_id = 201;
-    allPixPerDegree = [6.5]; % kheight = 32;
-%     allPixPerDegree = [9.6];  %kheight = 48;
+    allPixPerDegree = [5.5]; % kheight = 27;
+%     allPixPerDegree = [5.5]; % kheight = 27;
+%     allPixPerDegree = [6]; % kheight = 30;
+% 
+%     allPixPerDegree = [5.5, 6.5]; % kheight = 32;
+    allPixPerDegree = [9.6];  %kheight = 48;
 %     allPixPerDegree = [11];  %kheight = 55;
 %     allPixPerDegree = [12.9]; % kheight = 64
 %     allPixPerDegree = [25.9]; % kheight = 128
 %     allPixPerDegree = [51.8]; % kheight = 256
 
+%     allPixPerDegree = [10];
 %     allPixPerDegree = [6.5, 9.6, 12.9, 25.9];
+%     allPixPerDegree = [6.5, 9.6, 12.9];
     
     if 0 && 0
        %%
@@ -72,9 +81,33 @@ function generateSnakesFonts
     end
 
 
+    
+    
+                
+    
     for size_i = 1:length(allPixPerDegree)
         opts.pixPerDegree = allPixPerDegree(size_i);
-
+        ppd = opts.pixPerDegree;
+        
+    %                 opts.f_cycPerDeg = 1;
+    %                 opts.pixPerDegree = 40;
+    %                 opts.lambda_deg = .3;
+    %                 opts.markSpacing_deg = .91;
+%     opts.numGaborsPerLetterHeight = 4.2;
+        if ibetween(ppd, 5.0, 5.49)
+            opts.numGaborsPerLetterHeight = 4.25;
+        elseif ibetween(ppd, 5.5, 5.99)
+            opts.numGaborsPerLetterHeight = 4.2;
+        elseif ibetween(ppd, 6.0, 6.49)
+            opts.numGaborsPerLetterHeight = 4.19;
+        elseif ppd >= 6.5;
+            opts.numGaborsPerLetterHeight = 4.17;
+        end
+    %                 opts.extraMultForOffsetBorder = 1;
+    
+    
+        
+        
         S_noWiggle = DrawAlphabet_az('none', [], opts);
         [~, fontData_noWiggle] = processSnakeLetters(S_noWiggle, fontOpts);
         
@@ -91,11 +124,14 @@ function generateSnakesFonts
 
                 %%
 
+                
                 S = DrawAlphabet_az(wiggleType, wiggleAmount, opts);
     %             fprintf('%d - %dx%d\n', opts.pixPerDegree, size(S.signals,1), size(S.signals,2) )
             
                 [allLetters, fontData] = processSnakeLetters(S, fontOpts);
 
+                
+                
                 fontData.k_height = fontData_noWiggle.k_height;
                 fontData.x_height = fontData_noWiggle.x_height;
                 fontData.fontsize = fontData_noWiggle.fontsize;
@@ -121,10 +157,10 @@ function generateSnakesFonts
     %                 allLetters_show(abs(allLetters_show) > 0.69 & allLetters_show < 0) = -5;
 
 
-                    clf; imagesc(tileImages((allLetters_show), 2, 5)); axis image;
+                    clf; imagesc(tileImages((allLetters_show), 2, 5)); axis image; ticksOff;  imageToScale([], 2);  
                     colormap(gray(250));
                     ticksOff;   
-                    imageToScale([], 4);
+                    imageToScale([], 5);
                     drawnow;
                     
                     

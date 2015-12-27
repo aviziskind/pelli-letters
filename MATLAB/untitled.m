@@ -1,0 +1,3 @@
+dbquit
+dbquit
+createNoisyLettersDatafile; runIdealObserverTests;

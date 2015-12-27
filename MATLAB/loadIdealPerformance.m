@@ -83,7 +83,7 @@ function [idealP_total, idealP_eachLetter, logE] = loadIdealPerformance(fontName
         
 %         S = load([folder file_name]);
         switch expName
-            case {'Complexity', 'ChannelTuning', 'Grouping'},
+            case {'Complexity', 'ChannelTuning', 'Grouping', 'Uncertainty'},
                 
                 switch stimType
 

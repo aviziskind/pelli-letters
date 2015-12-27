@@ -34,7 +34,7 @@ convertAllOverFeatFiles = function(matlab_dir, convertOpts)
             torchLetters_dir = torch_dir .. 'letters/'    
 
             hostname = os.getenv('hostname') 
-            onLaptop = (hostname == 'XPS')
+            onLaptop = (hostname == 'cortex')
 
 
             print('Running load_data & letters_scripts scripts')
@@ -99,8 +99,8 @@ convertAllOverFeatFiles = function(matlab_dir, convertOpts)
             for i,overfeat_file_ext in ipairs(overfeat_file_exts) do
                 matFeatFilesBase[i] = string.gsub(matImFileBase, '_OFim', overfeat_file_ext)
                 matFeatFiles[i] = matlab_dir .. matFeatFilesBase[i]
-                matFeatFileNeedToDo[i] = not paths.filep(  matFeatFiles[i] )  or fileOlderThan(matFeatFiles[i], matImFile) or 
-                    (redoIfOld and fileOlderThan(matFeatFiles[i], redoIfOld_date))
+                matFeatFileNeedToDo[i] = not paths.filep(  matFeatFiles[i] )  or paths.fileOlderThan(matFeatFiles[i], matImFile) or 
+                    (redoIfOld and paths.fileOlderThan(matFeatFiles[i], redoIfOld_date))
                     
                     
             end

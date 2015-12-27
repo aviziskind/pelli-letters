@@ -41,9 +41,9 @@ function opt = fixNoisyLetterOpts(opt)
     
     
 %     -- if training on SVHN, make sure trainingImageSize matches size of SVHN training set
-    if isfield(opt, 'trainingFonts') && ~strcmp(opt.trainingFonts, 'same') && ~isempty(strfind( abbrevFontStyleNames(opt.trainingFonts), 'SVHN')) && ...
-        isfield(opt.trainingFonts, 'svhn_opts') && isfield(opt.trainingFonts.svhn_opts, 'imageSize') 
-            opt.trainingImageSize = opt.trainingFonts.svhn_opts.imageSize;
+    if isfield(opt, 'trainingFonts') && ~strcmp(opt.trainingFonts, 'same') && isRealDataFont(opt.trainingFonts)  && ...
+        isfield(opt.trainingFonts, 'realData_opts') && isfield(opt.trainingFonts.realData_opts, 'imageSize') 
+            opt.trainingImageSize = opt.trainingFonts.realData_opts.imageSize;
     end
     
    

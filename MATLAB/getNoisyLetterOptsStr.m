@@ -4,23 +4,19 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
     end
     makeNiceStr = ~isempty(niceStrFields);
     noisyOpt_str_nice = '';
-        
-    [oxy_str, oxy_str_nice] = getOriXYStr(noisyLetterOpts.OriXY);
-    if makeNiceStr && any(strcmpi(niceStrFields, 'Uncertainty'))
-%             noisyOpt_str_nice = [noisyOpt_str_nice, 'No uncertainty; '];
-        noisyOpt_str_nice = appendToStr(noisyOpt_str_nice, oxy_str_nice);
-    end
-
+     
     
-    targetPosition_str = '';
-    if isfield(noisyLetterOpts, 'targetPosition') &&  ~strcmpi(noisyLetterOpts.targetPosition, 'all') 
-        targetPosition_str = sprintf('_T%d', noisyLetterOpts.targetPosition);
+    oxy_str = '';
+    if ~strcmp(noisyLetterOpts.expName, 'Crowding')
+        [oxy_str, oxy_str_nice] = getOriXYStr(noisyLetterOpts.OriXY);
+        oxy_str = [oxy_str '-'];
+        if makeNiceStr && any(strcmpi(niceStrFields, 'Uncertainty'))
+    %             noisyOpt_str_nice = [noisyOpt_str_nice, 'No uncertainty; '];
+            noisyOpt_str_nice = appendToStr(noisyOpt_str_nice, oxy_str_nice);
+        end
     end
-
-    nLetters_str = '';
-    if  isfield(noisyLetterOpts, 'nLetters') && noisyLetterOpts.nLetters > 1
-        nLetters_str = sprintf('_L%d', noisyLetterOpts.nLetters);
-    end
+    
+    
         
     imageSizeStr = '';
     if ~noisyLetterOpts.autoImageSize
@@ -28,7 +24,7 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
         if length(sz) == 1
             sz = [sz, sz];
         end
-        imageSizeStr = sprintf('-[%dx%d]', sz);        
+        imageSizeStr = sprintf('[%dx%d]', sz);        
         
         if makeNiceStr && any(strcmpi(niceStrFields, 'ImageSize'))
             noisyOpt_str_nice = appendToStr(noisyOpt_str_nice, sprintf('[%dx%d]', sz));
@@ -38,8 +34,6 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
             
     differentTrainTestImageSize = isfield(noisyLetterOpts, 'trainingImageSize') && ~isequal(noisyLetterOpts.trainingImageSize, 'same') ...
             && ~ isequal(noisyLetterOpts.trainingImageSize, noisyLetterOpts.imageSize);
-    
-    
    
     trainingImageSizeStr = '';
     if differentTrainTestImageSize 
@@ -62,6 +56,7 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
             noisyOpt_str_nice = appendToStr(noisyOpt_str_nice, blur_str_nice);
         end
     end
+    
     
     differentTrainTestFonts = isfield(noisyLetterOpts, 'trainingFonts') && ~strcmp(noisyLetterOpts.trainingFonts, 'same') && ...
                               ~strcmp(abbrevFontStyleNames(noisyLetterOpts.trainingFonts), abbrevFontStyleNames(noisyLetterOpts.fontName) );
@@ -128,19 +123,17 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
     
     textureStats_str = '';
     if isfield(noisyLetterOpts, 'doTextureStatistics') && noisyLetterOpts.doTextureStatistics
-        textureStats_str = getTextureStatsStr(noisyLetterOpts);        
+        textureStats_str = getTextureStatsStr(noisyLetterOpts);
+        if makeNiceStr && any(strcmpi(niceStrFields, 'textureParams'))
+            noisyOpt_str_nice = appendToStr(noisyOpt_str_nice, sprintf('Texture: %s', strrep(textureStats_str(2:end), '_', '-') ));
+        end
     end
 
     overFeat_str = '';
     if isfield(noisyLetterOpts, 'doOverFeat') && noisyLetterOpts.doOverFeat
         overFeat_str = getOverFeatStr(noisyLetterOpts);        
     end
-    
-    
-
-                           
-                          
-                          
+                              
     if ~any([differentTrainTestNoise differentTrainTestFonts differentTrainTestWiggle, ...
                 differentTrainTestUncertainty differentTrainTestImageSize])
         noisyLetterOpts.retrainFromLayer = '';
@@ -160,6 +153,7 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
     if isfield(noisyLetterOpts, 'oris')
         nPositions = length(noisyLetterOpts.oris) * length(noisyLetterOpts.xs) * length(noisyLetterOpts.ys);
     end
+    
     indiv_pos_str = '';
     if isfield(noisyLetterOpts, 'trainOnIndividualPositions') && noisyLetterOpts.trainOnIndividualPositions 
         
@@ -178,7 +172,18 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
 
         
     end
-                
+       
+    
+    crowdedOpts_str = '';
+    if strcmp(noisyLetterOpts.expName, 'Crowding')
+       [crowdedOpts_str, crowdedOpts_str_nice] = getCrowdedLetterOptsStr(noisyLetterOpts, niceStrFields);
+        
+         if makeNiceStr
+             noisyOpt_str_nice = appendToStr(noisyOpt_str_nice, crowdedOpts_str_nice);
+         end
+        
+    end
+    
 
     %%
     
@@ -200,7 +205,6 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
     
     
     
-    
     classifierForEachFont_str = '';
     if isfield(noisyLetterOpts, 'classifierForEachFont') && isequal(noisyLetterOpts.classifierForEachFont, true) && (nFontShapes > 1)
         classifierForEachFont_str = '_clsFnt';
@@ -210,18 +214,18 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
     end   
     
 
+    loadOpts_str = '';
+    if isfield(noisyLetterOpts, 'loadOpts')
+        loadOpts_str = getLoadOptsStr(noisyLetterOpts.loadOpts);
+    end
+
     %%
-    noisyOpt_str = [oxy_str nLetters_str targetPosition_str imageSizeStr blur_str ...
+    noisyOpt_str = [oxy_str imageSizeStr blur_str ...     used to be : oxy_str [>nLetters_str targetPosition_str<] imageSizeStr blur_str 
         trainingOriXY_str,  trainingImageSizeStr trainingFonts_str  trainingWiggle_str ...
         noiseFilter_str,  trainNoise_str, ...
         textureStats_str, overFeat_str, ...
-        retrainFromLayer_str indiv_pos_str classifierForEachFont_str];
+        retrainFromLayer_str indiv_pos_str   crowdedOpts_str  classifierForEachFont_str, loadOpts_str];
     
-    if ~isempty(strfind(noisyOpt_str, '__trNpink'))
-        3;
-    end
-%     s = sprintf('%dori%s_%dx%s_%dy%s%s',  nOri,ori_lims_str, nX,x_lims_str, nY,y_lims_str,  imageSizeStr);
-
 
 
 end
@@ -247,38 +251,6 @@ end
 
 
 
-
-function tf = filtersEqual(filt1, filt2)
-
-    if ~strcmpi(filt1.filterType, filt2.filterType)
-        tf = false;
-        return;
-    end
-    
-    switch filt1.filterType
-        case 'band',
-            tf = filt1.cycPerLet_cent == filt2.cycPerLet_cent;
-            
-        case '1/f',
-            tf = filt1.fexp == filt2.fexp;
-            
-    end
-
-end
-
-
-
-
-% 
-% function str = getLimitsStr(x)
-%     if length(x) > 1
-%         str = sprintf('[%d]', round(diff(lims(x))) );
-%     else
-%         str = '';
-%     end
-% 
-% end
-% 
 
 
 

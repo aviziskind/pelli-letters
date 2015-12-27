@@ -44,8 +44,7 @@ function letterSignals = generateLetterSignals(allLetters, xs, ys, orientations,
     Dx = xs(end)-xs(1);
     Dy = ys(end)-ys(1);
     
-    fprintf('Creating letter signals ... ');
-
+   
     
     
     allLetters_allOrientations = allLetters;        
@@ -55,14 +54,26 @@ function letterSignals = generateLetterSignals(allLetters, xs, ys, orientations,
     end
     
     
-    
     if iscell(allLetters_allOrientations)
         nLetters = size(allLetters_allOrientations{1},3);
     else
         nLetters = size(allLetters_allOrientations,3);
     end
     
+    memoryAvail_ratio = 1;
+    if ~onLaptop
+        memoryAvail_ratio = 2;
+    end
+    memRequired_MB = (nX*nY*nOris * nLetters*imageHeight*imageWidth*4)/1024^2;
+    checkIfEnoughMemory(memRequired_MB, memoryAvail_ratio);
+    
+    
+    fprintf('Creating letter signals ... ');
+
+    
     letterSignals(nLetters, nX, nY, nOris) = struct;
+    
+    progressBar('init-', nOris * nX * nY * nLetters, 40);
 
 %     progressBar('init-', nLetters * nOris * nX * nY)
 %         letter_i = allLetters(:,:,let_i);
@@ -108,6 +119,7 @@ function letterSignals = generateLetterSignals(allLetters, xs, ys, orientations,
                 idx_horiz = idx_horiz(horizIdx_inImage);
                 
                 for yi=1:nY
+                    progressBar;
                     idx_vert = idx_vert0 + ys(yi);
                     
                     vertIdx_inImage = ibetween(idx_vert, [1, imageHeight]);
@@ -138,12 +150,12 @@ function letterSignals = generateLetterSignals(allLetters, xs, ys, orientations,
                     letterSignals(let_i,xi,yi,ori_i).x_bnd = x_bnd;
                     letterSignals(let_i,xi,yi,ori_i).y_bnd = y_bnd;
 
-                    
 %                     letterSignals(let_i,xi,yi,ori_i).pixArea=pixPerDeg^-2;
                 end
             end
         end
     end
+    progressBar('done');
     fprintf(' done.\n');
 
     

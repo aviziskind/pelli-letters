@@ -94,15 +94,16 @@ function [allLetters, fontData] = loadLetters(fontName, fontSize, fontSizeSpec, 
     %otherwise, are in 'load' mode:
     fontData = S_fonts.(font_field_name);
 
-%     if 
     
     allLetters = single( fontData.letters);
     if isSnakesFont
         scale_range = [-1, 1];
+        allLetters = rescaleToRangeWithoutOffset( allLetters, scale_range );    
     else
         scale_range = [0, 1];
+        allLetters = rescaleToRange( allLetters, scale_range );    
     end
-    allLetters = rescaleToRange( allLetters, scale_range );    
+    
     fontData.letters = allLetters;
     %%
     if scaleFactor > 1

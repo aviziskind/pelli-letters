@@ -1,7 +1,7 @@
 function [file_name, folder] = getDataFileName(fontName, snr, letterOpts)
         
     switch letterOpts.expName
-        case {'Complexity', 'ChannelTuning', 'Grouping'},
+        case {'Complexity', 'ChannelTuning', 'Grouping', 'Uncertainty'},
             file_name = getNoisyLetterFileName(fontName, snr, letterOpts);
             
 %         case 'NoisyLettersTextureStats',  
