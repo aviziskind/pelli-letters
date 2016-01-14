@@ -1108,8 +1108,11 @@ uniqueOpts = function(allDataOpts)
 
     local tbl_opts = {}
     for i,opt in ipairs(allDataOpts) do
-        local opt_str = getDataOptsStr(opt)
-        
+        local opt_str = getDataOptsStr(opt) 
+        Opt = opt
+        if opt.trialId and opt.trialId > 1 then
+            opt_str = opt_str .. '_' .. opt.trialId
+        end
         tbl_opts[i] = opt_str
     end
     DataOpts = allDataOpts

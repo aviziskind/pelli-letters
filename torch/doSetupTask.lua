@@ -61,7 +61,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local grouping_realDataName = 'SVHN'
         local grouping_realData_settings = {imageSize = grouping_realData_imageSize_train, globalNorm = true, localContrastNorm = false}
         --local grouping_dWiggle = 45
-        local grouping_dWiggle = 15
+        local grouping_dWiggle = 5
         
     --local grouping_trainOn = 'allWiggles'
     --local grouping_trainOn = 'noWiggle'
@@ -476,7 +476,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             
                 allNStates = {--{16, 64, -512},      {16, 64, -120},
                               
-                              {16, 64, 512, -120}, {16, 64, 512, -512} }
+                              {16, 64, 512, -120}, }-- {16, 64, 512, -512} }
 
             end
             --]]
@@ -1234,9 +1234,9 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --tbl_imageSize = { {32, 32}, {64, 64}  }
         --tbl_imageSize = { {32, 32},  }
         --tbl_imageSize = { {96, 96}  }
-        --tbl_imageSize = { {64, 64}  }
+        tbl_imageSize = { {64, 64}  }
         --tbl_imageSize = { {96, 96}  }
-        tbl_imageSize = { {80, 80}  }
+        --tbl_imageSize = { {80, 80}  }
         --tbl_imageSize = { {40, 40}  }
         
         --tbl_sizeStyle = { 55 }
@@ -1463,19 +1463,46 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                      
         --]]
         
+        --[[
         local oriXYSet_38x38y_d1        = {Nori = 1,  dOri = 0,    Nx = 38, dX = 1,   Ny = 38, dY = 1}
         local oriXYSet_39x39y_d1        = {Nori = 1,  dOri = 0,    Nx = 39, dX = 1,   Ny = 39, dY = 1}
         local oriXYSet_40x40y_d1        = {Nori = 1,  dOri = 0,    Nx = 40, dX = 1,   Ny = 40, dY = 1}
         local oriXYSet_41x41y_d1        = {Nori = 1,  dOri = 0,    Nx = 41, dX = 1,   Ny = 41, dY = 1}
         local oriXYSet_42x42y_d1        = {Nori = 1,  dOri = 0,    Nx = 42, dX = 1,   Ny = 42, dY = 1}
         local oriXYSet_43x43y_d1        = {Nori = 1,  dOri = 0,    Nx = 43, dX = 1,   Ny = 43, dY = 1}
+        local oriXYSet_44x44y_d1        = {Nori = 1,  dOri = 0,    Nx = 44, dX = 1,   Ny = 44, dY = 1}
                     
                    
         --tbl_OriXY = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_42x42y_d1}
                                        
-        tbl_OriXY = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1, oriXYSet_42x42y_d1, 
-                        oriXYSet_39x39y_d1,  oriXYSet_41x41y_d1};
-
+        local oriXYSet_40x40y_d1_3ori_d5        = {Nori = 3,  dOri = 5,    Nx = 40, dX = 1,   Ny = 40, dY = 1}
+        local oriXYSet_41x41y_d1_3ori_d5        = {Nori = 3,  dOri = 5,    Nx = 41, dX = 1,   Ny = 41, dY = 1}
+        local oriXYSet_42x42y_d1_3ori_d5        = {Nori = 3,  dOri = 5,    Nx = 42, dX = 1,   Ny = 42, dY = 1}
+        local oriXYSet_43x43y_d1_3ori_d5        = {Nori = 3,  dOri = 5,    Nx = 43, dX = 1,   Ny = 43, dY = 1}
+        local oriXYSet_44x44y_d1_3ori_d5        = {Nori = 3,  dOri = 5,    Nx = 44, dX = 1,   Ny = 44, dY = 1}
+                                       
+        local oriXYSet_40x40y_d1_11ori_d1        = {Nori = 11,  dOri = 1,    Nx = 40, dX = 1,   Ny = 40, dY = 1}
+        local oriXYSet_41x41y_d1_11ori_d1        = {Nori = 11,  dOri = 1,    Nx = 41, dX = 1,   Ny = 41, dY = 1}
+        local oriXYSet_42x42y_d1_11ori_d1        = {Nori = 11,  dOri = 1,    Nx = 42, dX = 1,   Ny = 42, dY = 1}
+        local oriXYSet_43x43y_d1_11ori_d1        = {Nori = 11,  dOri = 1,    Nx = 43, dX = 1,   Ny = 43, dY = 1}
+        local oriXYSet_44x44y_d1_11ori_d1        = {Nori = 11,  dOri = 1,    Nx = 44, dX = 1,   Ny = 44, dY = 1}
+                    
+        
+        tbl_OriXY = { oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, oriXYSet_43x43y_d1, oriXYSet_44x44y_d1, 
+            oriXYSet_40x40y_d1_3ori_d5,  oriXYSet_41x41y_d1_3ori_d5, oriXYSet_42x42y_d1_3ori_d5, oriXYSet_43x43y_d1_3ori_d5, oriXYSet_44x44y_d1_3ori_d5, 
+            oriXYSet_40x40y_d1_11ori_d1,  oriXYSet_41x41y_d1_11ori_d1, oriXYSet_42x42y_d1_11ori_d1, oriXYSet_43x43y_d1_11ori_d1, oriXYSet_44x44y_d1_11ori_d1}
+        --]]
+        ---[[
+        local oriXYSet_24x24y_d1_3ori_d5= {Nori = 3,  dOri = 5,    Nx = 24, dX = 1,   Ny = 24, dY = 1}
+        local oriXYSet_24x24y_d1        = {Nori = 1,  dOri = 0,    Nx = 24, dX = 1,   Ny = 24, dY = 1}
+        local oriXYSet_26x26y_d1        = {Nori = 1,  dOri = 0,    Nx = 26, dX = 1,   Ny = 26, dY = 1}
+        local oriXYSet_28x28y_d1        = {Nori = 1,  dOri = 0,    Nx = 28, dX = 1,   Ny = 28, dY = 1}
+        local oriXYSet_12x12y_d2        = {Nori = 1,  dOri = 0,    Nx = 12, dX = 2,   Ny = 12, dY = 2}
+        
+        tbl_OriXY = {oriXYSet_24x24y_d1_3ori_d5, oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, 
+                        oriXYSet_12x12y_d2};
+                     
+        --]]
                     
         
     elseif  expName == 'TrainingWithNoise' then
@@ -1691,7 +1718,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                       tbl_SNR_train = tbl_allSNRs_train,
                                       
                                       SNR_test = allSNRs_test, 
-                                      trialId = 1,
+                                      tbl_trialId = table.range(1, nTrials),
                                       
                                       ---- Crowding options      
                                       

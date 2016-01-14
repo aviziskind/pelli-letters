@@ -196,7 +196,7 @@ function runIdealObserverTests(expName)
 %     fontNames_use = fontSets_allFonts_multStyles;
 
 %%
-    dWiggle = 15;
+    dWiggle = 5;
     doMult = 0 && 1;
     noWiggle = [1];
     if doMult
@@ -438,21 +438,51 @@ function runIdealObserverTests(expName)
                      allUncertaintySets = {oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, oriXYSet_12x12y_d2, oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
                      
  
-                     allSizeStyle_imageSizes = { {'k32', [80, 80]}  };
+%                      allSizeStyle_imageSizes = { {'k32', [80, 80]}  };
                      
-                   oriXYSet_38x38y_d1             = struct('oris', [0], 'xs', [1 : 38 ], 'ys', [1 : 38 ] ); 
-                   oriXYSet_39x39y_d1             = struct('oris', [0], 'xs', [1 : 39 ], 'ys', [1 : 39 ] ); 
+%                    oriXYSet_38x38y_d1             = struct('oris', [0], 'xs', [1 : 38 ], 'ys', [1 : 38 ] ); 
+%                    oriXYSet_39x39y_d1             = struct('oris', [0], 'xs', [1 : 39 ], 'ys', [1 : 39 ] ); 
+                   
                    oriXYSet_40x40y_d1             = struct('oris', [0], 'xs', [1 : 40 ], 'ys', [1 : 40 ] ); 
                    oriXYSet_41x41y_d1             = struct('oris', [0], 'xs', [1 : 41 ], 'ys', [1 : 41 ] ); 
                    oriXYSet_42x42y_d1             = struct('oris', [0], 'xs', [1 : 42 ], 'ys', [1 : 42 ] ); 
                    oriXYSet_43x43y_d1             = struct('oris', [0], 'xs', [1 : 43 ], 'ys', [1 : 43 ] ); 
+                   oriXYSet_44x44y_d1             = struct('oris', [0], 'xs', [1 : 44 ], 'ys', [1 : 44 ] ); 
+                   
+                   oriXYSet_40x40y_d1_3ori_d5             = struct('oris', [-5, 0, 5], 'xs', [1 : 40 ], 'ys', [1 : 40 ] ); 
+                   oriXYSet_41x41y_d1_3ori_d5             = struct('oris', [-5, 0, 5], 'xs', [1 : 41 ], 'ys', [1 : 41 ] ); 
+                   oriXYSet_42x42y_d1_3ori_d5             = struct('oris', [-5, 0, 5], 'xs', [1 : 42 ], 'ys', [1 : 42 ] ); 
+                   oriXYSet_43x43y_d1_3ori_d5             = struct('oris', [-5, 0, 5], 'xs', [1 : 43 ], 'ys', [1 : 43 ] ); 
+                   oriXYSet_44x44y_d1_3ori_d5             = struct('oris', [-5, 0, 5], 'xs', [1 : 44 ], 'ys', [1 : 44 ] ); 
+
+                   oriXYSet_40x40y_d1_11ori_d1             = struct('oris', [-5 : 1 : 5], 'xs', [1 : 40 ], 'ys', [1 : 40 ] ); 
+                   oriXYSet_41x41y_d1_11ori_d1             = struct('oris', [-5 : 1 : 5], 'xs', [1 : 41 ], 'ys', [1 : 41 ] ); 
+                   oriXYSet_42x42y_d1_11ori_d1             = struct('oris', [-5 : 1 : 5], 'xs', [1 : 42 ], 'ys', [1 : 42 ] ); 
+                   oriXYSet_43x43y_d1_11ori_d1             = struct('oris', [-5 : 1 : 5], 'xs', [1 : 43 ], 'ys', [1 : 43 ] ); 
+                   oriXYSet_44x44y_d1_11ori_d1             = struct('oris', [-5 : 1 : 5], 'xs', [1 : 44 ], 'ys', [1 : 44 ] ); 
                    
 %                     allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_42x42y_d1};
                     
-                    allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, ...
-                        oriXYSet_39x39y_d1, oriXYSet_41x41y_d1, oriXYSet_43x43y_d1};
-                    
+%                     allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, ...
+%                         oriXYSet_39x39y_d1, oriXYSet_41x41y_d1, oriXYSet_43x43y_d1};
+                    allUncertaintySets = { oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, oriXYSet_43x43y_d1, oriXYSet_44x44y_d1, ...
+                        oriXYSet_40x40y_d1_3ori_d5,  oriXYSet_41x41y_d1_3ori_d5, oriXYSet_42x42y_d1_3ori_d5, oriXYSet_43x43y_d1_3ori_d5, oriXYSet_44x44y_d1_3ori_d5, ...
+                        oriXYSet_40x40y_d1_11ori_d1,  oriXYSet_41x41y_d1_11ori_d1, oriXYSet_42x42y_d1_11ori_d1, oriXYSet_43x43y_d1_11ori_d1, oriXYSet_44x44y_d1_11ori_d1};                    
                 
+                    
+                      oriXYSet_24x24y_d1_3ori_d5             = struct('oris', [-5, 0, 5], 'xs', [1 : 24], 'ys', [1 : 24]);
+                     oriXYSet_24x24y_d1             = struct('oris', [0], 'xs', [1 : 24], 'ys', [1 : 24]);
+                     oriXYSet_26x26y_d1             = struct('oris', [0], 'xs', [1 : 26], 'ys', [1 : 26]);
+                     oriXYSet_28x28y_d1             = struct('oris', [0], 'xs', [1 : 28], 'ys', [1 : 28]);
+
+                     oriXYSet_12x12y_d2             = struct('oris', [0], 'xs', [1 : 2 : 24], 'ys', [1 : 2 : 24]);
+                     oriXYSet_6x6y_d4               = struct('oris', [0], 'xs', [1 : 4 : 24], 'ys', [1 : 4 : 24]);
+                     oriXYSet_4x4y_d6               = struct('oris', [0], 'xs', [1 : 6 : 24], 'ys', [1 : 6 : 24]);
+
+                     allUncertaintySets = {oriXYSet_24x24y_d1_3ori_d5, oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, oriXYSet_12x12y_d2}; % oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
+                    
+                    
+                    
                      loopKeysOrder = {'fontName'};
          case 'Uncertainty',
 %              fontNames_use = {{'Bookman'}};

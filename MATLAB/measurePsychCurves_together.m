@@ -1,8 +1,8 @@
 function measurePsychCurves_together(redoFlag)
 
 %     expName = 'Channels';
-%     expName = 'Grouping';
-    expName = 'Complexity';
+    expName = 'Grouping';
+%     expName = 'Complexity';
     
 %     dataFolder = '/media/avi/Storage/Users/Avi/Code/nyu/letters/MATLAB/HumanObserver/'; % replace with folder where you want to keep stimuli & recorded data / thresholds
 %     dataFolder = '/media/avi/Storage/Users/Avi/Code/nyu/letters/MATLAB/HumanObserver/'; % replace with folder where you want to keep stimuli & recorded data / thresholds
@@ -21,9 +21,9 @@ function measurePsychCurves_together(redoFlag)
     userName = 'az_2'; % for wiggle-types v2
     userName = 'az_3'; % for wiggle-types v2
 
-    userName = 'az_8'; % for channels for different fonts
+%     userName = 'az_8'; % for channels for different fonts
 
-    userName = 'az_1'; % for complexities for different fonts
+%     userName = 'az_1'; % for complexities for different fonts
 
     %     norm_str = iff(applyFourierMaskGainFactor, '_NORM', '');
 %     userName = [userName];

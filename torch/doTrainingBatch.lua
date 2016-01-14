@@ -42,6 +42,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
         print('[ONLY DOING SINGLE LETTER TRAINING : SKIPPING MULTIPLE LETTER TESTS]');
     end
 
+    local multiple_trials_retrain_only_top_layer = true
     
     local tbl_Log = {nCompletedAlready=0, nBeingDoneByOthers=0, nSkipped=0, nCompleted=0};
     
@@ -395,8 +396,11 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                         if sameOptionsTrainTest then
                             expSubtitle_network = expSubtitle
                         else
-                            
-                            expSubtitle_network = getExpSubtitle(dataOpts_network, networkOpts_i, trialId)
+                            local trialId_network = trialId
+                            if multiple_trials_retrain_only_top_layer then
+                                trialId_network = 1
+                            end
+                            expSubtitle_network = getExpSubtitle(dataOpts_network, networkOpts_i, trialId_network)
                             
                             if retrainSomeLayers then
                                 expSubtitle_network_retrain = getExpSubtitle(dataOpts_network_retrain, networkOpts_i, trialId)

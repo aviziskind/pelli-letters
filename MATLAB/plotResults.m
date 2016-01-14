@@ -2,12 +2,12 @@ function plotResults
 
     nTrials = 1;
 %     fig_offset = 0;
-    fig_offset = 42;
+    fig_offset = 52;
 
 %     expName = 'ChannelTuning';
 %     expName = 'Crowding';
-%     expName = 'Grouping';
-    expName = 'Complexity';
+    expName = 'Grouping';
+%     expName = 'Complexity';
 %     expName = 'TrainingWithNoise';
 %     expName = 'Uncertainty';
 
@@ -1105,11 +1105,11 @@ function plotResults
             case 'linear', xtick_wiggle0 = 0;
         end
         
-%         wiggleType = 'orientation';
-        wiggleType = 'offset';
+        wiggleType = 'orientation';
+%         wiggleType = 'offset';
 %         wiggleType = 'phase';
 
-        dWiggle = 45;
+        dWiggle = 5;
 %         dWiggle = 10;
         allWiggleTypes = {'orientation', 'offset', 'phase'};
 %         allWiggleTypes = {'orientation', 'offset'};
@@ -1379,8 +1379,8 @@ function plotResults
         
         case 'Grouping',
 %             sizeStyle = 55; imageSize = [96, 96];
-%             sizeStyle = 'k32'; imageSize = [64, 64];
-            sizeStyle = 'k32'; imageSize = [96, 96];
+            sizeStyle = 'k32'; imageSize = [64, 64];
+%             sizeStyle = 'k32'; imageSize = [80, 80];
             
 %             sizeStyle = 'k48'; imageSize = [96, 96];
 %             sizeStyle = 'k32'; imageSize = [40 40];
@@ -1440,29 +1440,29 @@ function plotResults
 %             allUncertaintySets = { oriXYSet_30x30y21o };
 %             allUncertaintySets = { oriXYSet_19x19y21o };
             
-
-           
-            oriXYSet_3o_d5 = struct('oris', [-5,0,5], 'xs', [0], 'ys', [0] );  % for complexity
-            oriXYSet_21o_d2 = struct('oris', [-20:2:20], 'xs', [0], 'ys', [0] );  % for complexity            
-            oriXYSet_13o_d5 = struct('oris', [-30:5:30], 'xs', [0], 'ys', [0] );  % for complexity
-            oriXYSet_25o_d5 = struct('oris', [-60:5:60], 'xs', [0], 'ys', [0] );  % for complexity
-          
-
-            allUncertaintySets = {oriXYSet_1pos,  oriXYSet_3o_d5, oriXYSet_13o_d5, oriXYSet_21o_d2,   oriXYSet_25o_d5 }; % for texture
-
-            
-            
-                   oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
-                   oriXYSet_15x19y_d1_3o_d5       = struct('oris', [-5:5:5], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
-                   oriXYSet_15x19y_d1_7o_d5       = struct('oris', [-15:5:15], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
-                   oriXYSet_15x19y_d1_21o_d2       = struct('oris', [-20:2:20], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
-                   oriXYSet_15x19y_d1_11o_d1       = struct('oris', [-5:1:5], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
-                   oriXYSet_15x19y_d1_31o_d1       = struct('oris', [-15:1:15], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
-
-                   
-                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
-                                           oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
+% 
+%            
+%             oriXYSet_3o_d5 = struct('oris', [-5,0,5], 'xs', [0], 'ys', [0] );  % for complexity
+%             oriXYSet_21o_d2 = struct('oris', [-20:2:20], 'xs', [0], 'ys', [0] );  % for complexity            
+%             oriXYSet_13o_d5 = struct('oris', [-30:5:30], 'xs', [0], 'ys', [0] );  % for complexity
+%             oriXYSet_25o_d5 = struct('oris', [-60:5:60], 'xs', [0], 'ys', [0] );  % for complexity
+%           
+% 
+%             allUncertaintySets = {oriXYSet_1pos,  oriXYSet_3o_d5, oriXYSet_13o_d5, oriXYSet_21o_d2,   oriXYSet_25o_d5 }; % for texture
+% 
+%             
+%             
+%                    oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
+%                    oriXYSet_15x19y_d1_3o_d5       = struct('oris', [-5:5:5], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
+%                    oriXYSet_15x19y_d1_7o_d5       = struct('oris', [-15:5:15], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
+%                    oriXYSet_15x19y_d1_21o_d2       = struct('oris', [-20:2:20], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
+%                    oriXYSet_15x19y_d1_11o_d1       = struct('oris', [-5:1:5], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
+%                    oriXYSet_15x19y_d1_31o_d1       = struct('oris', [-15:1:15], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  % for complexity 22*22 = 484
+% 
+%                    
 %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
+%                                            oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
+% %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
 %                                            oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
 %             
 % 
@@ -1493,28 +1493,50 @@ function plotResults
 %              oriXYSet_2x_d16= struct('oris', [0], 'xs', [0 : 16 : 16], 'ys', [0] );  
 % 
 %              allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x_d1, oriXYSet_2x_d2, oriXYSet_2x_d3, oriXYSet_2x_d4, oriXYSet_2x_d6, oriXYSet_2x_d8, oriXYSet_2x_d16};
-                    
-%                      oriXYSet_24x24y_d1             = struct('oris', [0], 'xs', [1 : 24], 'ys', [1 : 24]);
-%                      oriXYSet_26x26y_d1             = struct('oris', [0], 'xs', [1 : 26], 'ys', [1 : 26]);
-%                      oriXYSet_28x28y_d1             = struct('oris', [0], 'xs', [1 : 28], 'ys', [1 : 28]);
-% 
-%                      oriXYSet_12x12y_d2             = struct('oris', [0], 'xs', [1 : 2 : 24], 'ys', [1 : 2 : 24]);
-%                      oriXYSet_6x6y_d4               = struct('oris', [0], 'xs', [1 : 4 : 24], 'ys', [1 : 4 : 24]);
-%                      oriXYSet_4x4y_d6               = struct('oris', [0], 'xs', [1 : 6 : 24], 'ys', [1 : 6 : 24]);
-%                      allUncertaintySets = {oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, oriXYSet_12x12y_d2, oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
+%                     
+                     oriXYSet_24x24y_d1_3ori_d5     = struct('oris', [-5, 0, 5], 'xs', [1 : 24], 'ys', [1 : 24]);
+                     oriXYSet_24x24y_d1             = struct('oris', [0], 'xs', [1 : 24], 'ys', [1 : 24]);
+                     oriXYSet_26x26y_d1             = struct('oris', [0], 'xs', [1 : 26], 'ys', [1 : 26]);
+                     oriXYSet_28x28y_d1             = struct('oris', [0], 'xs', [1 : 28], 'ys', [1 : 28]);
+
+                     oriXYSet_12x12y_d2             = struct('oris', [0], 'xs', [1 : 2 : 24], 'ys', [1 : 2 : 24]);
+                     oriXYSet_6x6y_d4               = struct('oris', [0], 'xs', [1 : 4 : 24], 'ys', [1 : 4 : 24]);
+                     oriXYSet_4x4y_d6               = struct('oris', [0], 'xs', [1 : 6 : 24], 'ys', [1 : 6 : 24]);
+%                      allUncertaintySets = {oriXYSet_28x28y_d1, oriXYSet_26x26y_d1, oriXYSet_24x24y_d1, oriXYSet_12x12y_d2, oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
+                     allUncertaintySets = {oriXYSet_28x28y_d1, oriXYSet_26x26y_d1, oriXYSet_24x24y_d1, oriXYSet_24x24y_d1_3ori_d5, oriXYSet_12x12y_d2};
 %            
-                   oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
-                   oriXYSet_22x26y_d1             = struct('oris', [0], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
-                   oriXYSet_31x36y_d1             = struct('oris', [0], 'xs', [1 : 31 ], 'ys', [1 : 36 ] ); 
-                   oriXYSet_45x47y_d1             = struct('oris', [0], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
-%                    oriXYSet_45x47y_d1_21o_d1      = struct('oris', [-10:1:10], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
-%                    oriXYSet_45x47y_d1_41o_d1      = struct('oris', [-20:1:20], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
-                   
-                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_31x36y_d1, ...
-                                           oriXYSet_45x47y_d1 }; ..., oriXYSet_45x47y_d1_21o_d1, oriXYSet_45x47y_d1_41o_d1};
+%                    oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+%                    oriXYSet_22x26y_d1             = struct('oris', [0], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
+%                    oriXYSet_31x36y_d1             = struct('oris', [0], 'xs', [1 : 31 ], 'ys', [1 : 36 ] ); 
+%                    oriXYSet_45x47y_d1             = struct('oris', [0], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
+% %                    oriXYSet_45x47y_d1_21o_d1      = struct('oris', [-10:1:10], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
+% %                    oriXYSet_45x47y_d1_41o_d1      = struct('oris', [-20:1:20], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
+%                    
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_31x36y_d1, ...
+%                                            oriXYSet_45x47y_d1 }; ..., oriXYSet_45x47y_d1_21o_d1, oriXYSet_45x47y_d1_41o_d1};
 
 %             allRetrainFromLayers = {'classifier'};
 %             allRetrainFromLayers = {''};            
+
+
+
+%     
+%                    oriXYSet_38x38y_d1             = struct('oris', [0], 'xs', [1 : 38 ], 'ys', [1 : 38 ] ); 
+%                    oriXYSet_39x39y_d1             = struct('oris', [0], 'xs', [1 : 39 ], 'ys', [1 : 39 ] ); 
+%                    oriXYSet_40x40y_d1             = struct('oris', [0], 'xs', [1 : 40 ], 'ys', [1 : 40 ] ); 
+%                    oriXYSet_41x41y_d1             = struct('oris', [0], 'xs', [1 : 41 ], 'ys', [1 : 41 ] ); 
+%                    oriXYSet_42x42y_d1             = struct('oris', [0], 'xs', [1 : 42 ], 'ys', [1 : 42 ] ); 
+%                    oriXYSet_43x43y_d1             = struct('oris', [0], 'xs', [1 : 43 ], 'ys', [1 : 43 ] ); 
+%                    oriXYSet_44x44y_d1             = struct('oris', [0], 'xs', [1 : 44 ], 'ys', [1 : 44 ] ); 
+%                    
+% %                     allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_42x42y_d1};
+%                     
+% %                     allUncertaintySets = { oriXYSet_38x38y_d1, oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, ...
+% %                         oriXYSet_39x39y_d1, oriXYSet_41x41y_d1, oriXYSet_43x43y_d1};
+%                     allUncertaintySets = {oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, ...
+%                         oriXYSet_43x43y_d1, oriXYSet_44x44y_d1};
+%                     
+  
 
             fullWiggleSet = {'same'};
             svhn_trainingSize = [32, 32];
@@ -3562,11 +3584,11 @@ function plotResults
         alsoPlotIdeal = strcmp(expName, 'ChannelTuning') ||  strcmp(expName, 'Crowding') ...
              || strcmp(y_name, 'Threshold_model');
 %         alsoPlotIdeal = 0;
-        alsoPlotIdeal= 1;
+%         alsoPlotIdeal= 1;
         h_ideal = [];
         leg_ideal_C = {};
             
-        if alsoPlotIdeal
+        if alsoPlotIdeal && exist('th_ideal', 'var')
             %%
             th_ideal_M = nanmean(nanmean(th_ideal, 2), 4);
             th_ideal_use = th_ideal_M(:,1,plot_i); %take data for this plot, 1st set, 1st trial
@@ -3802,7 +3824,7 @@ function plotResults
                     ylims = [0.001, .21];
 
                 elseif strncmp(y_name, 'Threshold', 9)
-                    ylims = [1, 1000];
+                    ylims = [10, 1000];
                 end
                     
 %                 ylims = [.001, 1]; 
@@ -3825,6 +3847,7 @@ function plotResults
                         ylims = [0.01, .085];
                         ylims = [0.00, 0.12];
                         ylims = [0.00, 0.18];
+%                         ylims = [0.00, 0.1];
                         if strcmp(modelName, 'Texture')
                             ylims = [0.00, 0.05];
                         end
