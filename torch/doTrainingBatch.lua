@@ -97,7 +97,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                             and ( abbrevFontStyleNames(dataOpts.trainingFonts) ~= abbrevFontStyleNames(dataOpts.fontName)) 
         
         local trainTestOnDifferentNoise = dataOpts.trainingNoise and not (dataOpts.trainingNoise == 'same') 
-                                            and (filterStr(dataOpts.trainingNoise, 1) ~= filterStr(dataOpts.noiseFilter, 1)) 
+                                            and (getFilterStr(dataOpts.trainingNoise, 1) ~= getFilterStr(dataOpts.noiseFilter, 1)) 
                                             and not isRealDataFont( dataOpts.fontName)
                                             
                     

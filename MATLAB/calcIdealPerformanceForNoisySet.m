@@ -173,7 +173,7 @@ function [propCorrectLetter, propCorrectEachLetter, propCorrectOrientation, prop
                     [~, fontXheight, ~] = getFontSize(noisySet.fontName, noisySet.sizeStyle);  
        
                     if any(strcmp (trainingNoise.filterType, {'band', 'lo', 'hi'}))
-                        trainingNoise.cycPerLet_range = getCycPerLet_range(trainingNoise);
+                        trainingNoise.cycPerLet_range = getNoiseRange(trainingNoise);
                         trainingNoise.cycPerPix_range = trainingNoise.cycPerLet_range / fontXheight;
                     end
                     trainingNoise.applyFourierMaskGainFactor = false;  % we will normalize it outselves after inverting it.

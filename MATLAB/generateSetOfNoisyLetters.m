@@ -70,7 +70,8 @@ function noisySet = generateSetOfNoisyLetters(signal, params)
         noiseImage_raw=RandSample(noiseSamples.noiseList,noiseSamples.noiseSize);
 
         if filterNoise
-            noiseImage_raw = ifft2( mask .* fft2(noiseImage_raw), 'symmetric') * gain_factor;
+            noiseImage_raw = applyFourierMask(mask, noiseImage_raw, gain_factor);
+%             noiseImage_raw = ifft2( mask .* fft2(noiseImage_raw), 'symmetric') * gain_factor;
         end
         noiseImage=noiseContrast*noiseImage_raw;
         

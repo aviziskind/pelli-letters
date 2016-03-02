@@ -59,10 +59,10 @@ getNoisyLetterOptsStr = function(noisyLetterOpts)
     local noiseFilter_str = noiseFilterOptStr(noisyLetterOpts)    -- includes "trained with" if appropriate
 
     local differentTrainTestNoise = noisyLetterOpts.trainingNoise and not isequal(noisyLetterOpts.trainingNoise, 'same') 
-                            and not (filterStr(noisyLetterOpts.noiseFilter, 1) == filterStr(noisyLetterOpts.trainingNoise, 1))
+                            and not (getFilterStr(noisyLetterOpts.noiseFilter, 1) == getFilterStr(noisyLetterOpts.trainingNoise, 1))
     local trainNoise_str = ''
     if differentTrainTestNoise then
-        trainNoise_str = '_tr' .. filterStr(noisyLetterOpts.trainingNoise, 1)
+        trainNoise_str = '_tr' .. getFilterStr(noisyLetterOpts.trainingNoise, 1)
     end
     
     
@@ -229,7 +229,7 @@ noiseFilterOptStr = function(dataOpts)
     local noiseFilter_str = ''
     if useNoiseFilter then
         
-        local testFilt_str = filterStr(dataOpts.noiseFilter)
+        local testFilt_str = getFilterStr(dataOpts.noiseFilter)
         -- define training noise string
         
         -- final test noise filter:
@@ -245,86 +245,6 @@ end
  
    
 
-
-filterStr = function(filt, wForWhite)
-    
-    local filtStr    
-    
-    local applyFourierMaskGainFactor_default = false
-    local applyFourierMaskGainFactor = applyFourierMaskGainFactor_default
-    if filt and filt.filterType == 'white' then
-        applyFourierMaskGainFactor = false
-    elseif filt and filt.applyFourierMaskGainFactor then
-        applyFourierMaskGainFactor = filt.applyFourierMaskGainFactor
-    end
-    local normStr = iff(applyFourierMaskGainFactor, 'N', '')
-    
-    
-    
-    if filt == nil or filt == 'same' then
-        filtStr = ''
-        
-    elseif filt.filterType == 'white' then
-        if wForWhite then
-            filtStr = 'w'
-        else
-            filtStr = ''
-        end
-        
-    elseif filt.filterType == 'band' then
-        filtStr = string.format('Nband%.0f', filt.cycPerLet_centFreq*10)
-        
-    elseif filt.filterType == 'hi' then
-        filtStr = string.format('Nhi%.0f', filt.cycPerLet_cutOffFreq*10)
-    
-    elseif filt.filterType == 'lo' then
-        filtStr = string.format('Nlo%.0f', filt.cycPerLet_cutOffFreq*10)
-
-
-    elseif string.sub(filt.filterType, 1, 3) == '1/f' then
-   
-        local f_exp_std_str = ''
-        if filt.f_exp_std and filt.f_exp_std > 0 then
-            f_exp_std_str = string.format('s%.0f', filt.f_exp_std*100)
-        end
-    
-
-        if filt.filterType == '1/f' then
-            filtStr = string.format('Npink%.0f%s', filt.f_exp*10, f_exp_std_str)
-        
-        elseif (filt.filterType == '1/fPwhite') or  (filt.filterType == '1/fOwhite' ) then
-        
-            local f_exp = filt.f_exp;
-            local f_exp_default = 1.0;
-            local f_exp_str = '';
-            local pinkWhiteRatio = filt.ratio;
-                
-            local pinkExtraStr = '';
-            local whiteExtraStr = '';
-            if pinkWhiteRatio > 1 then
-                pinkExtraStr = string.format('%.0f', pinkWhiteRatio * 10);
-            elseif pinkWhiteRatio < 1 then
-                whiteExtraStr = string.format('%.0f', (1/pinkWhiteRatio)*10 );
-            end
-            
-            if f_exp ~= f_exp_default then
-                f_exp_str = string.format('%.0f', f_exp*10);
-            end
-            
-            local plus_or_str = switchh(filt.filterType, {'1/fPwhite','1/fOwhite'}, {'P', 'O'});
-           
-            filtStr = string.format('N%spink%s%s%sw%s', pinkExtraStr, f_exp_str, f_exp_std_str, 
-                plus_or_str, whiteExtraStr);    
-        end
-    
-    else
-        error(string.format('Unknown filter type: %s ', filt.filterType))
-    end
-    
-    return filtStr .. normStr
-    
-
-end
 
 
 
@@ -973,7 +893,7 @@ fixDataOpts = function(opt)
     end
     
     -- remove 'retrainFromLayer' if trainNoise is same as testNoise, and trainFonts = testFonts
-    local differentTrainTestNoise = opt.trainingNoise and (opt.trainingNoise ~= 'same') and (filterStr(opt.noiseFilter, 1) ~= filterStr(opt.trainingNoise, 1))
+    local differentTrainTestNoise = opt.trainingNoise and (opt.trainingNoise ~= 'same') and (getFilterStr(opt.noiseFilter, 1) ~= getFilterStr(opt.trainingNoise, 1))
     OO = opt
     local differentTrainTestFonts = opt.trainingFonts and (opt.trainingFonts ~= 'same') and (abbrevFontStyleNames(opt.trainingFonts) ~=  abbrevFontStyleNames(opt.fontName) )
             
