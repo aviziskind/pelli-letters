@@ -816,7 +816,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     end
                                     
                                     -- split network and retrain upper layers on retraining data
-                                    model_struct = splitModelAfterLayer(model_struct, dataOpts_network_retrain.retrainFromLayer)
+                                    model_struct = splitModelFromLayer(model_struct, dataOpts_network_retrain.retrainFromLayer)
                                                                            
 
                                     -- retrain network
@@ -855,7 +855,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     model_struct.model = model_struct.model_indiv_pos_combined
                                     
                                     -- resplit network so that just the top-most classifier is trained
-                                    model_struct = splitModelAfterLayer(model_struct, -3)  -- last 3 layers: -1: logSoftMax, -2: linear to 26 outputs. -3: layer before that one
+                                    model_struct = splitModelFromLayer(model_struct, -3)  -- last 3 layers: -1: logSoftMax, -2: linear to 26 outputs. -3: layer before that one
 
                                    
                                     

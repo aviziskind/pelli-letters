@@ -2328,7 +2328,7 @@ function plotResults
                 plotTitle{plot_i} = sprintf('Size = %s. ImageSize = %d x %d', num2str(letterOpt_use.sizeStyle), letterOpt_use.imageSize);
             case 'TrainingNoise',
                 letterOpt_use.trainingNoise = allTrainingNoise{plot_i};
-                [~, noiseFilter_str_nice] = filterStr( letterOpt_use.trainingNoise ); %, {'trainingNoise'});
+                [~, noiseFilter_str_nice] = getFilterStr( letterOpt_use.trainingNoise ); %, {'trainingNoise'});
 %                 [~, str] = getLetterOptsStr(letterOpt_use, r);
                 if ~strcmp(noiseFilter_str_nice, 'same')
                     plotTitle{plot_i} = ['Trained on: ' noiseFilter_str_nice]; %sprintf('Training Noise = %s ', num2str(letterOpt_use.sizeStyle), letterOpt_use.imageSize);

@@ -32,7 +32,7 @@ function opt = fixNoisyLetterOpts(opt)
     end
     
 %     -- remove 'retrainFromLayer' if trainNoise is same as testNoise, && trainFonts = testFonts
-    differentTrainTestNoise = isfield(opt, 'trainingNoise') && ~strcmp(opt.trainingNoise, 'same') && ~strcmp(filterStr(opt.noiseFilter, 1), filterStr(opt.trainingNoise, 1));
+    differentTrainTestNoise = isfield(opt, 'trainingNoise') && ~strcmp(opt.trainingNoise, 'same') && ~strcmp(getFilterStr(opt.noiseFilter, 1), getFilterStr(opt.trainingNoise, 1));
     differentTrainTestFonts = isfield(opt, 'trainingFonts') && ~strcmp(opt.trainingFonts, 'same') && ~strcmp(abbrevFontStyleNames(opt.trainingFonts), abbrevFontStyleNames(opt.fontName) );
             
     if ~differentTrainTestNoise && ~differentTrainTestFonts 

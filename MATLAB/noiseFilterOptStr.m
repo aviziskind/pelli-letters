@@ -7,7 +7,7 @@ function [noiseFilter_str, noiseFilter_str_nice] = noiseFilterOptStr(letterOpts,
     
     if useNoiseFilter
         
-        [testFilt_str, testFilt_str_nice] = filterStr(letterOpts.noiseFilter);
+        [testFilt_str, testFilt_str_nice] = getFilterStr(letterOpts.noiseFilter);
         % a) define training noise string
         
                 
@@ -43,7 +43,7 @@ end
     
     if useNoiseFilter
         
-        [testFilt_str, testFilt_str_nice] = filterStr(letterOpts.noiseFilter);
+        [testFilt_str, testFilt_str_nice] = getFilterStr(letterOpts.noiseFilter);
                 % a) define training noise string
         % get the training noise string -- only write explicitly if training noise different
         % from testing noise.
@@ -51,7 +51,7 @@ end
         trainNoise_str = '';
         doExplicitTrainNoise = isfield(letterOpts, 'trainingNoise') && ~strcmpi(letterOpts.trainingNoise, 'same') && ~isequal(letterOpts.noiseFilter, letterOpts.trainingNoise);
         if doExplicitTrainNoise
-            [trainFilt_str, trainFilt_str_nice] = filterStr(letterOpts.trainingNoise, 1);
+            [trainFilt_str, trainFilt_str_nice] = getFilterStr(letterOpts.trainingNoise, 1);
             trainNoise_str = ['_tr' trainFilt_str];
                         
         end
@@ -68,11 +68,11 @@ end
                 if strcmpi(letterOpts.trainingNoise, 'same')
                     trainingNoise_str_nice = 'Trained on same noise; ';
                 elseif isfield(letterOpts, 'trainingNoise') 
-                    [~, trainFilt_str_nice] = filterStr(letterOpts.trainingNoise, 1);
+                    [~, trainFilt_str_nice] = getFilterStr(letterOpts.trainingNoise, 1);
                     trainingNoise_str_nice = sprintf('Trained on %s', trainFilt_str_nice);
                 else
                     error('check!');
-%                     [~, trainFilt_str_nice] = filterStr(letterOpts.noiseFilter, 1);
+%                     [~, trainFilt_str_nice] = getFilterStr(letterOpts.noiseFilter, 1);
 %                     trainingNoise_str_nice = sprintf('Trained on %s', trainFilt_str_nice);
                 end
                 noiseFilter_str_nice = [noiseFilter_str_nice trainingNoise_str_nice];

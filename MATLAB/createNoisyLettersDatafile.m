@@ -1214,7 +1214,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     end
 %     noiseFilter.applyFourierMaskGainFactor = applyFourierMaskGainFactor;
     
-%     [~, noiseFilter_str] = filterStr(noiseFilter);
+%     [~, noiseFilter_str] = getFilterStr(noiseFilter);
     
 %     connectToNYU crunchy3 matlab createNoisyLettersDatafile
 %     fprintf('Noise filter : %s', noiseFilter_str)
@@ -2178,7 +2178,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             y_idx=noisySet.targetY_idx(sample_idx);
             sImage=noisySet.signal(let_idx,x_idx,y_idx,ori_idx).image;
             nImage= (snImage-sImage) / noiseContrast;
-            [~, filt_str] = filterStr( noiseFilter);
+            [~, filt_str] = getFilterStr( noiseFilter);
             %                 h_ax(snr_i,3) = subplot(rows,3,row_start+3,'align');
             subplotGap(2,nSets, 1, set_idx);
             if isfield(noisySet, 'fourierMask')

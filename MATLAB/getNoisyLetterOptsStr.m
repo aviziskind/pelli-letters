@@ -107,12 +107,12 @@ function [noisyOpt_str, noisyOpt_str_nice] = getNoisyLetterOptsStr(noisyLetterOp
     end
     
     differentTrainTestNoise = isfield(noisyLetterOpts, 'trainingNoise') && ~isempty(noisyLetterOpts.trainingNoise) && ~strcmp(noisyLetterOpts.trainingNoise, 'same') && ...
-                              isfield(noisyLetterOpts, 'noiseFilter') && ~isequal( filterStr(noisyLetterOpts.noiseFilter, 1), filterStr(noisyLetterOpts.trainingNoise, 1) );
+                              isfield(noisyLetterOpts, 'noiseFilter') && ~isequal( getFilterStr(noisyLetterOpts.noiseFilter, 1), getFilterStr(noisyLetterOpts.trainingNoise, 1) );
 
     trainNoise_str = '';
     if differentTrainTestNoise
         
-        [trainingNoise_str, trainingNoise_str_nice] = filterStr(noisyLetterOpts.trainingNoise, 1);
+        [trainingNoise_str, trainingNoise_str_nice] = getFilterStr(noisyLetterOpts.trainingNoise, 1);
         trainNoise_str = ['_tr' trainingNoise_str];
         
         if makeNiceStr && any(strcmpi(niceStrFields, 'trainingNoise'))
