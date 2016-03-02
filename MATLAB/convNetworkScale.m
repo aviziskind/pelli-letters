@@ -2,7 +2,7 @@
 %     clear all
 %     clc
 
-%     nstates = [6,16,120];
+%     nstates = [6,16,-120];
 %     nstates = [6,50];
 %     nstates = [6, 16, 128, 120];
 
@@ -13,18 +13,21 @@
 
 %           nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3];  poolsizes = [2, 2, 2];
 %         nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 2];
-%         nstates = [16, 64, 256, 120];  filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
-        nstates = [16, 128, 512, 240];  filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
+        nstates = [16, 64, 256, 120];  filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
+%         nstates = [16, 128, 512, 240];  filtsizes = [5, 5, 3]; poolsizes = [4, 3, 16];
 %         nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
 
 
         
-        
-%         nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
+      nstates = [16, 64, -120];    filtsizes = [5, 5]; poolsizes = [2, 26];
+%           nstates = [16, 64, 128, 1024, -120];  filtsizes = [5, 5, 5, 3]; poolsizes = [2, 2, 2, 8];
+      
+%       pp  nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
 %         nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3]; poolsizes = [2, 2, 3];
 %         nstates = [6, 16, 64, 120];    filtsizes = [5, 3, 3]; poolsizes = [2, 2, 2];
 %         nstates = [6, 16, 64, 120];    filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
         
+    convPadding = true;
         
     nfeats = 1; 
     fanin = [1,4,16];
@@ -36,6 +39,7 @@
 %     poolsizes = [2, 2, 2];
 
     strides = poolsizes; %[4];
+%     strides = ones(size(poolsizes));
     pooltype = 2;
 
 %     height = 29;
@@ -45,8 +49,8 @@
 %     width = 88;
 %     height = 96;
 %     width = 96;
-%     height = 64;  width = 64;
-    height = 32;  width = 32;
+    height = 64;  width = 64;
+%     height = 32;  width = 32;
 %     height = 56;  width = 56;
     
     noutputs = 26;
@@ -96,9 +100,13 @@
             width_prev = nOut_pool_w(layer_i-1);
         end
 
-        nOut_conv_h(layer_i) = height_prev - filtsizes(layer_i) + 1;
-        nOut_conv_w(layer_i) = width_prev - filtsizes(layer_i) + 1;
-        
+        if convPadding
+            nOut_conv_h(layer_i) = height_prev;
+            nOut_conv_w(layer_i) = width_prev;            
+        else
+            nOut_conv_h(layer_i) = height_prev - filtsizes(layer_i) + 1;
+            nOut_conv_w(layer_i) = width_prev - filtsizes(layer_i) + 1;
+        end        
         
         
         nOut_pool_h(layer_i) = floor( (nOut_conv_h(layer_i) - poolsizes(layer_i) )/strides(layer_i)) + 1;

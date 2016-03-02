@@ -509,6 +509,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                         local pretrainedNetworkFileExists, pretrainedNetwork_filename, foldersChecked
                         
                         local extraLocksToPlace = {}
+                        
                         if not sameOptionsTrainTest then
                             -- 2. files that are prerequisites (ie. pretrained networks). 
                                 -- if don't have the results file ==>, skip if onlyRetrainIfHavePretrainedNetworks = true
@@ -520,25 +521,46 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                             --local pretrainedNetworkFileExists = paths.filep(pretrainedNetwork_file)
                             --local pretrainedResults_file = training_dir .. expSubtitle .. '.t7'
                             --local pretrainedResultsFileExists = paths.filep(pretrainedNetwork_file)
-                            local checkForPretrainedResults = false
-                            local pretrainedResults_filename_base = expFullTitle_network .. '.mat'
                             
                             
-                            --[[
-                            local pretrainedResultsFileExists, pretrainedNetworkFileExists
-                            if checkForPretrainedResults then
-                                local pretrainedResultsFileExists, pretrainedResults_filename = fileExistsInSisterSubdirs(
-                                    results_dir_main, preferred_subdir, pretrainedResults_filename_base)
-                        
-                            end
+                            ---[[
+
                             --]]
+                            -- check and see if we have the pretrained network
                             local pretrainedNetwork_filename_base = expFullTitle_network .. '.t7'
                             
                             pretrainedNetworkFileExists, pretrainedNetwork_filename, foldersChecked = fileExistsInSisterSubdirs(
                                 training_dir_main, preferred_subdir, pretrainedNetwork_filename_base)
                         
+                        
+                            -- check and see if the pretrained network has finished training (ie. if there is a 'results' file)
+                            local checkForPretrainedResults = true and pretrainedNetworkFileExists 
+                            local pretrainedResults_filename_base = dataOpts.stimType .. '_' .. expFullTitle_network .. '.mat'
+                            local pretrainedNetworkNotFinishedTraining = false
+                            local pretrainedResultsFileExists, pretrainedResults_filename 
+                            
+                            if checkForPretrainedResults then
+                                pretrainedResultsFileExists, pretrainedResults_filename, foldersChecked = fileExistsInSisterSubdirs(
+                                    results_dir_main, preferred_subdir, pretrainedResults_filename_base)
+                                
+                                if pretrainedResultsFileExists then
+                                    if debugFileNames then
+                                        io.write(string.format('Found pretrained results file in %s\n', pretrainedResults_filename))
+                                    end
+                                else
+                                    if debugFileNames then
+                                        io.write(string.format('No pretrained results file %s\n', pretrainedResults_filename))
+                                        print('Checked in ', foldersChecked)
+                                    end
+                                    pretrainedNetworkNotFinishedTraining = true
+                                        
+                                end
+                            end                        
+                        
+                            -- only 'exists if FINISHED TRAINING!'
+                        
                             if not pretrainedNetworkFileExists and onlyRetrainIfHavePretrainedNetworks then
-                                print('No pretrained network:', pretrainedResults_filename_base)
+                                print('     >>  No pretrained network:', pretrainedNetwork_filename_base)
                                 if debugFileNames then
                                     print(' ==>Checked in : ');
                                     print(foldersChecked);
@@ -546,9 +568,17 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                 skipNow = true
                                 skipReason = 'Pretrained network not present'
                                 nSkipped = nSkipped + 1
+                                
+                            elseif pretrainedNetworkFileExists and pretrainedNetworkNotFinishedTraining and onlyRetrainIfHavePretrainedNetworks then
+                                print('      >> Pretrained network has not finished training [no results file yet].', pretrainedResults_filename_base)
+                                skipNow = true
+                                skipReason = 'Pretrained network not finished training'
+                                nSkipped = nSkipped + 1
+                            
                             else
+                                print('      >> Found pretrained network :', pretrainedNetwork_filename)
                                 if debugFileNames then
-                                    print('Found pretrained network :', pretrainedNetwork_filename)
+                                    
                                 end
                                 local isAlreadyLocked, otherProcessID = lock.isLocked(expFullTitle_network)
                                 if isAlreadyLocked then
@@ -586,7 +616,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                         else
                         
                         -- if not resultsFileExists or redoResultsFiles or resultsFileTooOld then
-                            
+                            --print('skipNow', skipNow)
                             local gotLock, ID_of_otherProcess, lock_of_otherProcess
                             local tryDoThisProcess = not skipNow
                             if tryDoThisProcess then
@@ -816,7 +846,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     end
                                     
                                     -- split network and retrain upper layers on retraining data
-                                    model_struct = splitModelAfterLayer(model_struct, dataOpts_network_retrain.retrainFromLayer)
+                                    model_struct = splitModelFromLayer(model_struct, dataOpts_network_retrain.retrainFromLayer)
                                                                            
 
                                     -- retrain network

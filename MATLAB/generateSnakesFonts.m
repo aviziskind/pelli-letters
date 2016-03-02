@@ -48,7 +48,9 @@ function generateSnakesFonts
 %     S_ori = DrawAlphabet_az('orientation', -22.5, opts);
 %     S_offset = DrawAlphabet_az('offset', .4 * .6, opts);
 %     S_phase = DrawAlphabet_az('phase', 3, opts);
-    
+
+%      sizes: [27 32 48 55 58 60 64]
+%     k_heights: [27 32 48 55 58 60 64]
 
 %     fontSize
 
@@ -59,8 +61,8 @@ function generateSnakesFonts
 %     allPixPerDegree = [6]; % kheight = 30;
 % 
 %     allPixPerDegree = [5.5, 6.5]; % kheight = 32;
-    allPixPerDegree = [9.6];  %kheight = 48;
-%     allPixPerDegree = [11];  %kheight = 55;
+%     allPixPerDegree = [9.6];  %kheight = 48;
+    allPixPerDegree = [11];  %kheight = 55;
 %     allPixPerDegree = [12.9]; % kheight = 64
 %     allPixPerDegree = [25.9]; % kheight = 128
 %     allPixPerDegree = [51.8]; % kheight = 256
@@ -68,7 +70,9 @@ function generateSnakesFonts
 %     allPixPerDegree = [10];
 %     allPixPerDegree = [6.5, 9.6, 12.9, 25.9];
 %     allPixPerDegree = [6.5, 9.6, 12.9];
-    
+
+    allPixPerDegree = [5.5, 6.5, 9.6, 11, 12.9]; % kheight = 27;
+
     if 0 && 0
        %%
         x = [6.5,  11];
@@ -160,7 +164,7 @@ function generateSnakesFonts
                     clf; imagesc(tileImages((allLetters_show), 2, 5)); axis image; ticksOff;  imageToScale([], 2);  
                     colormap(gray(250));
                     ticksOff;   
-                    imageToScale([], 5);
+                    imageToScale([], 1);
                     drawnow;
                     
                     
@@ -176,7 +180,7 @@ function generateSnakesFonts
                         end
                         
                     else
-                        title(sprintf('%s : %d x %d (sz = %s. k = %d)', fontName, size(allLetters(:,:,1)), num2str(opts.pixPerDegree), fontData_noWiggle.k_height ), 'interpreter', 'none');
+                        title(sprintf('%s : %d x %d [[ %d x %d ]] (sz = %s. k = %d)', fontName, size(allLetters(:,:,1)), fontData.size_rotated(1,:), num2str(opts.pixPerDegree), fontData_noWiggle.k_height ), 'interpreter', 'none');
                     end
     %                 caxis([-5, 5]);
 
@@ -247,7 +251,9 @@ function [allLetters, fontData] = processSnakeLetters(S, fontOpts)
 
 
     %%
-    [nH, nW] = size(allLetters(:,:,1));
+%     [nH, nW] = size(allLetters(:,:,1));
+    [nH, nW] = getBoundOfRotatedLetters(abs(allLetters), 0, fontOpts.margin_pixels_rotated);
+
     [idxT_each, idxB_each, idxL_each, idxR_each] = findLetterBounds(abs(allLetters), fontOpts.margin_pixels, 1);
     allHeights = idxB_each-idxT_each+1;
     allWidths = idxR_each-idxL_each+1;
@@ -265,6 +271,7 @@ function [allLetters, fontData] = processSnakeLetters(S, fontOpts)
     oris_rotated = fontOpts.orientations;
     [nH_rot, nW_rot] = getBoundOfRotatedLetters(abs(allLetters), oris_rotated, fontOpts.margin_pixels_rotated);
 
+%     nH = nH_rot(
 
     %             snakeLetters = struct('name', 'Snakes',
     %                                   'bol

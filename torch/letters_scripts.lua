@@ -549,6 +549,7 @@ checkNetworkFitsInImage = function(networkOpts, imageSize)
     local _, nOutputsEachBank = nOutputsFromConvStages(networkOpts, imageSize)
     
     local networkFits = nOutputsEachBank > 0
+    networkFits = true
     --local net_str = getNetworkStr(networkOpts)
     --printf('\n --- net = %s. nOutputs = %d --- \n', net_str, nOutputsEachBank);
     if not networkFits then

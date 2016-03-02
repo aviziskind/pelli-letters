@@ -13,7 +13,7 @@ if any(doFigs == 1)  % show stimulus & response for efficiency vs complexity exp
     
     allLogSNRs = [0, 1, 1.5, 2, 2.5, 3, 4]; nSNRs = length(allLogSNRs);
     allLogSNRs_plot = [0:4]; nSNRs_plot = length(allLogSNRs_plot);
-    noisyLetterOpts = struct('sizeStyle', sizeStyle, 'oris', 0, 'xs', 0, 'ys', 0, 'tf_pca', 0, 'stimType', 'NoisyLetters', 'autoImageSize', 1); 
+    noisyLetterOpts = struct('expName', 'Complexity', 'sizeStyle', sizeStyle, 'OriXY', struct('oris', 0, 'xs', 0, 'ys', 0), 'tf_pca', 0, 'stimType', 'NoisyLetters', 'autoImageSize', 1); 
 
     folder = [datasetsPath 'NoisyLetters' filesep fontName filesep]; % 'sz32x32' filesep];
     allIm = cell(1,nSNRs);

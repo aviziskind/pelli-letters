@@ -108,8 +108,16 @@ doTask = function(task)
 
       
     if logNoisySet then
-        io.write('Save Current script to log file? [n]')
+        local default = 'n'
+        if task.savedTaskFile then
+            default = 'y'
+        end 
+        io.write('Save Current script to log file? [' .. default .. ']')
         local ans = io.read("*line")
+        if #ans == 0 then
+            ans = default
+        end
+        
         if not (ans == 'y' or ans == 'Y') then
             logNoisySet = false
         end        
