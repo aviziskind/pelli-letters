@@ -858,11 +858,14 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     --print(os.date('%x %X', retrainOpts.prevTrainingDate))
                                     model_struct = trainModel(model_struct, retrain_trData, retrain_tsData, retrainOpts)
                                     
-                                    local sameAfterRetrain, val1, val2 = areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct)
-                                    print('After retrain, same filters = ', sameAfterRetrain, val1, val2);
-                                    print('After retrain, first conv value = ', firstConvolutionalWeightValue(model_struct))
-                                     assert(areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct) )
-                                     assert(firstConvWeightVal == firstConvolutionalWeightValue(model_struct))
+                                    if not string.find( string.lower(dataOpts_network_retrain.retrainFromLayer), 'conv') then
+                                        -- if not retraining the convolutional layers, check that they remain unchanged
+                                        local sameAfterRetrain, val1, val2 = areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct)
+                                        print('After retrain, same filters = ', sameAfterRetrain, val1, val2);
+                                        print('After retrain, first conv value = ', firstConvolutionalWeightValue(model_struct))
+                                        assert(areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct) )
+                                        assert(firstConvWeightVal == firstConvolutionalWeightValue(model_struct))
+                                    end
                                      --print('  ==> After retraining, first conv value = ', firstConvolutionalWeightValue(model_struct))
                                     
                                 elseif trainOnIndividualPositions then   -- train/retrain on the same dataset using different criteria
