@@ -2,15 +2,16 @@ function makePlots
 %%
 %     expName = 'ChannelTuning';
 %     expName = 'Crowding';
-    expName = 'Grouping';
+%     expName = 'Grouping';
 %     expName = 'Complexity';
 %     expName = 'TrainingWithNoise';
-%     expName = 'Uncertainty';
+    expName = 'Uncertainty';
 
 %     modelNames = {'ConvNet', 'Texture'};   modelColors = {'b', 'g'}; modelMarkers = {'o', 'o'};
     
 %     modelNames = {'ConvNet'}; modelColors = {'b'}; modelMarkers = {'o'};
-            modelNames = {'ConvNet', 'Texture', 'IdealObserver'};   modelColors = {'b', 'g', 'r'}; modelMarkers = {'o', 'o', 's'};
+%             modelNames = {'ConvNet', 'Texture', 'IdealObserver'};   modelColors = {'b', 'g', 'r'}; modelMarkers = {'o', 'o', 's'};
+            modelNames = {'ConvNet', 'IdealObserver'};   modelColors = {'b', 'r'}; modelMarkers = {'o', 's'};
     
     
     yticks = [];
@@ -82,7 +83,8 @@ function makePlots
 %             ylab = 'Efficiency';
             ylab = 'pctCorrect';
             
-            modelNames = {'ConvNet: 1 layer', 'ConvNet: 2 layers', 'ConvNet: 3 layers', 'Texture'};   modelColors = {'b', 'b', 'b', 'g'};
+%             modelNames = {'ConvNet: 1 layer', 'ConvNet: 2 layers', 'ConvNet: 3 layers', 'Texture'};   modelColors = {'b', 'b', 'b', 'g'};
+            modelNames = {'ConvNet: 1 layer', 'ConvNet: 2 layers', 'ConvNet: 3 layers'};   modelColors = {'b', 'g', 'r'};
             modelMarkers = {'o', 's', '^', 'o'};
             opt.y_name = ylab;
             
@@ -91,7 +93,7 @@ function makePlots
                     ylims = [0.01 1];
                     yscale = 'log';
                 case 'pctCorrect'
-                    ylims = [85 101];
+                    ylims = [50 101];
                     yscale = 'linear';
                     
             end
@@ -104,7 +106,9 @@ function makePlots
   
             log_xyratio = 1;
             
-            doHuman = true; 
+            doHumanPts = false; 
+            doHumanFit = true;
+            doHuman = doHumanPts || doHumanFit;
             
     end
 
@@ -129,17 +133,24 @@ function makePlots
     
     
     if doHuman
-        h_human_line_fit = plot(x_human_fit, y_human_fit, 'k-', 'linewidth', 6);
+        if doHumanFit
+            h_human_line_fit = plot(x_human_fit, y_human_fit, 'k-', 'linewidth', 6);    
+        end
 
         mkSize = 8;
-        h_human_pts = plot(x_human, y_human,                  'ks', 'color', .5*[1,1,1], 'markersize', mkSize, 'linewidth', 3);
-        h_human_pts_err = errorbar(x_human, y_human, y_err_human, 'ks', 'color', .5*[1,1,1], 'markersize', mkSize, 'linewidth', 3);
+        if doHumanPts
+            h_human_pts = plot(x_human, y_human,                  'ks', 'color', .5*[1,1,1], 'markersize', mkSize, 'linewidth', 3);
+            h_human_pts_err = errorbar(x_human, y_human, y_err_human, 'ks', 'color', .5*[1,1,1], 'markersize', mkSize, 'linewidth', 3);
+        end
     end
     
     for i = 1:nModels
         h_model_pts(i) = plot(x_model{i}, y_model{i}, [modelColors{i} modelMarkers{i} '-'],  'markersize', 10, 'linewidth', 3); 
     end
     xlabel(xlab);
+    if strcmp(ylab, 'pctCorrect')
+        ylab = 'Percent correct';
+    end
     ylabel(ylab);
     set(gca, 'xlim', xlims, 'ylim', ylims);
     set(gca, 'xscale', xscale, 'yscale', yscale);
@@ -169,10 +180,16 @@ function makePlots
     end
     
     h_legends = h_model_pts;
-    if doHuman
-        h_legends = [h_legends, h_human_pts, h_human_line_fit];
-        modelNames_leg = [modelNames_leg, {'Human observer', 'Human observer (fit)'}];
+    if doHumanPts
+        h_legends = [h_legends, h_human_pts];
+        modelNames_leg = [modelNames_leg, {'Human observer'}];
     end
+    
+    if doHumanFit
+        h_legends = [h_legends, h_human_line_fit];
+        modelNames_leg = [modelNames_leg, {'Human observer'}];        
+    end
+    
     legend(h_legends, modelNames_leg);
 
     
@@ -396,12 +413,18 @@ function [x,y] = getData(expName, modelName, opt)
                 case 'ConvNet: 1 layer',
                      if strcmp(opt.y_name, 'pctCorrect') 
                            y = [100.0000000,   100.0000000,   100.0000000,    99.9000015,    99.8499985,    99.1999969,    90.9000015]; % 1 layer
+                           
+                           y =[100, 100, 100, 95.8000031, 98.5, 92.1999969, 68.5];  % [16, -120]. Bookman, k15, 32x60, trained on SVHN, rtLin1
+                           
                      elseif strcmp(opt.y_name, 'Efficiency') 
                             y = [0.4557718,     0.1960564,     0.1206492,     0.0673899,     0.0640190,     0.0439210,     0.0327603]; % 1 layer
                      end
                 case 'ConvNet: 2 layers',
                      if strcmp(opt.y_name, 'pctCorrect') 
                            y = [100.0000000,   100.0000000,   100.0000000,   100.0000000,   100.0000000,   100.0000000,   100.0000000]; % 2 layers
+ 
+                            y =[100, 100, 94.3499985, 96.3499985, 88.5500031, 81.1999969, 72.9499969]; % [16, 64,-120]. Bookman, k15, 32x60, trained on SVHN, rtLin1
+ 
                      elseif strcmp(opt.y_name, 'Efficiency') 
                            y = [0.3973418,     0.2925842,     0.2361833,     0.1895894,     0.1646396,     0.1406080,     0.1186297]; % 2 layers
                      end
@@ -410,6 +433,9 @@ function [x,y] = getData(expName, modelName, opt)
                 case 'ConvNet: 3 layers',
                     if strcmp(opt.y_name, 'pctCorrect') 
                             y = [100.0000000,   100.0000000,   100.0000000,   100.0000000,   100.0000000,   100.0000000,   100.0000000]; % 3 layers
+                            
+                             y =[100, 100, 100, 98.9499969, 99.3000031, 95.0999985, 79.4000015]; % [16, 64, 512, -120]. Bookman, k15, 32x60, trained on SVHN, rtLin1
+
                      elseif strcmp(opt.y_name, 'Efficiency') 
                             y = [0.4521954,     0.4098388,     0.3568460,     0.2893636,     0.2872577,     0.2701378,     0.2628508]; % 3 layers
                     end

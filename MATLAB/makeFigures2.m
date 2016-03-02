@@ -1,4 +1,4 @@
-makeFigures2
+% makeFigures2
 %%
 L = 64;
 r1 = L/2;

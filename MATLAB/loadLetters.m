@@ -35,6 +35,7 @@ function [allLetters, fontData] = loadLetters(fontName, fontSize, fontSizeSpec, 
         return
     end
         
+    fontData = [];
     if nargin == 0
         allLetters = S_fonts;
         return;

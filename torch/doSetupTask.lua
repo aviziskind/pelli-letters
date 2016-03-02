@@ -101,8 +101,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local crowding_realDataName = 'SVHN'
     --local crowding_trainOn = 'WhiteNoise'
     
-    --local crowdingStage = 'train'
-    local crowdingStage = 'test'
+    local crowdingStage = 'train'
+    --local crowdingStage = 'test'
     
     
     
@@ -463,9 +463,13 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
 
             --allNStates = {{16, 64, 512, -120},  {6, 16, 64, -120}}
             --allNStates = {{6, 16, -120},  {6, 16, 64, -120}, {16, 64, 512, -120},}
+            --[[
             allNStates = {{16, 64, 512, -512}, {16, 64, 512, -120}}
             allFiltSizes = {{5, 5, 3}}
             allPoolSizes = {{2,2,2}, }
+            --]]
+            
+            
             
             if expName == 'Uncertainty' then
                 allNStates = {{16, -512},          {16, -120},
@@ -473,10 +477,62 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                               {16, 64, 512, -512}, {16, 64, 512, -120}}
                           
             elseif expName == 'Grouping' then
-            
-                allNStates = {--{16, 64, -512},      {16, 64, -120},
+              allNStates =  { {16, 64, 512, -120}, {16, 64, 1024, -120} }
+                --allNStates = {--{16, 64, -512},      {16, 64, -120},
                               
-                              {16, 64, 512, -120}, }-- {16, 64, 512, -512} }
+                  --            {16, 64, 512, -120}, }-- {16, 64, 512, -512} }
+                allPoolSizes = { {2,2,2}, {2,2,4}, {2,2,12} }
+
+                allPoolSizes = { {2,2,16}, {2,3,16}, {2,4,16} ,
+                                 {3,2,16}, {3,3,16},{3,4,16}, 
+                                 {4,2,16}, {4,3,16},{4,4,16} }
+
+             elseif expName == 'Complexity' then
+                allNStates =  {  {16, 64, 512, -120}, {16, 64, 1024, -120} }
+                allFiltSizes = { {5, 5, 3}, }
+                --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
+                allPoolSizes = { {2,2,16}, {2,3,16}, {2,4,16} ,
+                                 {3,2,16}, {3,3,16},{3,4,16}, 
+                                 {4,2,16}, {4,3,16},{4,4,16} }
+                --allPoolSizes = { {3,3,12}, {2,3,6},{2,2,12} }
+                allPoolTypes = {'MAX'}
+            
+            --[[
+                allNStates =  {  {16, 64, -120}, {32, 128, -120} }
+                allFiltSizes = { {5, 5}, }
+                --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
+                allPoolSizes = { {2,26}, }
+--]]
+            
+            elseif expName == 'ChannelTuning' then
+            
+                --allNStates =  { {16, 64, 512, -120}, {16, 64, 1024, -120} }
+                allNStates =  { {16, 64, 1024, -120} }
+                allFiltSizes = { {5, 5, 3}}
+                --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
+                allPoolSizes = { {2,2,2}, {2,2,4}, {2,2,6}, {2,2,12} }
+                allPoolTypes = {'MAX'}
+                allPoolSizes = { --{2,2,16}, {2,3,16},{2,4,16},
+                                 --{3,2,16}, {3,3,16},{3,4,16}, 
+                                 --{4,2,16}, {4,3,16},{4,4,16} }
+                                 {2,2,16}, {3,3,16},{4,4,16},
+                                 
+                                 }
+
+                allNStates =  { {32, 128, -120} }
+                allFiltSizes = { {5, 5}, }
+                --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
+                allPoolSizes = { {2,26}, }
+
+
+                --allNStates =  {  {16, 64, -120} }
+                --allFiltSizes = { {5, 5}, }
+                --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
+                --allPoolSizes = { {2,26} }
+                                 --{3,2,16}, {3,3,16},{3,4,16}, 
+                                 --{4,2,16}, {4,3,16},{4,4,16} }
+                --allPoolSizes = { {3,3,12}, {2,3,6},{2,2,12} }
+                allPoolTypes = {'MAX'}
 
             end
             --]]
@@ -508,6 +564,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --local tbl_trainConfig = {config_sgd, config_sgd_mom, config_adadelta}
         local tbl_trainConfig = {config_sgd_mom }
         local finalLayer = 'LogSoftMax'
+        local zeroPadForConvolutions = false
             
         allNetworkOptions_tbl = { netType = 'ConvNet', 
                                 tbl_nStates = allNStates,
@@ -538,6 +595,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                 tbl_trainConfig = tbl_trainConfig,
                                 
                                 finalLayer = finalLayer,
+                                zeroPadForConvolutions = zeroPadForConvolutions,
                                 
                               }
 
@@ -865,7 +923,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
 
         --tbl_OriXY = { oriXYSet_1pos, oriXYSet_2x2y_d1,    oriXYSet_3x3y_d1, oriXYSet_4x4y_d1, 
           --  oriXYSet_5x6y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
-   
+   --[[
+  
         local oriXYSet_4x4y_d1 = {Nori = 1,  dOri = 0,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
         local oriXYSet_4x4y_d1_3o_d5 = {Nori = 3,  dOri = 5,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
         local oriXYSet_4x4y_d1_7o_d5 = {Nori = 7,  dOri = 5,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
@@ -873,6 +932,18 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
 
    
         tbl_OriXY = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 }
+    --]]
+   
+        --local oriXYSet_2x2y_d1 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 1,   Ny = 2, dY = 1}
+        --local oriXYSet_3x3y_d1 = {Nori = 1,  dOri = 0,    Nx = 3, dX = 1,   Ny = 3, dY = 1}
+        local oriXYSet_4x4y_d1 = {Nori = 1,  dOri = 0,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
+        local oriXYSet_8x8y_d1 = {Nori = 1,  dOri = 0,    Nx = 8, dX = 1,   Ny = 8, dY = 1}
+        local oriXYSet_13x11y_d1={Nori = 1,  dOri = 0,    Nx = 13, dX = 1,   Ny = 11, dY = 1}
+        local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
+
+   
+        tbl_OriXY = { oriXYSet_1pos, oriXYSet_30x39y_d1, oriXYSet_4x4y_d1, }
+
    
         if doTextureModel then
             tbl_OriXY = { oriXYSet_1pos }
@@ -938,7 +1009,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 if doTextureModel then
                     tbl_retrainFromLayer = {'linear-2', 'classifier'}
                 else
-                    tbl_retrainFromLayer = {'linear'}
+                    --tbl_retrainFromLayer = {'linear'}
+                    tbl_retrainFromLayer = {'conv1'}
                 end
                 tbl_trainingNoise = {'same'}
                 
@@ -1132,8 +1204,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             tbl_OriXY = { oriXYSet_1pos, oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, 
                         oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5} --  oriXYSet_6x5y21o, 
 
-            tbl_OriXY  = { oriXYSet_1pos, oriXYSet_5x13y_d1,  oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, 
-                            oriXYSet_14x37y_d1, oriXYSet_30x39y_d1};
+
  --]]
     --[[
             local oriXYSet_7x18y_d1        = {Nori = 1,   dOri = 0,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
@@ -1150,7 +1221,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
 --[[
             local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
             local oriXYSet_5x13y_d1_3ori_d5   = {Nori = 3,   dOri = 5,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_5x13y_d1_3ori_d10  = {Nori = 3,   dOri = 10,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+       s     local oriXYSet_5x13y_d1_3ori_d10  = {Nori = 3,   dOri = 10,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
             local oriXYSet_5x13y_d1_3ori_d15  = {Nori = 3,   dOri = 15,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
             local oriXYSet_5x13y_d1_3ori_d30  = {Nori = 3,   dOri = 30,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
             
@@ -1158,12 +1229,26 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 oriXYSet_5x13y_d1_3ori_d10, oriXYSet_5x13y_d1_3ori_d15, oriXYSet_5x13y_d1_3ori_d30};
  --]]
  
+ --[[
             local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
             local oriXYSet_6x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 6, dX = 1,   Ny = 13, dY = 1}
             local oriXYSet_5x14y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 14, dY = 1}
  
              tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_6x13y_d1, oriXYSet_5x14y_d1};
+--]]
 
+        local oriXYSet_5x13y_d1 =  {Nori = 1,  dOri = 0,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+        local oriXYSet_7x18y_d1 =  {Nori = 1,  dOri = 0,   Nx = 7, dX = 1,   Ny = 18, dY = 1}
+        local oriXYSet_10x26y_d1 = {Nori = 1,  dOri = 0,   Nx = 10, dX = 1,  Ny = 26, dY = 1}
+        local oriXYSet_14x37y_d1 = {Nori = 1,  dOri = 0,   Nx = 14, dX = 1,  Ny = 37, dY = 1}
+        local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
+        local oriXYSet_15x20y_d1 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 1,  Ny = 20, dY = 1}
+        local oriXYSet_15x20y_d2 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 2,  Ny = 20, dY = 2}
+        
+        
+        --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_5x13y_d1,  oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, 
+          --                  oriXYSet_14x37y_d1, oriXYSet_30x39y_d1, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
+        tbl_OriXY  = { oriXYSet_1pos, oriXYSet_30x39y_d1};
  
  
         elseif complexity_imageSize[1] == 56 then
@@ -1239,8 +1324,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --tbl_imageSize = { {80, 80}  }
         --tbl_imageSize = { {40, 40}  }
         
-        --tbl_sizeStyle = { 55 }
-        tbl_sizeStyle = { 'k32' } 
+        tbl_sizeStyle = { 'k55' }
+        --tbl_sizeStyle = { 'k32' } 
         --tbl_sizeStyle = { 'k48' } 
         --tbl_sizeStyle = { 'k27' } 
         
@@ -1429,9 +1514,15 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_45x47y_d1        = {Nori = 1,  dOri = 0,    Nx = 45, dX = 1,   Ny = 47, dY = 1}
         local oriXYSet_45x47y_d1_21o_d1 = {Nori = 21, dOri = 1,    Nx = 45, dX = 1,   Ny = 47, dY = 1}
         local oriXYSet_45x47y_d1_41o_d1 = {Nori = 41, dOri = 1,    Nx = 45, dX = 1,   Ny = 47, dY = 1}
+        local oriXYSet_7x7y_d1          = {Nori = 1,  dOri = 0,    Nx = 7,  dX = 1,   Ny = 7,  dY = 1}
                    
-        tbl_OriXY = { oriXYSet_45x47y_d1, oriXYSet_31x36y_d1, oriXYSet_22x26y_d1, oriXYSet_15x19y_d1, oriXYSet_1pos,
-                       };
+
+        --tbl_OriXY = { oriXYSet_45x47y_d1, oriXYSet_31x36y_d1, oriXYSet_22x26y_d1, oriXYSet_15x19y_d1, oriXYSet_1pos,
+          --             };
+    
+        --tbl_OriXY = { oriXYSet_15x19y_d1, oriXYSet_1pos };
+        tbl_OriXY = { oriXYSet_7x7y_d1, oriXYSet_1pos };
+    
     --]]
     
                    --[[
@@ -1492,7 +1583,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             oriXYSet_40x40y_d1_3ori_d5,  oriXYSet_41x41y_d1_3ori_d5, oriXYSet_42x42y_d1_3ori_d5, oriXYSet_43x43y_d1_3ori_d5, oriXYSet_44x44y_d1_3ori_d5, 
             oriXYSet_40x40y_d1_11ori_d1,  oriXYSet_41x41y_d1_11ori_d1, oriXYSet_42x42y_d1_11ori_d1, oriXYSet_43x43y_d1_11ori_d1, oriXYSet_44x44y_d1_11ori_d1}
         --]]
-        ---[[
+        --[[
         local oriXYSet_24x24y_d1_3ori_d5= {Nori = 3,  dOri = 5,    Nx = 24, dX = 1,   Ny = 24, dY = 1}
         local oriXYSet_24x24y_d1        = {Nori = 1,  dOri = 0,    Nx = 24, dX = 1,   Ny = 24, dY = 1}
         local oriXYSet_26x26y_d1        = {Nori = 1,  dOri = 0,    Nx = 26, dX = 1,   Ny = 26, dY = 1}
@@ -1774,6 +1865,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             io.write(string.format('[Writing to task file file ==>  %s...]\n', taskFileNameBase))
 
         end
+    
+        task.savedTaskFile = saveTaskFile
     end
         
 

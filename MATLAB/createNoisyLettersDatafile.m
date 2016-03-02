@@ -37,9 +37,9 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     precision = 'single'; precision_func = @single;
 
 
-%     expName = 'ChannelTuning';
+    expName = 'ChannelTuning';
 %     expName = 'Complexity';
-    expName = 'Grouping';
+%     expName = 'Grouping';
 %     expName = 'TestConvNet';
 %     expName = 'Uncertainty';
 %     expName = 'Crowding';
@@ -72,10 +72,12 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %         redoFilesIfOlderThan = 736210.540042; % 9/3/2015 %735768.686739; %735767.913364; % sprintf('%.6f', now)
 %         redoFilesIfOlderThan = 736252.049851; % 9/3/2015 %735768.686739; %735767.913364; % sprintf('%.6f', now)
 %         redoFilesIfOlderThan = 736275.929786; % 11/7/2015     
-        redoFilesIfOlderThan = 736288.165278; % 11/20/2015 
+%         redoFilesIfOlderThan = 736288.165278; % 11/20/2015 
         
         
-        redoFilesIfOlderThan = 736291.993269; % 11/23/2015 
+%         redoFilesIfOlderThan = 736291.993269; % 11/23/2015 
+        
+        redoFilesIfOlderThan = 736366.943890; % 2/6/2016
         
         
         
@@ -88,7 +90,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %     fontSizeStyle = 'dflt';     marginPixels = 1;
 %     fontSizeStyle = 'sml';   ch
 
-    viewSampleLettersOnLaptop = false && onLaptop;
+    viewSampleLettersOnLaptop = true && onLaptop;
+    saveSampleLettersOnLaptop = true;
 
     showLetters = 0             && showAnyFigures;        
     showSamplesWithNoise = 1    && showAnyFigures;
@@ -120,10 +123,11 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %             allFontNames      = {'Bookman', 'BookmanU', 'Sloan', 'Helvetica', 'Courier', 'KuenstlerU', 'Braille', 'Yung'};              
 
 %             allFontNames      = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'};
-            allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Devanagari', 'Checkers4x4', 'Courier'};
+            allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
 %             allFontNames      = {'Braille', 'BookmanB', 'Courier', 'KuenstlerU'};
 %             allFontNames      = {'Bookman', 'KuenstlerU'};
 %             allFontNames      = {'Bookman', 'Courier'};   
+%             allFontNames      = {'Bookman'};   
             if ~doTextureStatistics 
 %                 allFontNames      = expandFontsToTheseStyles(allFontNames, {'', 'B', 'I', 'BI'});
             end
@@ -143,7 +147,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             allFontNames      = {'Bookman'};
             
         case 'Crowding', 
-            allFontNames      = {'Bookman', 'Sloan'};
+            allFontNames      = {'Sloan'};
 
     end
 %     allFontNames      = {'Bookman', 'BookmanU', 'Courier'};
@@ -160,13 +164,14 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             
 %             all_SNRs = [1, 2, 3, 4];
             if onLaptop
-                all_SNRs = all_SNRs(1) : .5 : all_SNRs(end);
+%                 all_SNRs = all_SNRs(1) : .5 : all_SNRs(end);
+                all_SNRs = [1 2 3 4 5];
             end
 
         case 'ChannelTuning',
             
             if onLaptop
-                dSNR = 1;
+                dSNR = 0.5;
             else
                 dSNR = 0.5;
             end
@@ -198,7 +203,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             all_SNRs = [0 : 0.5 : 5 ];
 
         case 'Crowding',
-            all_SNRs = [0 : 0.5 : 5 ];
+%             all_SNRs = [0 : 0.5 : 5 ];
+            all_SNRs = [ 4 ];
     end
               
 
@@ -586,7 +592,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 NoiseFilters = allPinkWideNoiseFilters;
 %                 NoiseFilters = [allBandNoiseFilters, whiteNoiseFilter, allPinkNoiseFilters_1_2];
 %                 NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter, allBandNoiseFilters];
-                NoiseFilters = [whiteNoiseFilter, allBandNoiseFilters];
+%                 NoiseFilters = [whiteNoiseFilter, allBandNoiseFilters];
+                NoiseFilters = [allBandNoiseFilters];
 % %                    NoiseFilters = allPinkPlusWhiteNoiseFilters;
 %                    NoiseFilters = [allPinkNoiseFilters(1), whiteNoiseFilter];
 %                 NoiseFilters = [allPinkNoiseFilters_1_2, whiteNoiseFilter]; 
@@ -607,16 +614,21 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 allSizeStyle_imageSizes = {  {'k30', [45, 45]}  };
 %                 allSizeStyle_imageSizes = {  {'k30', [64, 64]}  };
                 allSizeStyle_imageSizes = {  {'k36', [64, 64]}  };
+%                 allSizeStyle_imageSizes = {  {'k15', [64, 64]}  };
          
 %                 allUncertaintySets = {oriXYSet_4x4y7o, oriXYSet_6x6y11o,  oriXYSet_6x5y21o, oriXYSet_1pos};
 %                 allUncertaintySets = {oriXYSet_1pos, oriXYSet_3o_d5};
                 
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, ...
 %                         oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
-
+                oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [1 : 1 : 30], 'ys', [1 : 1 : 39] );  % for complexity 31*39 = 1209
+                
 %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x2y_d1,    oriXYSet_3x3y_d1, oriXYSet_4x4y_d1, oriXYSet_5x6y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
-                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
+%                     allUncertaintySets = { oriXYSet_13x11y_d1, oriXYSet_8x8y_d1, oriXYSet_4x4y_d1};
 
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_30x39y_d1, oriXYSet_4x4y_d1, };
                     if doTextureStatistics
                         allUncertaintySets = { oriXYSet_1pos };
                     end
@@ -631,7 +643,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             case 'Complexity',     
 %                 allSizeStyle_imageSizes = {  {'k30', [64, 64]}  };
 %                 allSizeStyle_imageSizes = {  {'k15', [56, 56]}  };
-                allSizeStyle_imageSizes = {  {'k15', [64, 64]}, {'k24', [64, 64]} };
+%                 allSizeStyle_imageSizes = {  {'k15', [64, 64]}, {'k24', [64, 64]} };
 %                 allSizeStyle_imageSizes = {  {'k30', [80, 80]}  };
 %                 NoiseFilters = [whiteNoiseFilter, allPinkNoiseFilters];
 %                 NoiseFilters = [allPinkNoiseFilters, whiteNoiseFilter];
@@ -657,13 +669,6 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, ...
 %                         oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
 
-%                 oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [0 : 1 : 4], 'ys', [0 : 1 : 12] );  % for complexity  5*13   = 65
-%                 oriXYSet_7x18y_d1 = struct('oris', [0], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18    = 126
-%                 oriXYSet_10x26y_d1 = struct('oris', [0], 'xs', [0 : 1 : 9], 'ys', [0 : 1 : 25] );  % for complexity 10*26  = 260
-%                 oriXYSet_14x37y_d1 = struct('oris', [0], 'xs', [0 : 1 : 13], 'ys', [0 : 1 : 36] );  % for complexity 14*37  = 518
-%                 oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
-                
-%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1};
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3};
 
                 allSizeStyle_imageSizes = {  {'k15', [64, 64]}  };
@@ -684,6 +689,22 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                 
                 allUncertaintySets = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_6x13y_d1, oriXYSet_5x14y_d1};
                 
+                
+                oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity 5*13   = 65
+                oriXYSet_7x18y_d1 = struct('oris', [0], 'xs', [1 : 1 : 7], 'ys', [1 : 1 : 18] );  % for complexity 7*18   = 126
+                oriXYSet_10x26y_d1 = struct('oris', [0], 'xs', [1 : 1 : 10], 'ys', [1 : 1 : 26] );  % for complexity 10*26  = 260
+                oriXYSet_14x37y_d1 = struct('oris', [0], 'xs', [1 : 1 : 14], 'ys', [1 : 1 : 37] );  % for complexity 14*37  = 518
+                oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [1 : 1 : 30], 'ys', [1 : 1 : 39] );  % for complexity 31*39 = 1209
+                oriXYSet_15x20y_d1 = struct('oris', [0], 'xs', [1 : 1 : 15], 'ys', [1 : 1 : 20] );  % for complexity 31*39 = 1209
+                oriXYSet_15x20y_d2 = struct('oris', [0], 'xs', [1 : 2 : 30], 'ys', [1 : 2 : 39] );  % for complexity 31*39 = 1209
+                
+                allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2, oriXYSet_30x39y_d1};
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1};
+
+                allUncertaintySets = { oriXYSet_15x20y_d2, oriXYSet_30x39y_d1};
+                
+                
+                
                  if doTextureStatistics
 %                      allUncertaintySets = { oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, oriXYSet_1pos};
                      allUncertaintySets = { oriXYSet_1pos,   oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2,      oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5 };
@@ -695,9 +716,10 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 NoiseFilters = [whiteNoiseFilter, allPinkNoiseFilters];
                 NoiseFilters = [whiteNoiseFilter];
             
+                allSizeStyle_imageSizes = { {'k55', [64, 64]} };
                 
 %                 allSizeStyle_imageSizes = { {'k48', [96, 96]} };
-                allSizeStyle_imageSizes = { {'k32', [64, 64]} };
+%                 allSizeStyle_imageSizes = { {'k32', [64, 64]} };
 %                 allSizeStyle_imageSizes = { {'k32', [80, 80]} };
 %                 allSizeStyle_imageSizes = { {'k27', [64, 64]} };
 %                 allSizeStyle_imageSizes = { {'k48', [64, 64]} };
@@ -751,8 +773,9 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                    
 %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
 %                                            oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
-                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
-                                           oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, ...
+%                                            oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1};
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1};
                     
 %                     allUncertaintySets = {  oriXYSet_1pos  };
         
@@ -798,6 +821,14 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                      oriXYSet_4x4y_d6               = struct('oris', [0], 'xs', [1 : 6 : 24], 'ys', [1 : 6 : 24]);
 
                      allUncertaintySets = {oriXYSet_24x24y_d1_3ori_d5, oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, oriXYSet_12x12y_d2}; % oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
+                     
+                     
+%                      allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1};
+                     
+                    oriXYSet_7x7y_d1 = struct('oris', [0], 'xs', [1:7], 'ys', [1:7]);
+                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x7y_d1};
+                     
+                     
 %                      allUncertaintySets = {oriXYSet_24x24y_d1, oriXYSet_26x26y_d1, oriXYSet_28x28y_d1, oriXYSet_12x12y_d2, oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
 
 % %                      allUncertaintySets = {oriXYSet_26x26y_d1};
@@ -899,7 +930,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 all_trainPositions = {[3:15]};
 %                 all_testPositions = {9};
                 allNDistractors = [2, 1];
-                allLogDNRs = [2.5, 2.9]; 
+%                 allLogDNRs = [2.5, 2.9]; 
+                allLogDNRs = [3.5]; 
                 
 %                 allCrowdingOpts = (struct('tbl_trainPositions', {all_trainPositions}, ...
 %                                           'tbl_testPositions', {all_testPositions}, ...
@@ -1183,7 +1215,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     nSNRs = length(all_SNRs);
 
     if viewSampleLettersOnLaptop
-        all_SNRs = [3];
+%         all_SNRs = [3];
     end
     
     isSnakesFont = isstruct(fontName) && strcmp(fontName.fonts, 'Snakes');
@@ -1364,7 +1396,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     nNoiseSamples = 1e5;
 
     if onLaptop
-        setSize = 2000;
+        setSize = 1000;
 %         setSize = 200;
         if doOverFeat 
             setSize = 250;
@@ -1866,7 +1898,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
         if createPcaFiles && all_SNRs_done_pca(snr_i)           
             noisySet = addPCAscoresToSet(noisySet, meanImageVec, coeff);
 
-            show = 0 && showAnyFigures;
+            show = 1 && showAnyFigures;
             if show
 %%
                 nLettersPlot = 12;
@@ -2045,7 +2077,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
             3;
         end
         
-        if createImageFiles && all_SNRs_toDo_im(snr_i) && ~viewSampleLettersOnLaptop
+        if createImageFiles && all_SNRs_toDo_im(snr_i) && saveSampleLettersOnLaptop
 %             setToSave.inputMatrix = noisySet.inputMatrix;
 %             setToSave.propLetterCorrect_ideal     = propLetterCorrect_ideal;        
 %             setToSave.propEachLetterCorrect_ideal = propEachLetterCorrect_ideal;        
@@ -2370,7 +2402,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                             fprintf('Already completed \n');
                         end
 
-                        showTestingSet = 0 && ~haveFileAlready;
+                        showTestingSet = 1 && ~haveFileAlready;
                         if showTestingSet && showAnyFigures
                             %%
                             tmp = 0;
@@ -2389,24 +2421,26 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                             if snr_i == 1 && ds_i == 1
                                 clf;
                             end
-
-                            h_ax = subplotGap(nSNRs, nSpacings, find(logSNR == sort(all_SNRs)), ds_i);
+        clf;
+%                             h_ax = subplotGap(nSNRs, nSpacings, find(logSNR == sort(all_SNRs)), ds_i);
     %                         [subM, subN] = deal(14,10);
-
-
+                
+                            h_ax = axes;
                             [subM, subN] = deal(1,1);
                             nTot = subM*subN;
 
                             idx_rand = randperm(length(crowdedSet.labels));
-                            idx_use = idx_rand(1:nTot);
+                            idx_use = idx_rand(1);
 
-                            imagesc(tileImages(crowdedSet.inputMatrix(:,:,idx_use), subM, subN, 3, 1));
+%                             imagesc(tileImages(crowdedSet.inputMatrix(:,:,idx_use), subM, subN, 3, 1));
+                            imagesc(crowdedSet.inputMatrix(:,:,idx_use));
                             %         imagesc(tileImages(trainingSetSamples(:,:,1)))
                             axis equal tight;
                             colormap('gray');
     %                         set(gca, 'xtick', [], 'ytick', [], 'position', [0.01 0.01 .8 .8]);
                             ticksOff;
-                            xlabel(sprintf('ds = %d, snr = %.1f', distractorSpacing, logSNR)); %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
+                            imageToScale([], 1)
+%                             xlabel(sprintf('ds = %d, snr = %.1f', distractorSpacing, logSNR)); %#ok<AGROW,NASGU> % set(h_ax(1), 'xtick', [], 'ytick', [])
                             3;
                         end
                         3;

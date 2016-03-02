@@ -30,9 +30,9 @@ function main()
     local expName, modelName
     --if not expName then
 
-    --expName = 'ChannelTuning'
+    expName = 'ChannelTuning'
     --expName = 'Crowding'
-    expName = 'Grouping'
+    --expName = 'Grouping'
     --expName = 'Complexity'
     --expName = 'TrainingWithNoise'
     --expName = 'TestConvNet'

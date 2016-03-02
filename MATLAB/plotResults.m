@@ -100,6 +100,7 @@ function plotResults
     
     switch expName
         case 'ChannelTuning',
+%             x_name = 'NoiseFreq';   y_name = 'maxPctCorrect';
             x_name = 'NoiseFreq';   y_name = 'Threshold_model';
 %             x_name = 'NoiseFreq';   y_name = 'Channel_Gain';
 
@@ -135,8 +136,8 @@ function plotResults
 
 
         case 'Complexity',
-%             x_name = 'Complexity';   y_name = 'Efficiency';
-            x_name = 'Complexity';   y_name = 'Threshold_model';
+            x_name = 'Complexity';   y_name = 'Efficiency';
+%             x_name = 'Complexity';   y_name = 'Threshold_model';
 %             x_name = 'Complexity'; y_name = 'maxPctCorrect';
             
             complexity_trainOn = 'SVHN'; 
@@ -153,7 +154,7 @@ function plotResults
         case 'Uncertainty'
             x_name = 'Uncertainty'; y_name = 'Efficiency';
 %             x_name = 'Threshold_model'; y_name = 'Efficiency';
-            x_name = 'Uncertainty'; y_name = 'maxPctCorrect';
+%             x_name = 'Uncertainty'; y_name = 'maxPctCorrect';
             
     end
 %     x_name = 'Complexity';    y_name = 'Threshold_model'; 
@@ -184,7 +185,7 @@ function plotResults
     th_pct_correct = switchh(expName, {{'Crowding'}, {'Grouping'}, {'ChannelTuning', 'Complexity', 'TrainingWithNoise', 'Uncertainty'} }, [82, 64, 64]);
 
     getIdeal = (any(strcmp(expName, {'Complexity', 'Grouping', 'Uncertainty'})) && any(strncmp(y_name, {'Efficiency', 'Threshold'}, 9))) || ...
-                (any(strcmp(expName, {'ChannelTuning'})) && strcmp(y_name, 'Threshold_model'));
+                (any(strcmp(expName, {'ChannelTuning'})) && strcmp(y_name, 'Threshold_model') && 0);
 
     %% Multiple Lines on each plot
     
@@ -316,9 +317,11 @@ function plotResults
         	allFontNames      = {'Snakes'};    
             
         case 'Complexity',
-%             allFontNames = allFontNames_std;
-%             allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Devanagari', 'Checkers4x4', 'Courier'};
-            allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'Devanagari', 'Courier'};
+            allFontNames = allFontNames_std;
+            allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
+%             allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'Devanagari', 'Courier'};
+%             allFontNames      = {'Bookman'};
+            allFontNames      = {'Armenian', 'Bookman', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
             
         case 'TrainingWithNoise',
             allFontNames      = {'Bookman'};
@@ -399,6 +402,7 @@ function plotResults
     end
 
         
+    zeroPadForConvolutions = false;
     
     %% Networks 
     trainConfig = struct();
@@ -665,31 +669,61 @@ function plotResults
                                       [16, 64, 512, -120], [16, 64, 512, -512], [16, 64, 512, -1024], [16, 64, 512, -2048]};
 %                         allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
 %                         allNStates = {[16, 64, 512, -120]};
-                        allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
+%                         allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
+                                                
+                            allNStates = {[16, 64, 512, -120], [16, 64, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,2], [2,2,3], [2,2,4], [2,2,6], [2,2,12]};
+%                          allPoolSizes_C = {[2,2,12]};
+                         allPoolSizes_C = {[2,2,4], [2,2,6], [2,2,12]};
+                         
+                         allPoolTypes = {'MAX'};
+                         
                         case {'Grouping'}
                             
 %                         allNStates = {[16, 64, -120], [16, 64, -512], ...
 %                                       [16, 64, 512, -120], [16, 64, 512, -512]};
-                        allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
+%                         allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
 %                         allNStates = {[16, 64, 512, -120]};
                             
+                            allNStates = {[16, 64, 512, -120], [16, 64, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,2], [2,2,3], [2,2,4], [2,2,6], [2,2,12]};
+                         allPoolSizes_C = {[2,2,2], [2,2,4], [2,2,12]};
+                         
                         case {'Uncertainty'}
-                            allNStates = {[16, -512],          [16, -120], ...
-                                          [16, 64, -512],      [16, 64, -120], ... 
-                                          [16, 64, 512, -512], [16, 64, 512, -120]};
-%                             allNStates = { [16, -120], ...
-%                                            [16, 64, -120], ... 
-%                                            [16, 64, 512, -120]};
+%                             allNStates = {[16, -512],          [16, -120], ...
+%                                           [16, 64, -512],      [16, 64, -120], ... 
+%                                           [16, 64, 512, -512], [16, 64, 512, -120]};
+                            allNStates = { [16, -120], ...
+                                           [16, 64, -120], ... 
+                                           [16, 64, 512, -120]};
 %                         allNStates = {[16, 64, 512, -120]};
                             
                         case {'ChannelTuning'}
-                            allNStates = {...
-                                          [16, 64, 512, -512], [16, 64, 512, -120], ...
-                                          [16, 64, -512],      [16, 64, -120], ... 
-                                          [16, -512],      [16, -120], ...
-                                          };
-                        allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
+%                             allNStates = {...
+%                                           [16, 64, 512, -512], [16, 64, 512, -120], ...
+%                                           [16, 64, -512],      [16, 64, -120], ... 
+%                                           [16, -512],      [16, -120], ...
+%                                           };
+%                         allNStates = {[16, 64, 512, -120], [16, 64, 512, -512]};
 
+%                             allNStates = {[16, 64, 512, -120], [16, 64, 1024, -120]};
+%                             allNStates = { [16, 64, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,2], [2,2,3], [2,2,4], [2,2,6], [2,2,12]};
+%                          allPoolSizes_C = {[2,2,2], [2,2,12]};
+%                          allPoolSizes_C = {[2,2,2], [2,2,4], [2,2,6], [2,2,12]};
+%                          allPoolSizes_C = {[2,2,16], [2,3,16], [2,4,16], ...
+%                                            [3,2,16], [3,3,16], [3,4,16], ...
+%                                            [4,2,16], [4,3,16], [4,4,16]};
+                         allPoolSizes_C = {[2,2,16], [3,3,16], [4,4,16]};
+                                       zeroPadForConvolutions = true;
+
+%                            allNStates = { [32, 128, -120]};
+%                          allPoolSizes_C = {[2,26]};
+%                          zeroPadForConvolutions = false;
+                           allNStates = { [16, 64, 256, 1024, -120]};
+                         allPoolSizes_C = {[2,2,2,8]};
+                         allFiltSizes = {[5, 5, 5, 3]};
+                         zeroPadForConvolutions = false;
                     case {'Crowding'}
                             
 %                         allNStates = {[16, 64, 512, -120, [16, 64, 512, -512]};
@@ -723,6 +757,7 @@ function plotResults
                                         'poolStrides', poolStrides, ... 
                                         ...
                                         'convFunction', convFunction, ...
+                                        'zeroPadForConvolutions', zeroPadForConvolutions, ...
                                         'trainOnGPU', trainOnGPU, ...
                                         'GPU_batchSize', GPU_batchSize, ...
                                         'trainConfig', trainConfig, ...
@@ -1227,7 +1262,8 @@ function plotResults
 %             sizeStyle = 'k30'; imageSize = [45 45];
 %             sizeStyle = 'k15'; imageSize = [45 45];
 %             sizeStyle = 'k16';
-            sizeStyle = 'k36'; imageSize = [64 64];
+%             sizeStyle = 'k36'; imageSize = [64 64];
+            sizeStyle = 'k15'; imageSize = [64 64];
 
             fontName_use = 'Bookman';
 %             fontName_use = 'KuenstlerU';
@@ -1363,9 +1399,16 @@ function plotResults
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
 %                 allUncertaintySets = { oriXYSet_4x4y_d1_11o_d1 };
 %                   allUncertaintySets = { oriXYSet_1pos };
-                allUncertaintySets = {  oriXYSet_4x4y_d1_11o_d1 };
+%                 allUncertaintySets = {  oriXYSet_4x4y_d1_11o_d1 };
 
+%                 allUncertaintySets = { oriXYSet_4x4y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
 
+                oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
+
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_13x11y_d1};
+                allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_30x39y_d1};
+
+                
               if doTextureStatistics
                   
                   allUncertaintySets = { oriXYSet_1pos };
@@ -1380,6 +1423,7 @@ function plotResults
         case 'Grouping',
 %             sizeStyle = 55; imageSize = [96, 96];
             sizeStyle = 'k32'; imageSize = [64, 64];
+%             sizeStyle = 'k55'; imageSize = [64, 64];
 %             sizeStyle = 'k32'; imageSize = [80, 80];
             
 %             sizeStyle = 'k48'; imageSize = [96, 96];
@@ -1505,7 +1549,7 @@ function plotResults
 %                      allUncertaintySets = {oriXYSet_28x28y_d1, oriXYSet_26x26y_d1, oriXYSet_24x24y_d1, oriXYSet_12x12y_d2, oriXYSet_6x6y_d4, oriXYSet_4x4y_d6};
                      allUncertaintySets = {oriXYSet_28x28y_d1, oriXYSet_26x26y_d1, oriXYSet_24x24y_d1, oriXYSet_24x24y_d1_3ori_d5, oriXYSet_12x12y_d2};
 %            
-%                    oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
+                   oriXYSet_15x19y_d1             = struct('oris', [0], 'xs', [1 : 15 ], 'ys', [1 : 19 ] );  
 %                    oriXYSet_22x26y_d1             = struct('oris', [0], 'xs', [1 : 22 ], 'ys', [1 : 26 ] ); 
 %                    oriXYSet_31x36y_d1             = struct('oris', [0], 'xs', [1 : 31 ], 'ys', [1 : 36 ] ); 
 %                    oriXYSet_45x47y_d1             = struct('oris', [0], 'xs', [1 : 45 ], 'ys', [1 : 47 ] ); 
@@ -1535,8 +1579,11 @@ function plotResults
 % %                         oriXYSet_39x39y_d1, oriXYSet_41x41y_d1, oriXYSet_43x43y_d1};
 %                     allUncertaintySets = {oriXYSet_40x40y_d1,  oriXYSet_41x41y_d1, oriXYSet_42x42y_d1, ...
 %                         oriXYSet_43x43y_d1, oriXYSet_44x44y_d1};
+                    oriXYSet_7x7y_d1 = struct('oris', [0], 'xs', [1:7], 'ys', [1:7]);
 %                     
-  
+                      allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1 };
+%                      allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x7y_d1};
+
 
             fullWiggleSet = {'same'};
             svhn_trainingSize = [32, 32];
@@ -1746,14 +1793,6 @@ function plotResults
                                                   oriXYSet_3x7y_d2, oriXYSet_21o_d2_3x7y_d2, ...
                                                   oriXYSet_5x13y_d1, oriXYSet_21o_d2_5x13y_d1, ...
                                                   };
-            oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [0 : 1 : 4], 'ys', [0 : 1 : 12] );  % for complexity  5*13   = 65
-            oriXYSet_7x18y_d1 = struct('oris', [0], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18    = 126
-            oriXYSet_10x26y_d1 = struct('oris', [0], 'xs', [0 : 1 : 9], 'ys', [0 : 1 : 25] );  % for complexity 10*26  = 260
-            oriXYSet_14x37y_d1 = struct('oris', [0], 'xs', [0 : 1 : 13], 'ys', [0 : 1 : 36] );  % for complexity 14*37  = 518
-            oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
-
-                                                                                
-            allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1};
 
             
 %             
@@ -1786,6 +1825,20 @@ function plotResults
 
 %             allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1};
 
+
+
+                oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [0 : 1 : 4], 'ys', [0 : 1 : 12] );  % for complexity  5*13   = 65
+                oriXYSet_7x18y_d1 = struct('oris', [0], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18    = 126
+                oriXYSet_10x26y_d1 = struct('oris', [0], 'xs', [0 : 1 : 9], 'ys', [0 : 1 : 25] );  % for complexity 10*26  = 260
+                oriXYSet_14x37y_d1 = struct('oris', [0], 'xs', [0 : 1 : 13], 'ys', [0 : 1 : 36] );  % for complexity 14*37  = 518
+                oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
+                oriXYSet_15x20y_d1 = struct('oris', [0], 'xs', [1 : 1 : 15], 'ys', [1 : 1 : 20] );  % for complexity 31*39 = 1209
+                oriXYSet_15x20y_d2 = struct('oris', [0], 'xs', [1 : 2 : 30], 'ys', [1 : 2 : 39] );  % for complexity 31*39 = 1209
+                
+%                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1,  oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
+
+                allUncertaintySets = { oriXYSet_30x39y_d1,  oriXYSet_15x20y_d2};
+
             if doConvNet
                 
                 
@@ -1815,8 +1868,8 @@ function plotResults
 %                 sizeStyle = 'k15';  imageSize = [64, 64];
                 sizeStyle = 'k15';  imageSize = [32, 160];
 
-%                 uncertainty_trainOn = 'same';
-                uncertainty_trainOn = 'SVHN';
+                uncertainty_trainOn = 'same';
+%                 uncertainty_trainOn = 'SVHN';
                 
                 switch uncertainty_trainOn
                     case 'same',
@@ -3197,9 +3250,9 @@ function plotResults
         end
     end    
     %%
-    color_idx_start = 1;    nColors_use = 4;
-    marker_idx_start = 1;   nMarkers_use = 1;
-    line_idx_start = 1;     nLineStyles_use = 3;
+    color_idx_start = 1;    nColors_use = 5;
+    marker_idx_start = 1;   nMarkers_use = 4;
+    line_idx_start = 1;     nLineStyles_use = 1;
     
 %     all_colors_idx = mod([1:nLines] + color_idx_start-2, length(colors_use))+1;
 %     all_markers_idx = mod( ceil([1:nLines]/length(colors_use)) + marker_idx_start-2, length(markers_use))+1;
@@ -3588,7 +3641,7 @@ function plotResults
         h_ideal = [];
         leg_ideal_C = {};
             
-        if alsoPlotIdeal && exist('th_ideal', 'var')
+        if alsoPlotIdeal && exist('th_ideal', 'var') && getIdeal
             %%
             th_ideal_M = nanmean(nanmean(th_ideal, 2), 4);
             th_ideal_use = th_ideal_M(:,1,plot_i); %take data for this plot, 1st set, 1st trial
