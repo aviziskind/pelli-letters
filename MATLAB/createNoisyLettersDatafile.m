@@ -1241,7 +1241,7 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
     
     
     if any(strcmp (noiseFilter.filterType, {'band', 'lo', 'hi'}))
-        noiseFilter.cycPerLet_range = getCycPerLet_range(noiseFilter);
+        noiseFilter.cycPerLet_range = getNoiseRange(noiseFilter);
         noiseFilter.cycPerPix_range = noiseFilter.cycPerLet_range / fontXheight;
     end
 %     noiseFilter.applyFourierMaskGainFactor = applyFourierMaskGainFactor;

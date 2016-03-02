@@ -452,7 +452,7 @@ function measurePsychCurves_together(redoFlag)
             
             if any(strcmp (noiseFilter.filterType, {'band', 'lo', 'hi'}))
 %                 [~, fontXheight, ~] = getFontSize(fontName, fontSize);      
-                noiseFilter.cycPerLet_range = getCycPerLet_range(noiseFilter);
+                noiseFilter.cycPerLet_range = getNoiseRange(noiseFilter);
                 noiseFilter.cycPerPix_range = noiseFilter.cycPerLet_range / fontXheight;
             end
 
