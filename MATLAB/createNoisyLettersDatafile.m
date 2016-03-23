@@ -613,7 +613,8 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
 %                 allSizeStyle_imageSizes = {  {'k15', [45, 45]}  };
 %                 allSizeStyle_imageSizes = {  {'k30', [45, 45]}  };
 %                 allSizeStyle_imageSizes = {  {'k30', [64, 64]}  };
-                allSizeStyle_imageSizes = {  {'k36', [64, 64]}  };
+%                 allSizeStyle_imageSizes = {  {'k36', [64, 64]}  };
+                allSizeStyle_imageSizes = {  {'k24', [64, 64]}  };
 %                 allSizeStyle_imageSizes = {  {'k15', [64, 64]}  };
          
 %                 allUncertaintySets = {oriXYSet_4x4y7o, oriXYSet_6x6y11o,  oriXYSet_6x5y21o, oriXYSet_1pos};
@@ -621,14 +622,15 @@ function createNoisyLettersDatafile(fontName, fontSizeStyle, orientations, xs, y
                 
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, ...
 %                         oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
-                oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [1 : 1 : 30], 'ys', [1 : 1 : 39] );  % for complexity 31*39 = 1209
+%                 oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [1 : 1 : 30], 'ys', [1 : 1 : 39] );  % for complexity 31*39 = 1209
+                oriXYSet_17x28y_d1 = struct('oris', [0], 'xs', [1 : 1 : 17], 'ys', [1 : 1 : 28] );  % for complexity 31*39 = 1209
                 
 %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_2x2y_d1,    oriXYSet_3x3y_d1, oriXYSet_4x4y_d1, oriXYSet_5x6y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
 %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
 %                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 };
 %                     allUncertaintySets = { oriXYSet_13x11y_d1, oriXYSet_8x8y_d1, oriXYSet_4x4y_d1};
 
-                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_30x39y_d1, oriXYSet_4x4y_d1, };
+                    allUncertaintySets = { oriXYSet_1pos, oriXYSet_17x28y_d1};
                     if doTextureStatistics
                         allUncertaintySets = { oriXYSet_1pos };
                     end

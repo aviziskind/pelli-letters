@@ -4,9 +4,9 @@ function plotResults
 %     fig_offset = 0;
     fig_offset = 52;
 
-%     expName = 'ChannelTuning';
+    expName = 'ChannelTuning';
 %     expName = 'Crowding';
-    expName = 'Grouping';
+%     expName = 'Grouping';
 %     expName = 'Complexity';
 %     expName = 'TrainingWithNoise';
 %     expName = 'Uncertainty';
@@ -104,7 +104,7 @@ function plotResults
             x_name = 'NoiseFreq';   y_name = 'Threshold_model';
 %             x_name = 'NoiseFreq';   y_name = 'Channel_Gain';
 
-            channels_trainOn = 'SVHN'; 
+            channels_trainOn = 'RealData'; 
 %             channels_trainOn = 'pinkNoise'; 
 
             
@@ -140,7 +140,7 @@ function plotResults
 %             x_name = 'Complexity';   y_name = 'Threshold_model';
 %             x_name = 'Complexity'; y_name = 'maxPctCorrect';
             
-            complexity_trainOn = 'SVHN'; 
+            complexity_trainOn = 'RealData'; 
 %             complexity_trainOn = 'pinkNoise'; 
 %             complexity_trainOn = 'whiteNoise'; 
 
@@ -231,7 +231,7 @@ function plotResults
     switch expName
         case 'ChannelTuning',
             multiple_lines = 'Networks';
-            if strcmp(channels_trainOn, 'SVHN')
+            if strcmp(channels_trainOn, 'RealData')
                 multiple_plots = 'TrainingFonts'; 
             else
                 multiple_plots = 'TrainingNoise';
@@ -318,10 +318,12 @@ function plotResults
             
         case 'Complexity',
             allFontNames = allFontNames_std;
-            allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
+%             allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
 %             allFontNames      = {'Armenian', 'Devanagari', 'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'Devanagari', 'Courier'};
 %             allFontNames      = {'Bookman'};
-            allFontNames      = {'Armenian', 'Bookman', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
+%             allFontNames      = {'Armenian', 'Bookman', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 'BookmanB', 'BookmanU', 'Hebraica', 'Checkers4x4', 'Courier'};
+%                 allFontNames      = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'};
+
             
         case 'TrainingWithNoise',
             allFontNames      = {'Bookman'};
@@ -675,8 +677,13 @@ function plotResults
 %                          allPoolSizes_C = {[2,2,2], [2,2,3], [2,2,4], [2,2,6], [2,2,12]};
 %                          allPoolSizes_C = {[2,2,12]};
                          allPoolSizes_C = {[2,2,4], [2,2,6], [2,2,12]};
-                         
+
+                         allPoolSizes_C = {[2,2,16], [2,3,16], [2,4,16], ...
+                             [3,2,16], [3,3,16], [3,4,16], ...
+                             [4,2,16], [4,3,16], [4,4,16]};
+
                          allPoolTypes = {'MAX'};
+                           zeroPadForConvolutions = true;
                          
                         case {'Grouping'}
                             
@@ -687,7 +694,12 @@ function plotResults
                             
                             allNStates = {[16, 64, 512, -120], [16, 64, 1024, -120]};
 %                          allPoolSizes_C = {[2,2,2], [2,2,3], [2,2,4], [2,2,6], [2,2,12]};
-                         allPoolSizes_C = {[2,2,2], [2,2,4], [2,2,12]};
+%                          allPoolSizes_C = {[2,2,2], [2,2,4], [2,2,12]};
+
+                         allPoolSizes_C = {[2,2,16], [2,3,16], [2,4,16], ...
+                             [3,2,16], [3,3,16], [3,4,16], ...
+                             [4,2,16], [4,3,16], [4,4,16]};
+                           zeroPadForConvolutions = true;
                          
                         case {'Uncertainty'}
 %                             allNStates = {[16, -512],          [16, -120], ...
@@ -711,19 +723,30 @@ function plotResults
 %                          allPoolSizes_C = {[2,2,2], [2,2,3], [2,2,4], [2,2,6], [2,2,12]};
 %                          allPoolSizes_C = {[2,2,2], [2,2,12]};
 %                          allPoolSizes_C = {[2,2,2], [2,2,4], [2,2,6], [2,2,12]};
-%                          allPoolSizes_C = {[2,2,16], [2,3,16], [2,4,16], ...
-%                                            [3,2,16], [3,3,16], [3,4,16], ...
-%                                            [4,2,16], [4,3,16], [4,4,16]};
-                         allPoolSizes_C = {[2,2,16], [3,3,16], [4,4,16]};
+                         allPoolSizes_C = {[2,2,16], [2,3,16], [2,4,16], ...
+                                           [3,2,16], [3,3,16], [3,4,16], ...
+                                           [4,2,16], [4,3,16], [4,4,16]};
+%                          allPoolSizes_C = {[2,2,16], [3,3,16], [4,4,16]};
                                        zeroPadForConvolutions = true;
 
 %                            allNStates = { [32, 128, -120]};
 %                          allPoolSizes_C = {[2,26]};
 %                          zeroPadForConvolutions = false;
-                           allNStates = { [16, 64, 256, 1024, -120]};
-                         allPoolSizes_C = {[2,2,2,8]};
-                         allFiltSizes = {[5, 5, 5, 3]};
-                         zeroPadForConvolutions = false;
+%                            allNStates = { [16, 64, 256, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,2,8]};
+%                          allFiltSizes = {[5, 5, 5, 3]};
+                         
+                         
+%                          allNStates = {[32, 128, -120]};
+%                          allPoolSizes_C = {[2,26]};
+%                          allFiltSizes = {[5, 5]};
+
+                            allNStates = {[16, 64, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,16]};
+                         allFiltSizes = {[5, 5, 3]};
+
+                         
+                         zeroPadForConvolutions = true;
                     case {'Crowding'}
                             
 %                         allNStates = {[16, 64, 512, -120, [16, 64, 512, -512]};
@@ -1079,7 +1102,7 @@ function plotResults
 %             allTrainingNoise = [whiteNoiseFilter];
             testNoiseFilter = whiteNoiseFilter{1}; % will change them all during loop
             
-            if strcmp(channels_trainOn, 'SVHN')
+            if strcmp(channels_trainOn, 'RealData')
                 allTrainingNoise = {'same'};
             end
           
@@ -1108,7 +1131,7 @@ function plotResults
             
 
         case 'Complexity',
-            if strcmp(complexity_trainOn, 'SVHN')
+            if strcmp(complexity_trainOn, 'RealData')
                 allTrainingNoise = [whiteNoiseFilter];
             elseif strcmp(complexity_trainOn, 'pinkNoise')
                 allTrainingNoise = [pinkNoiseFilters, whiteNoiseFilter];
@@ -1119,7 +1142,7 @@ function plotResults
 %             allTrainingNoise = [whiteNoiseFilter  ];
             testNoiseFilter = whiteNoiseFilter{1};
             
-            if strcmp(complexity_trainOn, 'SVHN');
+            if strcmp(complexity_trainOn, 'RealData');
                 allTrainingNoise = {'same'};        
             end
             
@@ -1273,15 +1296,17 @@ function plotResults
 %             fontName_use = 'Yung';
             all_sizeStyles_C = {sizeStyle};            
 
-             if strcmp(channels_trainOn, 'SVHN')
+             if strcmp(channels_trainOn, 'RealData')
+                 realData_name = 'CIFAR10';
 %                  trainingFonts = {'SVHN'};
                  if strcmp(modelName, 'ConvNet')
                      svhn_imageSize = [32 32];
     %                  svhn_imageSize = [64 64];
     %                  svhn_imageSize = imageSize;
-                     trainingFonts_no_lcn = struct('fonts', 'SVHN', 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', false));
-                     trainingFonts_lcn    = struct('fonts', 'SVHN', 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', true));
+                     trainingFonts_no_lcn = struct('fonts', realData_name, 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', false));
+                     trainingFonts_lcn    = struct('fonts', realData_name, 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', true));
                      trainingFonts = trainingFonts_no_lcn;
+%                      trainingFonts = trainingFonts_lcn;
 
                      allTrainingFonts = {trainingFonts_no_lcn, trainingFonts_lcn};
                  elseif strcmp(modelName, 'Texture')
@@ -1291,7 +1316,7 @@ function plotResults
                                                                 'tbl_scaleMethod', {{'tile', 'pad', 'fourier'}}, ...
                                                                 'imageSize', svhn_imageSize, ...
                                                                  'globalNorm', true'));
-                     allTrainingFonts = arrayfun(@(svhn_opt) struct('fonts', 'SVHN', 'realData_opts', svhn_opt), all_realData_opts, 'un', 0);
+                     allTrainingFonts = arrayfun(@(svhn_opt) struct('fonts', realData_name, 'realData_opts', svhn_opt), all_realData_opts, 'un', 0);
                     trainingFonts = allTrainingFonts{1};
                      
                      
@@ -1303,7 +1328,8 @@ function plotResults
 %                      allRetrainFromLayers = {'linear-2'};
                      allRetrainFromLayers = {'classifier'};
                  else
-                     allRetrainFromLayers = {'linear'};
+%                      allRetrainFromLayers = {'linear'};
+                     allRetrainFromLayers = {'conv3'};
                  end
 %                  allRetrainFromLayers = {'classifier'};
                  tbl_trainingNoise = {'same'};
@@ -1404,9 +1430,21 @@ function plotResults
 %                 allUncertaintySets = { oriXYSet_4x4y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
 
                 oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
+                if strcmp(sizeStyle, 'k36')
+                    
+                    allUncertaintySets = { oriXYSet_1pos };
+                    
+                elseif strcmp(sizeStyle, 'k15')
+                    
+%                     allUncertaintySets = { oriXYSet_1pos, oriXYSet_30x39y_d1};
+                    allUncertaintySets = { oriXYSet_1pos };
+                    
+                    
+                end
+
 
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_13x11y_d1};
-                allUncertaintySets = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_30x39y_d1};
+%                 allUncertaintySets = { oriXYSet_1pos };
 
                 
               if doTextureStatistics
@@ -1581,8 +1619,11 @@ function plotResults
 %                         oriXYSet_43x43y_d1, oriXYSet_44x44y_d1};
                     oriXYSet_7x7y_d1 = struct('oris', [0], 'xs', [1:7], 'ys', [1:7]);
 %                     
-                      allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1 };
-%                      allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x7y_d1};
+                            if strcmp(sizeStyle, 'k32')
+                                allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x19y_d1 };
+                            elseif strcmp(sizeStyle, 'k55')
+                                allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x7y_d1};
+                            end
 
 
             fullWiggleSet = {'same'};
@@ -1674,14 +1715,15 @@ function plotResults
             
             %                 fullStyleSet = {allFontStyles};
             
-             if strcmp(complexity_trainOn, 'SVHN')
+             if strcmp(complexity_trainOn, 'RealData')
+                 realData_name = 'CIFAR10';
 
                  if strcmp(modelName, 'ConvNet')
                      svhn_imageSize = [32 32];
     %                  svhn_imageSize = [64 64];
 
-                     trainingFonts_no_lcn = struct('fonts', 'SVHN', 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', false));
-                     trainingFonts_lcn = struct('fonts', 'SVHN', 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', true));
+                     trainingFonts_no_lcn = struct('fonts', realData_name, 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', false));
+                     trainingFonts_lcn = struct('fonts', realData_name, 'realData_opts', struct('imageSize', svhn_imageSize, 'globalNorm', true, 'localContrastNorm', true));
                      trainingFonts = trainingFonts_no_lcn;
     %                  trainingFonts = trainingFonts_lcn;
                      allTrainingFonts = {trainingFonts_no_lcn, trainingFonts_lcn, };
@@ -1694,7 +1736,7 @@ function plotResults
                                                                 'tbl_scaleMethod', {{'tile', 'pad', 'fourier'}}, ...
                                                                 'imageSize', svhn_imageSize, ...
                                                                  'globalNorm', true'));
-                     allTrainingFonts = arrayfun(@(svhn_opt) struct('fonts', 'SVHN', 'realData_opts', svhn_opt), all_realData_opts, 'un', 0);
+                     allTrainingFonts = arrayfun(@(svhn_opt) struct('fonts', realData_name, 'realData_opts', svhn_opt), all_realData_opts, 'un', 0);
                      trainingFonts = allTrainingFonts{1};
                       allRetrainFromLayers = {'linear-2'};
 
@@ -1837,7 +1879,8 @@ function plotResults
                 
 %                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_5x13y_d1,    oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, oriXYSet_14x37y_d1, oriXYSet_30x39y_d1,  oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
 
-                allUncertaintySets = { oriXYSet_30x39y_d1,  oriXYSet_15x20y_d2};
+%                 allUncertaintySets = { oriXYSet_30x39y_d1,  oriXYSet_15x20y_d2};
+                allUncertaintySets = { oriXYSet_30x39y_d1};
 
             if doConvNet
                 
@@ -3250,9 +3293,9 @@ function plotResults
         end
     end    
     %%
-    color_idx_start = 1;    nColors_use = 5;
-    marker_idx_start = 1;   nMarkers_use = 4;
-    line_idx_start = 1;     nLineStyles_use = 1;
+    color_idx_start = 1;    nColors_use = 3;
+    marker_idx_start = 1;   nMarkers_use = 3;
+    line_idx_start = 1;     nLineStyles_use = 2;
     
 %     all_colors_idx = mod([1:nLines] + color_idx_start-2, length(colors_use))+1;
 %     all_markers_idx = mod( ceil([1:nLines]/length(colors_use)) + marker_idx_start-2, length(markers_use))+1;

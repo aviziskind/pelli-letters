@@ -880,7 +880,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     
                                     local doIntermediateTesting = true
                                     if doIntermediateTesting then
-                                        local testOpts = {batchSize = trainOpts.BATCH_SIZE, savePctCorrectOnIndivLetters=savePctCorrectOnIndivLetters, printResults = true, returnPctCorrect = true}
+                                        local testOpts = {batchSize = trainOpts.BATCH_SIZE, savePctCorrectOnIndivLetters=savePctCorrectOnIndivLetters, printResults = true, returnPctCorrect = true, removeProgressBarWhenDone = true}
                                         testModelOnFontsSNRs(model_struct, fontNamesList, allSNRs_test, test_tsData, nil, testOpts)                                    
                                     end
                                         
@@ -943,10 +943,11 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         
                                         local testOpts = {batchSize = trainOpts.BATCH_SIZE, nClasses = inputStatsTest.nClasses, 
                                             savePctCorrectOnIndivLetters = savePctCorrectOnIndivLetters, 
-                                            printResults = true, returnPctCorrect = true}
+                                            printResults = true, returnPctCorrect = true, removeProgressBarWhenDone = true}
                                         local allSNRs_use = iff(isRealData, {0}, allSNRs_test)
                                         
-                                        pct_correct_vs_snr_total, pct_correct_vs_snr_eachLetter,   pct_correct_vs_snr_total_train, pct_correct_vs_snr_eachLetter_train = 
+                                        pct_correct_vs_snr_total, pct_correct_vs_snr_eachLetter,   
+                                        pct_correct_vs_snr_total_train, pct_correct_vs_snr_eachLetter_train = 
                                             testModelOnFontsSNRs(model_struct, fontNamesList, allSNRs_use, test_tsData, test_trData, testOpts)
                                                                                                                         
                                         
@@ -974,7 +975,8 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                         
                                         local testOpts = {batchSize = trainOpts.BATCH_SIZE, nClasses = inputStatsTest.nClasses, 
                                             savePctCorrectOnIndivLetters = savePctCorrectOnIndivLetters, 
-                                            printResults = true, printInOneLine = true, returnPctCorrect = true, reshapeToVector = true}
+                                            printResults = true, printInOneLine = true, returnPctCorrect = true, 
+                                            reshapeToVector = true, removeProgressBarWhenDone = true}
                               
                                         pct_correct_vs_snr_any = testModelOnFontsSNRs(model_struct, fontNamesList, 
                                             allSNRs_test, test_1let_tsData, nil, testOpts)
