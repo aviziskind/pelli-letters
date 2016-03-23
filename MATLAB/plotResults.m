@@ -633,8 +633,9 @@ function plotResults
             end
             
             all_nStates_and_filtSizes_and_poolSizes = {};
-            do3LayerFilters = true;
-            if do3LayerFilters
+            networkSetsName = '3LayerNets';
+%             networkSetsName = '5LayerNets';
+            if strcmp(networkSetsName, '3LayerNets')
 %                 all_nStates_and_filtSizes_and_poolSizes = {
 %                      {[16, 64, 512, -120], [5, 5, 3], [2,2,3]},
 %                      {[6, 16, 64, -120],   [5, 3, 3], [2,2,2]},
@@ -760,7 +761,29 @@ function plotResults
 %                 allFiltSizes = {[5, 5]};
 %                 allPoolSizes_C = {[2,2]};
                 
+            elseif strcmp(networkSetsName, '5LayerNets')
+                         allPoolSizes_C = {[2,2,2,2,4]};
+%                          allPoolSizes_C = {[2,2,16], [3,3,16], [4,4,16]};
+                                       zeroPadForConvolutions = true;
+
+%                            allNStates = { [32, 128, -120]};
+%                          allPoolSizes_C = {[2,26]};
+%                          zeroPadForConvolutions = false;
+%                            allNStates = { [16, 64, 256, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,2,8]};
+%                          allFiltSizes = {[5, 5, 5, 3]};
+                         
+                         
+%                          allNStates = {[32, 128, -120]};
+%                          allPoolSizes_C = {[2,26]};
+                         allFiltSizes = {[5, 5, 5, 5, 5], [5, 5, 5, 3, 3]};
+
+                            allNStates = {[16, 64, 256, 512, 1024, -120]};
+%                          allPoolSizes_C = {[2,2,16]};
+                
             end
+                
+                
             
             allConvNetOptions = struct('netType', 'ConvNet', ...
                                         'tbl_nStates', {allNStates}, ...
@@ -774,8 +797,8 @@ function plotResults
                                         ...'poolSizes', poolSize, ...
                                         'tbl_poolSizes', {allPoolSizes_C}, ...
                                         ...
-                                        ...'poolType', poolType, ...
-                                        'tbl_poolType', {allPoolTypes}, ...
+                                        ...'poolTypes', poolTypes, ...
+                                        'tbl_poolTypes', {allPoolTypes}, ...
                                         ...
                                         'poolStrides', poolStrides, ... 
                                         ...
@@ -783,10 +806,10 @@ function plotResults
                                         'zeroPadForConvolutions', zeroPadForConvolutions, ...
                                         'trainOnGPU', trainOnGPU, ...
                                         'GPU_batchSize', GPU_batchSize, ...
-                                        'trainConfig', trainConfig, ...
-                                        'tbl_nStates_and_filtSizes_and_poolSizes', {all_nStates_and_filtSizes_and_poolSizes} ...
+                                        'trainConfig', trainConfig ...
+                                        ...'tbl_nStates_and_filtSizes_and_poolSizes', {all_nStates_and_filtSizes_and_poolSizes} ...
                                       );
-            allNetworks = expandOptionsToList(allConvNetOptions, {'poolSizes', 'poolType', 'filtSizes', 'nStates' });
+            allNetworks = expandOptionsToList(allConvNetOptions, {'poolSizes', 'poolTypes', 'filtSizes', 'nStates' });
 
             fprintf('\n ---- Using the following networks ----\n');
             displayOptions(allConvNetOptions);
@@ -1254,9 +1277,9 @@ function plotResults
     overFeatOpts_C = {};
 %     niceStrFields = {'trainingNoise', 'testNoise'};
     allTextureStatsUse = {'V2'};
-%     niceStrFields = {'nStates', 'poolSizes', 'poolStrides', 'poolType', 'uncertainty'};
-%     niceStrFields = {'poolSizes', 'poolStrides', 'poolType', 'filtSize', 'nStates'};
-    niceStrFields = {'nStates', 'poolSizes', 'poolType', 'filtSize', 'textureParams'};
+%     niceStrFields = {'nStates', 'poolSizes', 'poolStrides', 'poolTypes', 'uncertainty'};
+%     niceStrFields = {'poolSizes', 'poolStrides', 'poolTypes', 'filtSize', 'nStates'};
+    niceStrFields = {'nStates', 'poolSizes', 'poolTypes', 'filtSize', 'textureParams'};
 %     niceStrFields = {'poolSizes', 'filtSize', 'nStates'};
     all_imageSizes_C = {[32, 32]};
     autoImageSize = 0;
@@ -1280,13 +1303,13 @@ function plotResults
 %             sizeStyle = 'k15'; imageSize = [32 32];
 %             sizeStyle = 'k15'; imageSize = [30 30];
 %             sizeStyle = 'k30'; imageSize = [64 64];
-%             sizeStyle = 'k24'; imageSize = [64 64];
 %             sizeStyle = 'k20'; imageSize = [36 36];
 %             sizeStyle = 'k30'; imageSize = [45 45];
 %             sizeStyle = 'k15'; imageSize = [45 45];
 %             sizeStyle = 'k16';
 %             sizeStyle = 'k36'; imageSize = [64 64];
-            sizeStyle = 'k15'; imageSize = [64 64];
+%             sizeStyle = 'k15'; imageSize = [64 64];
+            sizeStyle = 'k24'; imageSize = [64 64];
 
             fontName_use = 'Bookman';
 %             fontName_use = 'KuenstlerU';
@@ -1298,6 +1321,7 @@ function plotResults
 
              if strcmp(channels_trainOn, 'RealData')
                  realData_name = 'CIFAR10';
+%                  realData_name = 'SVHN';
 %                  trainingFonts = {'SVHN'};
                  if strcmp(modelName, 'ConvNet')
                      svhn_imageSize = [32 32];
@@ -1328,8 +1352,8 @@ function plotResults
 %                      allRetrainFromLayers = {'linear-2'};
                      allRetrainFromLayers = {'classifier'};
                  else
-%                      allRetrainFromLayers = {'linear'};
-                     allRetrainFromLayers = {'conv3'};
+                     allRetrainFromLayers = {'linear'};
+%                      allRetrainFromLayers = {'conv2'};
                  end
 %                  allRetrainFromLayers = {'classifier'};
                  tbl_trainingNoise = {'same'};
@@ -1432,7 +1456,9 @@ function plotResults
                 oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [0 : 1 : 29], 'ys', [0 : 1 : 38] );  % for complexity 31*39 = 1209
                 if strcmp(sizeStyle, 'k36')
                     
-                    allUncertaintySets = { oriXYSet_1pos };
+%                     allUncertaintySets = { oriXYSet_1pos };
+                    allUncertaintySets = { oriXYSet_1pos , oriXYSet_13x11y_d1 };
+                    
                     
                 elseif strcmp(sizeStyle, 'k15')
                     
@@ -4712,7 +4738,7 @@ function plotResults
     showPoolingPlot = false;
     if showPoolingPlot
         %%
-        defaultNetwork_pool = struct('netType', 'ConvNet', 'filtSizes', 5, 'poolSizes', 4, 'poolType', 2, 'poolStrides', 'auto', 'nStates', [6 15], 'doPooling', 1);
+        defaultNetwork_pool = struct('netType', 'ConvNet', 'filtSizes', 5, 'poolSizes', 4, 'poolTypes', 2, 'poolStrides', 'auto', 'nStates', [6 15], 'doPooling', 1);
         
         nStates1 = [3,6,12,24];
         nStates2 = [8,15,30,60,120];
@@ -4739,7 +4765,7 @@ function plotResults
 %         curParam = 'filtSize'; sub_i = 3;
 %         curParam = 'poolSize'; sub_i = 4;
 
-%         curParam = 'poolType'; curLabel = 'Pooling P-norm';  sub_i = 1;
+%         curParam = 'poolTypes'; curLabel = 'Pooling P-norm';  sub_i = 1;
 
         switch curParam
             case 'nStates1',
@@ -4776,7 +4802,7 @@ function plotResults
                 x = poolTypes;
                 for i = 1:length(poolTypes)
                     pt = iff(poolTypes(i) == 4, 'MAX', poolTypes(i));
-                    allNetworks_pooling(i) = defaultNetwork_pool;       allNetworks_pooling(i).poolType = pt;
+                    allNetworks_pooling(i) = defaultNetwork_pool;       allNetworks_pooling(i).poolTypes = pt;
                 end
             
         end
