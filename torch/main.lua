@@ -147,7 +147,13 @@ function main()
     --dofile (torchLetters_dir .. 'trainingLogger.lua')
 
 
-    local actionIfNoGPULock = 'turnGPUoff'
+    local actionIfNoGPULock 
+    if onNYUserver then
+        actionIfNoGPULock = 'turnGPUoff'
+    else
+        actionIfNoGPULock = 'doNothing';
+    end
+        
     --local actionIfNoGPULock = 'error'
 
     if useGPU then
@@ -169,6 +175,12 @@ function main()
             print(string.format('NO Detected GPU_ID. Not using GPU'))
             useGPU = false
             --trainOpts.BATCH_SIZE = 1
+        elseif actionIfNoGPULock == 'doNothing' then
+            -- 
+            print(string.format('NO Detected GPU_ID. Using GPU anyway... '))
+        
+        else
+            error('!')
         end
             
     end

@@ -503,7 +503,7 @@ loadAllNormalizedRealDataFiles = function(doTextureStats)
                         S_doubleFormat.inputMatrix = removeInputPlaneDimension( S_doubleFormat.inputMatrix )
             
                         io.write(string.format('   =>Saving as %s  ... ', matDatafileName))
-                        verifyFolderExists(matDatafileName)
+                        paths.verifyFolderExists(matDatafileName)
                         mattorch.save(matDatafileName, S_doubleFormat)    
                         io.write(' done\n');
                     
@@ -706,7 +706,7 @@ createRealDatafile = function(realDataFont, fileType, needToCreateMatFile)
         S_doubleFormat.inputMatrix = removeInputPlaneDimension( S_doubleFormat.inputMatrix )
         
         io.write(string.format('   =>Creating %s  ... ', matDatafileName_create))
-        verifyFolderExists(matDatafileName_create)
+        paths.verifyFolderExists(matDatafileName_create)
         mattorch.save(matDatafileName_create, S_doubleFormat)    
         io.write(' done\n');
         

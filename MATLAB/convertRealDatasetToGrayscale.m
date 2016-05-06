@@ -1,13 +1,13 @@
 function convertRealDatasetToGrayscale
 
-    datasetName = 'SVHN';
-%     datasetName = 'CIFAR10';
+%     datasetName = 'SVHN';
+    datasetName = 'CIFAR10';
 
     fileTypes = {'train', 'test'};
 %     fileTypes = {'test'};
 
-%     all_scaleFactors = [1, 2];
-    all_scaleFactors = {[1 5]};
+    all_scaleFactors = {[1]};
+%     all_scaleFactors = {[1 5]};
 %     all_scaleFactors = [2];
 %         scale_method = 'PixelRep';
 %         scale_method = 'Fourier';

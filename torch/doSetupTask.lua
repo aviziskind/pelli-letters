@@ -1154,7 +1154,7 @@ netType = 'MLP'
                                                                tbl_realData_opts= all_realData_opts} )
             else
                 tbl_realData_fontNames = 
-                    { {fonts = 'SVHN',    realData_opts = channels_realData_settings_noNorm}, 
+                    { --{fonts = 'SVHN',    realData_opts = channels_realData_settings_noNorm}, 
                       {fonts = 'CIFAR10', realData_opts = channels_realData_settings_noNorm}, 
                       --{fonts = complexity_realDataName, realData_opts = channels_realData_settings_norm}, 
                     }
