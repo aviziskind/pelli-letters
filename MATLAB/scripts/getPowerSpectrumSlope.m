@@ -60,7 +60,7 @@ function [slope_av, slope_noAv] = getPowerSpectrumSlope(X)
     
     slope_av = p_fit_av(1);
     
-    show = 0;
+    show = 1;
     if show
 %%
         Xm = X; %(X-mean(X(:))) / std(X(:));

@@ -1754,14 +1754,6 @@ end
 
 
 
-verifyFolderExists = function(dirname)
-    if string.find(  string.sub(dirname, #dirname - 5, #dirname), '[.]') then  -- ie. has filename at end
-        dirname = paths.dirname(dirname)
-    end
-    if not paths.dirp(dirname) then
-        error(string.format('Error: Path does not exist: %s', dirname))
-    end        
-end
 
 getRealDataFontList = function()
     return {'SVHN', 'MNIST', 'CIFAR10', 'CIFAR100'};

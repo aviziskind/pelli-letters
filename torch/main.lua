@@ -10,7 +10,7 @@ function main()
     torch.manualSeed(123)
 
     hostname = os.getenv('hostname') 
-    onLaptop = (hostname == 'cortex')
+    onLaptop = (hostname == 'cortex') or (hostname == 'neuron')
     onNYUserver = string.find(hostname, '.nyu.edu')
     assert(onLaptop or onNYUserver)
 
