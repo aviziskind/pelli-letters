@@ -858,11 +858,14 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     --print(os.date('%x %X', retrainOpts.prevTrainingDate))
                                     model_struct = trainModel(model_struct, retrain_trData, retrain_tsData, retrainOpts)
                                     
-                                    local sameAfterRetrain, val1, val2 = areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct)
-                                    print('After retrain, same filters = ', sameAfterRetrain, val1, val2);
-                                    print('After retrain, first conv value = ', firstConvolutionalWeightValue(model_struct))
-                                     assert(areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct) )
-                                     assert(firstConvWeightVal == firstConvolutionalWeightValue(model_struct))
+                                    if not string.find( string.lower(dataOpts_network_retrain.retrainFromLayer), 'conv') then
+                                        -- if not retraining the convolutional layers, check that they remain unchanged
+                                        local sameAfterRetrain, val1, val2 = areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct)
+                                        print('After retrain, same filters = ', sameAfterRetrain, val1, val2);
+                                        print('After retrain, first conv value = ', firstConvolutionalWeightValue(model_struct))
+                                        assert(areConvolutionalWeightsTheSame(model_struct_pretrained, model_struct) )
+                                        assert(firstConvWeightVal == firstConvolutionalWeightValue(model_struct))
+                                    end
                                      --print('  ==> After retraining, first conv value = ', firstConvolutionalWeightValue(model_struct))
                                     
                                 elseif trainOnIndividualPositions then   -- train/retrain on the same dataset using different criteria
@@ -877,7 +880,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     
                                     local doIntermediateTesting = true
                                     if doIntermediateTesting then
-                                        local testOpts = {batchSize = trainOpts.BATCH_SIZE, savePctCorrectOnIndivLetters=savePctCorrectOnIndivLetters, printResults = true, returnPctCorrect = true}
+                                        local testOpts = {batchSize = trainOpts.BATCH_SIZE, savePctCorrectOnIndivLetters=savePctCorrectOnIndivLetters, printResults = true, returnPctCorrect = true, removeProgressBarWhenDone = true}
                                         testModelOnFontsSNRs(model_struct, fontNamesList, allSNRs_test, test_tsData, nil, testOpts)                                    
                                     end
                                         
@@ -940,10 +943,11 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         
                                         local testOpts = {batchSize = trainOpts.BATCH_SIZE, nClasses = inputStatsTest.nClasses, 
                                             savePctCorrectOnIndivLetters = savePctCorrectOnIndivLetters, 
-                                            printResults = true, returnPctCorrect = true}
+                                            printResults = true, returnPctCorrect = true, removeProgressBarWhenDone = true}
                                         local allSNRs_use = iff(isRealData, {0}, allSNRs_test)
                                         
-                                        pct_correct_vs_snr_total, pct_correct_vs_snr_eachLetter,   pct_correct_vs_snr_total_train, pct_correct_vs_snr_eachLetter_train = 
+                                        pct_correct_vs_snr_total, pct_correct_vs_snr_eachLetter,   
+                                        pct_correct_vs_snr_total_train, pct_correct_vs_snr_eachLetter_train = 
                                             testModelOnFontsSNRs(model_struct, fontNamesList, allSNRs_use, test_tsData, test_trData, testOpts)
                                                                                                                         
                                         
@@ -971,7 +975,8 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                         
                                         local testOpts = {batchSize = trainOpts.BATCH_SIZE, nClasses = inputStatsTest.nClasses, 
                                             savePctCorrectOnIndivLetters = savePctCorrectOnIndivLetters, 
-                                            printResults = true, printInOneLine = true, returnPctCorrect = true, reshapeToVector = true}
+                                            printResults = true, printInOneLine = true, returnPctCorrect = true, 
+                                            reshapeToVector = true, removeProgressBarWhenDone = true}
                               
                                         pct_correct_vs_snr_any = testModelOnFontsSNRs(model_struct, fontNamesList, 
                                             allSNRs_test, test_1let_tsData, nil, testOpts)

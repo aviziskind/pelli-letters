@@ -8,7 +8,7 @@ function params = getDefaultConvNetParams()
 
     params.doPooling = true;
     params.poolSizes = [4,2];
-    params.poolType = 2;
+    params.poolTypes = 2;
     params.poolStrides = 'auto'; %[2,2];
     params.convFunction = 'SpatialConvolutionMap';
 end

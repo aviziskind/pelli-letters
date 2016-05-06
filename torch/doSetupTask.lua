@@ -22,7 +22,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     ------- ChannelTuning Settings ------
     local channels_trainOn = 'RealData'
-        local channels_realDataName = 'SVHN'
+        --local channels_realDataName = 'SVHN'
+        local channels_realDataName = 'CIFAR10'
     --local channels_trainOn = 'PinkNoise'
     
     --local channelTuningStage = 'train'
@@ -81,8 +82,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     --local complexity_trainOn = 'PinkNoise'
     local complexity_trainOn = 'RealData'
-        local complexity_realDataName = 'SVHN'
-        --local complexity_realDataName = 'CIFAR10'
+        --local complexity_realDataName = 'SVHN'
+        local complexity_realDataName = 'CIFAR10'
     --local complexity_trainOn = 'WhiteNoise'
         
     local doOnlyBookman = false;
@@ -92,8 +93,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     
     
-    --local complexityStage = 'train'
-    local complexityStage = 'test'
+    local complexityStage = 'train'
+    --local complexityStage = 'test'
     
     
     ------ Crowding Settings ------
@@ -120,7 +121,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         stimType = 'NoisyLettersOverFeat'
     end
 
-
+netType = 'MLP'
 
     local convertOverFeatFilesNow = false and (THREAD_ID  ~= nil)
     if doOverFeat and convertOverFeatFilesNow then
@@ -217,7 +218,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     local snr_train1h3p5 = table.range(1, 3.5, 0.5) --{0,1,2}
     local snr_train4 = {4}
         
-        
+    local finalLayer = 'LogSoftMax'
     local all_nStates_and_filtSizes_and_poolSizes
     print('=======NetType', netType)
     
@@ -497,6 +498,10 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 --allPoolSizes = { {3,3,12}, {2,3,6},{2,2,12} }
                 allPoolTypes = {'MAX'}
             
+            
+                allNStates =  {  {16, 64, 256, 512, 1024, -120},  }
+                allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
+                allPoolSizes = { {2,2,2,2,4},  }
             --[[
                 allNStates =  {  {16, 64, -120}, {32, 128, -120} }
                 allFiltSizes = { {5, 5}, }
@@ -510,20 +515,26 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 allNStates =  { {16, 64, 1024, -120} }
                 allFiltSizes = { {5, 5, 3}}
                 --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
-                allPoolSizes = { {2,2,2}, {2,2,4}, {2,2,6}, {2,2,12} }
+                --allPoolSizes = { {2,2,2}, {2,2,4}, {2,2,6}, {2,2,12} }
                 allPoolTypes = {'MAX'}
                 allPoolSizes = { --{2,2,16}, {2,3,16},{2,4,16},
                                  --{3,2,16}, {3,3,16},{3,4,16}, 
                                  --{4,2,16}, {4,3,16},{4,4,16} }
-                                 {2,2,16}, {3,3,16},{4,4,16},
-                                 
-                                 }
+                                 {2,2,16}, --{3,3,16},{4,4,16},                                
+                             }
+ 
+                allPoolSizes = { {2,2,16}, {2,3,16}, {2,4,16} ,
+                                 {3,2,16}, {3,3,16},{3,4,16}, 
+                                 {4,2,16}, {4,3,16},{4,4,16} }
+                allPoolTypes = {'MAX', 2}
+                             
 
+--[[
                 allNStates =  { {32, 128, -120} }
                 allFiltSizes = { {5, 5}, }
                 --allPoolSizes = { {2,2,2}, {2,2,3}, {2,2,4}, {2,2,6}, {2,2,12} }
                 allPoolSizes = { {2,26}, }
-
+--]]
 
                 --allNStates =  {  {16, 64, -120} }
                 --allFiltSizes = { {5, 5}, }
@@ -532,6 +543,10 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                  --{3,2,16}, {3,3,16},{3,4,16}, 
                                  --{4,2,16}, {4,3,16},{4,4,16} }
                 --allPoolSizes = { {3,3,12}, {2,3,6},{2,2,12} }
+                
+                allNStates =  {  {16, 64, 256, 512, 1024, -120},  }
+                allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
+                allPoolSizes = { {2,2,2,2,4},  }
                 allPoolTypes = {'MAX'}
 
             end
@@ -563,8 +578,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --local tbl_trainConfig = {config_vSGD, config_sgd, config_sgd_mom, config_adadelta, config_rmsprop, config_vSGD}
         --local tbl_trainConfig = {config_sgd, config_sgd_mom, config_adadelta}
         local tbl_trainConfig = {config_sgd_mom }
-        local finalLayer = 'LogSoftMax'
-        local zeroPadForConvolutions = false
+        
+        local zeroPadForConvolutions = true
             
         allNetworkOptions_tbl = { netType = 'ConvNet', 
                                 tbl_nStates = allNStates,
@@ -625,12 +640,14 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --local allNHiddenUnits = { {}, {30}, {120}, {240}, {480}, {60, 60} }
         --local allNHiddenUnits = { {}, {30}, {120}, {240}, }
         --local allNHiddenUnits = { {}, {120} }
-        local allNHiddenUnits = { {120}, {120, 120} }
+        --local allNHiddenUnits = { {120}, {120, 120} }
+        local allNHiddenUnits = { {128}}
         --local allNHiddenUnits = { {512, 512}, {150, 150}, {128, 128}, {120, 120}, {64, 64}, {32, 32}, {120}, {64}, {32}, }
         --local allNHiddenUnits = { {}, }
            
   --          {6, 15}, {6, 30}, {6,60}, {6,120}, {6, 240}, {12, 15}, {12, 30}, {12,60}, {12,120}, {12, 240} }
         allNetworkOptions_tbl = { netType = 'MLP',
+                                    finalLayer = finalLayer,
                                   tbl_nHiddenUnits = allNHiddenUnits }                    
         
         --allNetworks = expandOptionsToList(allNetworkOptions_tbl)
@@ -896,15 +913,17 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                     channels_realData_imageSize_train = {64, 64}
                     local all_realData_opts = expandOptionsToList({imageSize = channels_realData_imageSize_train, 
                                             globalNorm = true, 
-                                            tbl_localContrastNorm = {false, true},
+                                            tbl_localContrastNorm = {true},
                                             tbl_scaleMethod = {'tile', 'pad', 'fourier'} } )
                                     
                     tbl_realData_fontNames = expandOptionsToList( 
-                        {fonts = channels_realDataName, tbl_realData_opts= all_realData_opts} )
+                        {tbl_fonts = channels_realDataName, tbl_realData_opts= all_realData_opts} )
                 else
                     tbl_realData_fontNames = { {fonts = channels_realDataName, realData_opts = channels_realData_settings_noNorm}, 
-                                           --{fonts = channels_realDataName, realData_opts = channels_realData_settings_norm}, 
+                                               --{fonts = channels_realDataName, realData_opts = channels_realData_settings_norm}, 
                                         }
+
+                                        
                 end
         end
         
@@ -942,7 +961,11 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
 
    
-        tbl_OriXY = { oriXYSet_1pos, oriXYSet_30x39y_d1, oriXYSet_4x4y_d1, }
+        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_30x39y_d1, oriXYSet_4x4y_d1, }
+
+        tbl_OriXY = { oriXYSet_1pos, oriXYSet_13x11y_d1}
+        --tbl_OriXY = { oriXYSet_1pos }
+        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_30x39y_d1}
 
    
         if doTextureModel then
@@ -1009,8 +1032,9 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 if doTextureModel then
                     tbl_retrainFromLayer = {'linear-2', 'classifier'}
                 else
-                    --tbl_retrainFromLayer = {'linear'}
-                    tbl_retrainFromLayer = {'conv1'}
+                    --tbl_retrainFromLayer = {'linear', 'conv3'}
+                    tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
+                    --tbl_retrainFromLayer =  {'conv1'} -- {'conv2', 'conv3', 'linear'} -- {'conv1'}
                 end
                 tbl_trainingNoise = {'same'}
                 
@@ -1107,8 +1131,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         
         
         
-        --tbl_fontNames = allStdFontNames
-        tbl_fontNames = allExtFontNames
+        tbl_fontNames = allStdFontNames
+        --tbl_fontNames = allExtFontNames
         
         if doOnlyBookman then
             tbl_fontNames = { 'Bookman'}
@@ -1130,7 +1154,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                                                tbl_realData_opts= all_realData_opts} )
             else
                 tbl_realData_fontNames = 
-                    { {fonts = complexity_realDataName, realData_opts = channels_realData_settings_noNorm}, 
+                    { {fonts = 'SVHN',    realData_opts = channels_realData_settings_noNorm}, 
+                      {fonts = 'CIFAR10', realData_opts = channels_realData_settings_noNorm}, 
                       --{fonts = complexity_realDataName, realData_opts = channels_realData_settings_norm}, 
                     }
             end
@@ -1248,7 +1273,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         
         --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_5x13y_d1,  oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, 
           --                  oriXYSet_14x37y_d1, oriXYSet_30x39y_d1, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
-        tbl_OriXY  = { oriXYSet_1pos, oriXYSet_30x39y_d1};
+        --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_30x39y_d1};
+        tbl_OriXY  = { oriXYSet_30x39y_d1};
  
  
         elseif complexity_imageSize[1] == 56 then

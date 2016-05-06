@@ -13,13 +13,14 @@
 
 %           nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3];  poolsizes = [2, 2, 2];
 %         nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 2];
-        nstates = [16, 64, 256, 120];  filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
+%         nstates = [16, 64, 256, 120];  filtsizes = [5, 5, 3]; poolsizes = [4, 4, 16];
+        nstates = [16, 64, 256, 512, 1024, 120];  filtsizes = [5, 5, 5, 5, 5]; poolsizes = [2,2,2,2,4];
 %         nstates = [16, 128, 512, 240];  filtsizes = [5, 5, 3]; poolsizes = [4, 3, 16];
 %         nstates = [16, 64, 512, 120];  filtsizes = [5, 3, 3]; poolsizes = [2, 2, 3];
 
 
         
-      nstates = [16, 64, -120];    filtsizes = [5, 5]; poolsizes = [2, 26];
+%       nstates = [16, 64, -120];    filtsizes = [5, 5]; poolsizes = [2, 26];
 %           nstates = [16, 64, 128, 1024, -120];  filtsizes = [5, 5, 5, 3]; poolsizes = [2, 2, 2, 8];
       
 %       pp  nstates = [6, 16, 64, 120];    filtsizes = [5, 5, 3]; poolsizes = [2, 2, 2];
@@ -49,8 +50,8 @@
 %     width = 88;
 %     height = 96;
 %     width = 96;
-    height = 64;  width = 64;
-%     height = 32;  width = 32;
+%     height = 64;  width = 64;
+    height = 32;  width = 32;
 %     height = 56;  width = 56;
     
     noutputs = 26;

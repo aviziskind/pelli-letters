@@ -1,4 +1,8 @@
-function tmp_renameFilesInFolder(baseFolder)
+function tmp_renameFilesInFolder(baseFolder, logFileName, fid)
+
+    logToFile = true;
+    isBase = false;
+
     if nargin < 1
     %     baseFolder = [torchPath 'Results' filesep 'CrowdedLetters' filesep];
     %     baseFolder = [torchPath 'Results' filesep 'TrainingWithNoise' filesep];
@@ -9,17 +13,38 @@ function tmp_renameFilesInFolder(baseFolder)
 %         baseFolder = [torchPath];
 %         baseFolder = [lettersPath 'fonts' filesep];
 %         baseFolder = [lettersPath];
+
         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'Results' fsep 'Complexity_NYU' fsep 'NoisyLetters' fsep] ;
+%         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'Results' fsep 'ChannelTuning_NYU' fsep 'NoisyLetters' fsep] ;
+%         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'TrainedNetworks' fsep] ;
+%         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep] ;
         
         if ~onLaptop
-%             baseFolder = ['/misc/vlgscratch2/LecunGroup/ziskind/lettersData/'];
-            baseFolder = ['~/lettersData/Results/Complexity_NYU/NoisyLetters/'];
+            baseFolder = ['~/lettersData/'];
+%             baseFolder = ['~/lettersData/Results/Complexity_NYU/NoisyLetters/'];
         end
 
 %         baseFolder = 'D:\Users\Avi\Code\MATLAB\nyu\letters\datasets\NoisyLettersStats\Bookman\~reduced\';
-        
+        isBase = true;
+        logFileName = [];
+        fid = [];
+        if logToFile
+            logFileName = [strrep(userpath, pathsep, '') 'renameLog_' datestr(now, 'yyyy_mm_dd__HH_MM_SS') '.txt'];
+            fid = fopen(logFileName, 'w');
+            fprintf(' ==== Logging to file %s ====\n', logFileName);
+            tic;
+        end
     end
-    fprintf('Searching in %s ... \n', baseFolder);
+    
+    
+    
+    str = sprintf('Searching in %s ... \n', baseFolder);
+    fprintf(str)
+    if logToFile
+        fprintf(fid, str);
+    end
+        
+    
 
 %     global fid
     
@@ -33,8 +58,11 @@ function tmp_renameFilesInFolder(baseFolder)
 
 %     s1 = dir([baseFolder '*.mat']);
 
+
     status = 0;
     s = [s1; s2; s3; s4];
+    
+    showOldAndNew = true;
     
     if ispc
         rename_cmd = 'rename';
@@ -69,16 +97,84 @@ function tmp_renameFilesInFolder(baseFolder)
 %         if ~isempty(strfind(name_i, 'scl'))
 %         if ~isempty(strfind(name_i, 'Snakes')) && (~isempty(strfind(name_i, '-32')) || ~isempty(strfind(name_i, '_32-')) )
 %         if ~isempty(strfind(name_i, '__trN')) 
-        if ~isempty(strfind(name_i, '[64x64]_trfSVHN_rt')) || ~isempty(strfind(name_i, '[80x80]_trfSVHN_rt'))
+%         if ~isempty(strfind(name_i, '[64x64]_trfSVHN_rt')) || ~isempty(strfind(name_i, '[80x80]_trfSVHN_rt'))
+
+        [fs_str, fs_vec, psz_str, psz_vec] = getFilterPoolSizeStr(name_i);
+        skipFs = isempty(fs_str) || ~isempty(strfind(fs_str, 'r'));
+        skipPsz = isempty(psz_str) || ~isempty(strfind(psz_str, 'r'));
+                
+        isJustRep = @(x) length(unique(x)) == 1 && length(x) > 1;
+
+%         justRep1 = [isJustRep(psz_vec)  , isJustRep(fs_vec)];
+%         justRep2 = [isJustRep_fast(psz_vec)  , isJustRep_fast(fs_vec)];
+%         assert(isequal(justRep1, justRep2));
+        
+%         needToFix = isJustRep(psz_vec)  || isJustRep(fs_vec) || ...
+%             (~skipFs && ~strcmp(abbrevList(fs_vec), fs_str)) || (~skipPsz && ~strcmp(abbrevList(psz_vec), psz_str));
+
+        needToFix = isJustRep_fast(psz_vec)  || isJustRep_fast(fs_vec) || ...
+            (~skipFs && ~strcmp(abbrevList(fs_vec), fs_str)) || (~skipPsz && ~strcmp(abbrevList(psz_vec), psz_str));
+    
+        
+        if ~isempty(strfind(name_i, '_psz2_2_2_2_4_pt')) || ...    
+           ~isempty(strfind(name_i, '_psz2_2_2_8_pt')) || ...    
+           ~isempty(strfind(name_i, '_psz2_2_2_pt')) || ...
+           ~isempty(strfind(name_i, '_psz2_2_2__')) || ...
+           ~isempty(strfind(name_i, '_psz2_2_pt')) || ...
+           ~isempty(strfind(name_i, '_psz2_2__')) || ...
+           ~isempty(strfind(name_i, '_psz3_3_pt')) || ...
+           ~isempty(strfind(name_i, '_psz3_3__')) || ...
+           ~isempty(strfind(name_i, '_psz4_4_pt')) || ...
+           ~isempty(strfind(name_i, '_psz4_4__')) || ...
+           ~isempty(strfind(name_i, '_fs7_7_psz')) || ...
+           ~isempty(strfind(name_i, '_fs3_3_psz')) || ...
+           ~isempty(strfind(name_i, '_fs5_5_psz')) || ...
+           ~isempty(strfind(name_i, '_fs10_10_psz')) || ...
+           ~isempty(strfind(name_i, '_fs10_10_10_psz')) || ...
+           ~isempty(strfind(name_i, '_fs5_5_5_psz'))
 
             
-            
+            assert(needToFix == true);
+        
+        %%
+        
             name_i_orig = name_i;
 %             new_name_i = name_i_orig;
             
             new_name_i = name_i_orig;
-            new_name_i = strrep(new_name_i, '[64x64]_trfSVHN_rt', '[64x64]_tr32x32_trfSVHN_rt');
-            new_name_i = strrep(new_name_i, '[80x80]_trfSVHN_rt', '[80x80]_tr32x32_trfSVHN_rt');
+%             new_name_i = strrep(new_name_i, '[64x64]_trfSVHN_rt', '[64x64]_tr32x32_trfSVHN_rt');
+%             new_name_i = strrep(new_name_i, '[80x80]_trfSVHN_rt', '[80x80]_tr32x32_trfSVHN_rt');
+
+            new_name_i = strrep(new_name_i, '_psz2_2_2_2_4_pt', '_psz2r4_4_pt');            
+            new_name_i = strrep(new_name_i, '_psz2_2_2_8_pt', '_psz2r3_8_pt');            
+            new_name_i = strrep(new_name_i, '_psz2_2_2_pt', '_psz2_pt');
+            new_name_i = strrep(new_name_i, '_psz2_2_2__', '_psz2_');
+            new_name_i = strrep(new_name_i, '_psz2_2_pt', '_psz2_pt');
+            new_name_i = strrep(new_name_i, '_psz2_2__', '_psz2__');
+            new_name_i = strrep(new_name_i, '_psz3_3_pt', '_psz3_pt');
+            new_name_i = strrep(new_name_i, '_psz3_3__',  '_psz3__');
+            new_name_i = strrep(new_name_i, '_psz4_4_pt', '_psz4_pt');
+            new_name_i = strrep(new_name_i, '_psz4_4__',  '_psz4__');
+            new_name_i = strrep(new_name_i, '_fs3_3_psz', '_fs3_psz');
+            new_name_i = strrep(new_name_i, '_fs5_5_psz', '_fs5_psz');
+            new_name_i = strrep(new_name_i, '_fs7_7_psz', '_fs7_psz');
+            new_name_i = strrep(new_name_i, '_fs10_10_psz', '_fs10_psz');
+            new_name_i = strrep(new_name_i, '_fs5_5_5_psz', '_fs5_psz');
+            new_name_i = strrep(new_name_i, '_fs10_10_10_psz', '_fs10_psz');
+
+
+            [fs_str2, fs_vec2, psz_str2, psz_vec2] = getFilterPoolSizeStr(new_name_i);
+            skipFs2 = isempty(fs_str2) || ~isempty(strfind(fs_str2, 'r'));
+            skipPsz2 = isempty(psz_str2) || ~isempty(strfind(psz_str2, 'r'));
+%         
+%             isJustRep = @(x) length(unique(x)) == 1 && length(x) > 1;
+  
+            
+            needToFix2 = isJustRep(psz_vec2)  || isJustRep(fs_vec2) || ...
+                (~skipFs2 && ~strcmp(abbrevList(fs_vec2), fs_str2)) || (~skipPsz2 && ~strcmp(abbrevList(psz_vec2), psz_str2));
+
+                assert(~needToFix2);
+            
 
 %             new_name_i = strrep(new_name_i, '__trN', '_trN');
 %             new_name_i = strrep(new_name_i, '-32_', '-k32_');
@@ -138,11 +234,22 @@ function tmp_renameFilesInFolder(baseFolder)
 %             new_name_i = strrep(new_name_i, 'BookmanBoldU', 'BookmanUB');
 %             new_name_i = strrep(new_name_i, 'BookmanBold', 'BookmanB');
 
+            pct_done = i / length(s) * 100;
 
              if ~strcmp(new_name_i, name_i_orig)
 %             new_name_i = strrep(new_name_i, 'Bold', 'B');
 %                 disp(['  ' name_i_orig]);
-                disp(['       ' new_name_i]);
+                if showOldAndNew
+                    str = sprintf(' [%5.1f]  %s\n      ->  %s\n\n', pct_done, name_i_orig, new_name_i);
+                else
+                    str = sprintf(' [%5.1f]  %s\n',  new_name_i);
+                end
+                
+                fprintf(str);
+                if logToFile
+                    fprintf(fid, str);
+                end
+
 %                 if ~isempty(fid)
 %                     fprintf(fid, '%s\n', new_name_i);
 %                 end
@@ -153,6 +260,10 @@ function tmp_renameFilesInFolder(baseFolder)
                 else
                     cmd_str = sprintf('%s %s%s %s%s',     rename_cmd, baseFolder, name_i_orig, destFolder_str, new_name_i);
                 end
+                s_dest = dir([destFolder_str, new_name_i]);
+                if ~isempty(s_dest)
+                    error('Destination file already exists: \n %s\n', new_name_i);
+                end
                 [status, output] = system(cmd_str); 
                 if status ~= 0
                     display(cmd_str)
@@ -160,7 +271,9 @@ function tmp_renameFilesInFolder(baseFolder)
                 end
                 3;
             end
-        end       
+        else
+           assert(needToFix == false); 
+        end
         
     end
 
@@ -170,13 +283,17 @@ function tmp_renameFilesInFolder(baseFolder)
             if skipOldFolders && ~isempty(strfind(s_sub{si}, 'old'))
                 continue
             end
-            tmp_renameFilesInFolder([baseFolder s_sub{si} filesep]);
+            tmp_renameFilesInFolder([baseFolder s_sub{si} filesep], logFileName, fid);
         end
         
     end
 
-    
-%     fclose(fid);
+    if isBase 
+        toc;
+        if ~isempty(fid) 
+            fclose(fid);
+        end
+    end
 end
 
 
@@ -260,6 +377,71 @@ function name_i = tmp_reorderResultsFilenameStructure(name_i_orig)
     3;
 
 end
+
+function [fs_str, fs_vec, psz_str, psz_vec] = getFilterPoolSizeStr(name_i)
+    fs_idx = strfind(name_i, '_fs');
+    psz_idx = strfind(name_i, '_psz');
+    pt_idx = strfind(name_i, '_pt');
+    if ~isempty(pt_idx)
+        psz_str = name_i( psz_idx + 4 : pt_idx -1 );
+    else
+       sgd_idx =  strfind(name_i, '__SGD');
+       psz_str = name_i( psz_idx + 4 : sgd_idx -1 );
+    end
+
+    fs_str = name_i(fs_idx+3 : psz_idx-1);
+    if ~isempty(fs_str) && fs_str(end) == 'P'
+        fs_str = fs_str(1:end-1);
+    end
+
+    fs_vec = [];
+    if ~isempty(fs_str)
+%         fs_str_C2 = strsplit(fs_str, '_');
+        fs_str_C = strsplit_fast(fs_str, '_');
+%         assert(isequal(fs_str_C, fs_str_C2))
+        fs_vec = cellfun(@str2double, fs_str_C);
+    end
+    
+    psz_vec = [];
+    if ~isempty(psz_str)
+%         psz_str_C2 = strsplit(psz_str, '_');
+        psz_str_C = strsplit_fast(psz_str, '_');
+%         assert(isequal(psz_str_C, psz_str_C2))
+        psz_vec = cellfun(@str2double, psz_str_C);
+    end
+        
+end
+
+
+function C = strsplit_fast(str, delim)
+
+    idx_delim = find(str == delim);
+    nStrs = length(idx_delim) +  1;
+    C = cell(1, nStrs);
+    
+    idx_delim_ext = [0, idx_delim, length(str)+1];
+    for i = 1:nStrs
+        C{i} = str(idx_delim_ext(i)+1 : idx_delim_ext(i+1)-1);        
+    end
+    
+
+end
+
+function tf = isJustRep_fast(x)
+    
+    L = length(x);
+    if L == 0
+        tf = false;
+        return
+    end
+    if L == 1 
+        tf = false;
+        return
+    end
+    tf = all( diff(x) == 0);
+    
+end
+
 
 %{
             a = '60_160_1200_'; b = '60_160_F1200_';  new_name_i = strrep_f(new_name_i, a,b);
