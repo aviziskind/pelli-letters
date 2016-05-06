@@ -1352,8 +1352,8 @@ function plotResults
 %                      allRetrainFromLayers = {'linear-2'};
                      allRetrainFromLayers = {'classifier'};
                  else
-                     allRetrainFromLayers = {'linear'};
-%                      allRetrainFromLayers = {'conv2'};
+%                      allRetrainFromLayers = {'linear'};
+                     allRetrainFromLayers = {'conv3'};
                  end
 %                  allRetrainFromLayers = {'classifier'};
                  tbl_trainingNoise = {'same'};

@@ -121,7 +121,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         stimType = 'NoisyLettersOverFeat'
     end
 
-
+netType = 'MLP'
 
     local convertOverFeatFilesNow = false and (THREAD_ID  ~= nil)
     if doOverFeat and convertOverFeatFilesNow then
@@ -218,7 +218,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     local snr_train1h3p5 = table.range(1, 3.5, 0.5) --{0,1,2}
     local snr_train4 = {4}
         
-        
+    local finalLayer = 'LogSoftMax'
     local all_nStates_and_filtSizes_and_poolSizes
     print('=======NetType', netType)
     
@@ -578,7 +578,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --local tbl_trainConfig = {config_vSGD, config_sgd, config_sgd_mom, config_adadelta, config_rmsprop, config_vSGD}
         --local tbl_trainConfig = {config_sgd, config_sgd_mom, config_adadelta}
         local tbl_trainConfig = {config_sgd_mom }
-        local finalLayer = 'LogSoftMax'
+        
         local zeroPadForConvolutions = true
             
         allNetworkOptions_tbl = { netType = 'ConvNet', 
@@ -640,12 +640,14 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --local allNHiddenUnits = { {}, {30}, {120}, {240}, {480}, {60, 60} }
         --local allNHiddenUnits = { {}, {30}, {120}, {240}, }
         --local allNHiddenUnits = { {}, {120} }
-        local allNHiddenUnits = { {120}, {120, 120} }
+        --local allNHiddenUnits = { {120}, {120, 120} }
+        local allNHiddenUnits = { {128}}
         --local allNHiddenUnits = { {512, 512}, {150, 150}, {128, 128}, {120, 120}, {64, 64}, {32, 32}, {120}, {64}, {32}, }
         --local allNHiddenUnits = { {}, }
            
   --          {6, 15}, {6, 30}, {6,60}, {6,120}, {6, 240}, {12, 15}, {12, 30}, {12,60}, {12,120}, {12, 240} }
         allNetworkOptions_tbl = { netType = 'MLP',
+                                    finalLayer = finalLayer,
                                   tbl_nHiddenUnits = allNHiddenUnits }                    
         
         --allNetworks = expandOptionsToList(allNetworkOptions_tbl)

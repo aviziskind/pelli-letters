@@ -22,7 +22,7 @@ function main()
     else
         useGPU = true
     end
-    useGPU = false
+    useGPU = true
 
 
     useZBSdebugger = false
@@ -30,10 +30,10 @@ function main()
     local expName, modelName
     --if not expName then
 
-    expName = 'ChannelTuning'
+    --expName = 'ChannelTuning'
     --expName = 'Crowding'
     --expName = 'Grouping'
-    --expName = 'Complexity'
+    expName = 'Complexity'
     --expName = 'TrainingWithNoise'
     --expName = 'TestConvNet'
     --expName = 'Uncertainty'

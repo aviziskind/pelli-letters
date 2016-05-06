@@ -1,6 +1,6 @@
 function tmp_renameFilesInFolder(baseFolder, logFileName, fid)
 
-    logToFile = false;
+    logToFile = true;
     isBase = false;
 
     if nargin < 1
@@ -14,14 +14,14 @@ function tmp_renameFilesInFolder(baseFolder, logFileName, fid)
 %         baseFolder = [lettersPath 'fonts' filesep];
 %         baseFolder = [lettersPath];
 
-%         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'Results' fsep 'Complexity_NYU' fsep 'NoisyLetters' fsep] ;
+        baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'Results' fsep 'Complexity_NYU' fsep 'NoisyLetters' fsep] ;
 %         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'Results' fsep 'ChannelTuning_NYU' fsep 'NoisyLetters' fsep] ;
 %         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep 'TrainedNetworks' fsep] ;
-        baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep] ;
+%         baseFolder = [codePath 'nyu' fsep 'letters' fsep 'data' fsep] ;
         
         if ~onLaptop
-%             baseFolder = ['~/lettersData/'];
-            baseFolder = ['~/lettersData/Results/Complexity_NYU/NoisyLetters/'];
+            baseFolder = ['~/lettersData/'];
+%             baseFolder = ['~/lettersData/Results/Complexity_NYU/NoisyLetters/'];
         end
 
 %         baseFolder = 'D:\Users\Avi\Code\MATLAB\nyu\letters\datasets\NoisyLettersStats\Bookman\~reduced\';
@@ -29,8 +29,10 @@ function tmp_renameFilesInFolder(baseFolder, logFileName, fid)
         logFileName = [];
         fid = [];
         if logToFile
-            logFileName = [strrep(userpath, pathsep, '') 'renameLog_' datestr(now, 'yyyy_mm_dd__HH_MM_SS')];
+            logFileName = [strrep(userpath, pathsep, '') 'renameLog_' datestr(now, 'yyyy_mm_dd__HH_MM_SS') '.txt'];
             fid = fopen(logFileName, 'w');
+            fprintf(' ==== Logging to file %s ====\n', logFileName);
+            tic;
         end
     end
     
@@ -100,10 +102,17 @@ function tmp_renameFilesInFolder(baseFolder, logFileName, fid)
         [fs_str, fs_vec, psz_str, psz_vec] = getFilterPoolSizeStr(name_i);
         skipFs = isempty(fs_str) || ~isempty(strfind(fs_str, 'r'));
         skipPsz = isempty(psz_str) || ~isempty(strfind(psz_str, 'r'));
-        
+                
         isJustRep = @(x) length(unique(x)) == 1 && length(x) > 1;
+
+%         justRep1 = [isJustRep(psz_vec)  , isJustRep(fs_vec)];
+%         justRep2 = [isJustRep_fast(psz_vec)  , isJustRep_fast(fs_vec)];
+%         assert(isequal(justRep1, justRep2));
         
-        needToFix = isJustRep(psz_vec)  || isJustRep(fs_vec) || ...
+%         needToFix = isJustRep(psz_vec)  || isJustRep(fs_vec) || ...
+%             (~skipFs && ~strcmp(abbrevList(fs_vec), fs_str)) || (~skipPsz && ~strcmp(abbrevList(psz_vec), psz_str));
+
+        needToFix = isJustRep_fast(psz_vec)  || isJustRep_fast(fs_vec) || ...
             (~skipFs && ~strcmp(abbrevList(fs_vec), fs_str)) || (~skipPsz && ~strcmp(abbrevList(psz_vec), psz_str));
     
         
@@ -279,8 +288,11 @@ function tmp_renameFilesInFolder(baseFolder, logFileName, fid)
         
     end
 
-    if isBase && ~isempty(fid) 
-        fclose(fid);
+    if isBase 
+        toc;
+        if ~isempty(fid) 
+            fclose(fid);
+        end
     end
 end
 
@@ -384,17 +396,52 @@ function [fs_str, fs_vec, psz_str, psz_vec] = getFilterPoolSizeStr(name_i)
 
     fs_vec = [];
     if ~isempty(fs_str)
-        fs_str_C = strsplit(fs_str, '_');
+%         fs_str_C2 = strsplit(fs_str, '_');
+        fs_str_C = strsplit_fast(fs_str, '_');
+%         assert(isequal(fs_str_C, fs_str_C2))
         fs_vec = cellfun(@str2double, fs_str_C);
     end
     
     psz_vec = [];
     if ~isempty(psz_str)
-        psz_str_C = strsplit(psz_str, '_');
+%         psz_str_C2 = strsplit(psz_str, '_');
+        psz_str_C = strsplit_fast(psz_str, '_');
+%         assert(isequal(psz_str_C, psz_str_C2))
         psz_vec = cellfun(@str2double, psz_str_C);
     end
         
 end
+
+
+function C = strsplit_fast(str, delim)
+
+    idx_delim = find(str == delim);
+    nStrs = length(idx_delim) +  1;
+    C = cell(1, nStrs);
+    
+    idx_delim_ext = [0, idx_delim, length(str)+1];
+    for i = 1:nStrs
+        C{i} = str(idx_delim_ext(i)+1 : idx_delim_ext(i+1)-1);        
+    end
+    
+
+end
+
+function tf = isJustRep_fast(x)
+    
+    L = length(x);
+    if L == 0
+        tf = false;
+        return
+    end
+    if L == 1 
+        tf = false;
+        return
+    end
+    tf = all( diff(x) == 0);
+    
+end
+
 
 %{
             a = '60_160_1200_'; b = '60_160_F1200_';  new_name_i = strrep_f(new_name_i, a,b);
