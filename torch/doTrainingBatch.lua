@@ -787,6 +787,10 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                 if not retrainSomeLayers then   -- standard training paradigm
                                     io.write(string.format('Standard training (One training set) \n '))
                                     trainOpts.trainingFileBase = training_dir .. expSubtitle_network
+                                    if useGPU then
+                                        train_trData.inputMatrix = train_trData.inputMatrix:cuda()
+                                        train_tsData.inputMatrix = train_tsData.inputMatrix:cuda()
+                                    end
                                     
                                     model_struct = trainModel(model_struct, train_trData, train_tsData, trainOpts)       
                                   
@@ -924,7 +928,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                 if saveNetworkToMatfile_now then
                                     print('Saving network to ' .. basename(network_matfile, 3))
                                     local model_matFormat = convertNetworkToMatlabFormat(model_struct.model)
-                                    verifyFolderExists(network_matfile)
+                                    paths.verifyFolderExists(network_matfile)
                                     mattorch.save(network_matfile, model_matFormat)
                                 end
                                
@@ -964,7 +968,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         --print('full name = ', results_filename)
                                         
                                         print('Saving results to ' .. basename(results_filename,3))
-                                        verifyFolderExists(results_filename)                                    
+                                        paths.verifyFolderExists(results_filename)                                    
                                         mattorch.save(results_filename, var_list)
                                          
                                         
@@ -986,7 +990,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                                                     
                                         print('  => Saved to ' .. basename(results_filename, 2))
                                         
-                                        verifyFolderExists( results_filename )
+                                        paths.verifyFolderExists( results_filename )
                                         mattorch.save(results_filename, var_list_1let)
                                         
                                                 
@@ -1020,7 +1024,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                                 local results_filename_2let = results_dir .. results_filename_base_2let
 
                                                 print('    => Saved to ' .. basename(allMultiLetterResultsFileNames[opt_j], 2) ) --  basename(results_filename_2let, 2))
-                                                verifyFolderExists(allMultiLetterResultsFileNames[opt_j])
+                                                paths.verifyFolderExists(allMultiLetterResultsFileNames[opt_j])
                                                 mattorch.save(allMultiLetterResultsFileNames[opt_j], var_list_nlet)
                                                     
                                             end

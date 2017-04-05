@@ -82,8 +82,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     --local complexity_trainOn = 'PinkNoise'
     local complexity_trainOn = 'RealData'
-        --local complexity_realDataName = 'SVHN'
-        local complexity_realDataName = 'CIFAR10'
+        local complexity_realDataName = 'SVHN'
+        --local complexity_realDataName = 'CIFAR10'
     --local complexity_trainOn = 'WhiteNoise'
         
     local doOnlyBookman = false;
@@ -121,7 +121,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         stimType = 'NoisyLettersOverFeat'
     end
 
-netType = 'MLP'
+--netType = 'MLP'
 
     local convertOverFeatFilesNow = false and (THREAD_ID  ~= nil)
     if doOverFeat and convertOverFeatFilesNow then
@@ -500,7 +500,8 @@ netType = 'MLP'
             
             
                 allNStates =  {  {16, 64, 256, 512, 1024, -120},  }
-                allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
+                --allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
+                allFiltSizes = { {5, 5, 5, 5, 5},  }
                 allPoolSizes = { {2,2,2,2,4},  }
             --[[
                 allNStates =  {  {16, 64, -120}, {32, 128, -120} }
@@ -559,6 +560,15 @@ netType = 'MLP'
           --allNStates = {{6, -120}, {6, 16, -120}}
             --allFiltSizes = {{5, 5}}
             --allPoolSizes = {{2,2}, }
+                allNStates =  {  {16, 64, 256, 512, 1024, -120},  }
+                --allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
+                allFiltSizes = { {5, 5, 5, 5, 5},  }
+                allPoolSizes = { {2,2,2,2,4},  }
+
+
+            allNStates = {{6, -120}}
+            allFiltSizes = {{5}}
+            allPoolSizes = {{2}}
     
         end
         
@@ -1154,8 +1164,8 @@ netType = 'MLP'
                                                                tbl_realData_opts= all_realData_opts} )
             else
                 tbl_realData_fontNames = 
-                    { --{fonts = 'SVHN',    realData_opts = channels_realData_settings_noNorm}, 
-                      {fonts = 'CIFAR10', realData_opts = channels_realData_settings_noNorm}, 
+                    { {fonts = 'SVHN',    realData_opts = channels_realData_settings_noNorm}, 
+                      --{fonts = 'CIFAR10', realData_opts = channels_realData_settings_noNorm}, 
                       --{fonts = complexity_realDataName, realData_opts = channels_realData_settings_norm}, 
                     }
             end
@@ -1170,8 +1180,9 @@ netType = 'MLP'
                 tbl_trainingFonts = tbl_realData_fontNames
                 tbl_noiseFilter = {whiteNoiseFilter}
                 --tbl_retrainFromLayer = {'classifier', 'linear'}
-                tbl_retrainFromLayer = {'linear'}
+                --tbl_retrainFromLayer = {'linear'}
                 --tbl_retrainFromLayer = {'linear-2', 'classifier'}
+                tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
                 
                 loopKeysOrder_dataOpts  = {'fontName', 'trainingFonts', };
             end
@@ -1220,62 +1231,65 @@ netType = 'MLP'
             tbl_OriXY = { oriXYSet_2x2y3o, oriXYSet_3x6y7o, oriXYSet_1pos } --  oriXYSet_6x5y21o, 
         elseif complexity_imageSize[1] == 64 then
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} }
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k24'} }
+            tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k24'} }
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k30'} }
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'}, {{64, 64}, 'k24'} }
-            tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'} }
+            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'} }
             
             --[[
             tbl_OriXY = { oriXYSet_1pos, oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, 
                         oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5} --  oriXYSet_6x5y21o, 
 
 
- --]]
+     --]]
+        --[[
+                local oriXYSet_7x18y_d1        = {Nori = 1,   dOri = 0,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
+                local oriXYSet_7x18y_d1_3o_d5  = {Nori = 3,   dOri = 5,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
+                local oriXYSet_7x18y_d1_7o_d5  = {Nori = 7,   dOri = 5,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
+                local oriXYSet_7x18y_d1_11o_d3 = {Nori = 11,  dOri = 3,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
+                local oriXYSet_7x17y_d1_11o_d4 = {Nori = 11,  dOri = 4,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
+
+               
+                tbl_OriXY  = { oriXYSet_1pos, oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, 
+                                oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3}
+    --]]
+
     --[[
-            local oriXYSet_7x18y_d1        = {Nori = 1,   dOri = 0,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-            local oriXYSet_7x18y_d1_3o_d5  = {Nori = 3,   dOri = 5,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-            local oriXYSet_7x18y_d1_7o_d5  = {Nori = 7,   dOri = 5,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-            local oriXYSet_7x18y_d1_11o_d3 = {Nori = 11,  dOri = 3,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-            local oriXYSet_7x17y_d1_11o_d4 = {Nori = 11,  dOri = 4,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
+                local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
+                local oriXYSet_5x13y_d1_3ori_d5   = {Nori = 3,   dOri = 5,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
+           s     local oriXYSet_5x13y_d1_3ori_d10  = {Nori = 3,   dOri = 10,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+                local oriXYSet_5x13y_d1_3ori_d15  = {Nori = 3,   dOri = 15,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+                local oriXYSet_5x13y_d1_3ori_d30  = {Nori = 3,   dOri = 30,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+                
+                tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_5x13y_d1_3ori_d5, 
+                    oriXYSet_5x13y_d1_3ori_d10, oriXYSet_5x13y_d1_3ori_d15, oriXYSet_5x13y_d1_3ori_d30};
+     --]]
+     
+     --[[
+                local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
+                local oriXYSet_6x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 6, dX = 1,   Ny = 13, dY = 1}
+                local oriXYSet_5x14y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 14, dY = 1}
+     
+                 tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_6x13y_d1, oriXYSet_5x14y_d1};
+    --]]
 
-           
-            tbl_OriXY  = { oriXYSet_1pos, oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, 
-                            oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3}
---]]
-
---[[
-            local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_5x13y_d1_3ori_d5   = {Nori = 3,   dOri = 5,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-       s     local oriXYSet_5x13y_d1_3ori_d10  = {Nori = 3,   dOri = 10,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_5x13y_d1_3ori_d15  = {Nori = 3,   dOri = 15,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_5x13y_d1_3ori_d30  = {Nori = 3,   dOri = 30,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+            local oriXYSet_5x13y_d1 =  {Nori = 1,  dOri = 0,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
+            local oriXYSet_7x18y_d1 =  {Nori = 1,  dOri = 0,   Nx = 7, dX = 1,   Ny = 18, dY = 1}
+            local oriXYSet_10x26y_d1 = {Nori = 1,  dOri = 0,   Nx = 10, dX = 1,  Ny = 26, dY = 1}
+            local oriXYSet_14x37y_d1 = {Nori = 1,  dOri = 0,   Nx = 14, dX = 1,  Ny = 37, dY = 1}
+            local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
+            local oriXYSet_15x20y_d1 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 1,  Ny = 20, dY = 1}
+            local oriXYSet_15x20y_d2 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 2,  Ny = 20, dY = 2}
             
-            tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_5x13y_d1_3ori_d5, 
-                oriXYSet_5x13y_d1_3ori_d10, oriXYSet_5x13y_d1_3ori_d15, oriXYSet_5x13y_d1_3ori_d30};
- --]]
- 
- --[[
-            local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_6x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 6, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_5x14y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 14, dY = 1}
- 
-             tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_6x13y_d1, oriXYSet_5x14y_d1};
---]]
-
-        local oriXYSet_5x13y_d1 =  {Nori = 1,  dOri = 0,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-        local oriXYSet_7x18y_d1 =  {Nori = 1,  dOri = 0,   Nx = 7, dX = 1,   Ny = 18, dY = 1}
-        local oriXYSet_10x26y_d1 = {Nori = 1,  dOri = 0,   Nx = 10, dX = 1,  Ny = 26, dY = 1}
-        local oriXYSet_14x37y_d1 = {Nori = 1,  dOri = 0,   Nx = 14, dX = 1,  Ny = 37, dY = 1}
-        local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
-        local oriXYSet_15x20y_d1 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 1,  Ny = 20, dY = 1}
-        local oriXYSet_15x20y_d2 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 2,  Ny = 20, dY = 2}
-        
-        
-        --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_5x13y_d1,  oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, 
-          --                  oriXYSet_14x37y_d1, oriXYSet_30x39y_d1, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
-        --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_30x39y_d1};
-        tbl_OriXY  = { oriXYSet_30x39y_d1};
- 
+            
+            local oriXYSet_17x28y_d1 = {Nori = 1,  dOri = 0,   Nx = 17, dX = 1,  Ny = 28, dY = 1}
+            
+            --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_5x13y_d1,  oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, 
+              --                  oriXYSet_14x37y_d1, oriXYSet_30x39y_d1, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
+            --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_30x39y_d1};
+            --tbl_OriXY  = { oriXYSet_30x39y_d1};
+            tbl_OriXY  = { oriXYSet_17x28y_d1 };
+     
  
         elseif complexity_imageSize[1] == 56 then
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} }
@@ -1498,9 +1512,9 @@ netType = 'MLP'
             
             --tbl_retrainFromLayer = {'classifier', '', 'linear'}
             --tbl_retrainFromLayer = {'classifier', 'linear'}
-            tbl_retrainFromLayer = {'linear'}
+            --tbl_retrainFromLayer = {'linear'}
             --tbl_retrainFromLayer = {'linear', 'linear-2'}
-            
+            tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
             --tbl_retrainFromLayer = {''}
             
             --tbl_OriXY         = { oriXYSet_1pos }
@@ -1511,9 +1525,10 @@ netType = 'MLP'
             
         end  -- if groupingStage == 'train' or 'test'
         
+        
         --tbl_OriXY = {oriXYSet_1pos,  oriXYSet_3o_d5, oriXYSet_13o_d5, oriXYSet_21o_d2,   oriXYSet_25o_d5 };
         --[[
-        local oriXYSet_15x19y_d1        = {Nori = 1,  dOri = 0,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
+        
         local oriXYSet_15x19y_d1_3o_d5  = {Nori = 3,  dOri = 5,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
         local oriXYSet_15x19y_d1_7o_d5  = {Nori = 7,  dOri = 5,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
         local oriXYSet_15x19y_d1_21o_d2 = {Nori = 21, dOri = 2,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
@@ -1547,7 +1562,9 @@ netType = 'MLP'
           --             };
     
         --tbl_OriXY = { oriXYSet_15x19y_d1, oriXYSet_1pos };
-        tbl_OriXY = { oriXYSet_7x7y_d1, oriXYSet_1pos };
+        --tbl_OriXY = { oriXYSet_7x7y_d1, oriXYSet_1pos };
+        --tbl_OriXY = { oriXYSet_15x19y_d1 };   -- standard for k32 in 64x64
+        tbl_OriXY = { oriXYSet_7x7y_d1};  -- standardd for k55 in 64x64
     
     --]]
     

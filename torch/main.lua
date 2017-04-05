@@ -22,7 +22,7 @@ function main()
     else
         useGPU = true
     end
-    useGPU = true
+    useGPU = false
 
 
     useZBSdebugger = false

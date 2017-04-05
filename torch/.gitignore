@@ -1,0 +1,10 @@
+Results/*
+TrainedNetworks/*
+olivier/*
+datasets/*
+myscripts
+*~
+~old/*
+*.mat
+torch_main
+tasks/*
