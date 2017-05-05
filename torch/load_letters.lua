@@ -131,6 +131,7 @@ loadLetters = function(fontNames, SNRs, letterOpts, loadOpts)   -- for noisy let
             File_name = file_name
             
             if nSamplesTotal then
+                --nn= nSamplesTotal
                 assert(nSamplesTotal == S.labels:numel())  -- make sure all files have same # samples (10,000)
                 
             else
@@ -645,10 +646,10 @@ end
 
 
 function checkDataSetValid(S)
-    if (S.labels:min() ~= 1) then
+    if (S.labels:min() < 1) then
         error(string.format('Minimum label is %d, should be 1', S.labels:min()))
     end   
-    if (S.labels:max() ~= S.nClasses) then
+    if (S.labels:max() > S.nClasses) then
         error(string.format('Maximum label is %d, should be %d', S.labels:min(), S.nClasses))
     end
     

@@ -21,6 +21,7 @@ getNoisyLetterOptsStr = function(noisyLetterOpts)
         trainingImageSizeStr = string.format('_tr%dx%d', noisyLetterOpts.trainingImageSize[1], noisyLetterOpts.trainingImageSize[2]);        
     end
 
+
     
     local useBlur = noisyLetterOpts.blurStd and noisyLetterOpts.blurStd > 0
     local blurStr = ''
@@ -66,6 +67,15 @@ getNoisyLetterOptsStr = function(noisyLetterOpts)
     end
     
     
+    local differentTrainRetrainNoise = noisyLetterOpts.retrainingNoise and not isequal(noisyLetterOpts.retrainingNoise, 'same') 
+                            and not (getFilterStr(noisyLetterOpts.noiseFilter, 1) == getFilterStr(noisyLetterOpts.retrainingNoise, 1))
+    local retrainNoise_str = ''
+    if differentTrainRetrainNoise then
+        retrainNoise_str = '_2tr' .. getFilterStr(noisyLetterOpts.retrainingNoise, 1)
+    end
+    
+    
+    
     assert(not (noisyLetterOpts.doOverFeat and noisyLetterOpts.doTextureStatistics))
     local textureStats_str = ''
     if noisyLetterOpts.doTextureStatistics then
@@ -87,6 +97,16 @@ getNoisyLetterOptsStr = function(noisyLetterOpts)
     if noisyLetterOpts.retrainFromLayer and noisyLetterOpts.retrainFromLayer ~= '' then
         retrainFromLayer_str = '_rt' .. networkLayerStrAbbrev(noisyLetterOpts.retrainFromLayer)
     end
+        
+        
+        
+        
+        
+    local secondRetrainFromLayer_str = ''
+    if noisyLetterOpts.secondRetrainFromLayer and noisyLetterOpts.secondRetrainFromLayer ~= '' then
+        secondRetrainFromLayer_str = '_2rt' .. networkLayerStrAbbrev(noisyLetterOpts.secondRetrainFromLayer)
+    end
+    
     
     local nPositions = 1
     if noisyLetterOpts.Nori then
@@ -127,7 +147,7 @@ getNoisyLetterOptsStr = function(noisyLetterOpts)
             trainingOriXY_str .. trainingImageSizeStr .. trainingFonts_str .. trainingWiggle_str .. 
             noiseFilter_str .. trainNoise_str ..
             textureStats_str .. overFeat_str .. 
-            retrainFromLayer_str .. indiv_pos_str .. crowdedOpts_str .. classifierForEachFont_str .. loadOpts_str
+            retrainFromLayer_str .. secondRetrainFromLayer_str .. indiv_pos_str .. crowdedOpts_str .. classifierForEachFont_str .. loadOpts_str
     
     
             
@@ -1130,6 +1150,8 @@ getAllDistractorSpacings = function(xrange, fontWidth, nDistractors, targetPosit
         maxXSpacing = math.max(maxDistOnLeft, maxDistOnRight)
     elseif nDistractors == 2 then
         maxXSpacing = math.min(maxDistOnLeft, maxDistOnRight)
+    else 
+        error('nDistractors must be 1 or 2, not ... ' .. tostring(nDistractors));
     end
     
     local allDistractSpacings = torch.range(minXSpacing, maxXSpacing)
@@ -1320,9 +1342,9 @@ abbrevFontStyleNames = function(names_orig, fontOrStyle)
                 fontAbbrev = string.lower(fontAbbrev)
             end
             abbrev_short = fontAbbrev ..                  bold_str .. italic_str
-            print(abbrev_short)
+            --print(abbrev_short)
             abbrev_med   = fontAbbrev_med .. upper_str .. bold_str .. italic_str
-            print(abbrev_med)
+            --print(abbrev_med)
         elseif fontOrStyle == 'style' then
             
             local styleName = name

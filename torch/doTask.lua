@@ -24,6 +24,7 @@ doTask = function(task)
 
     T = task
     local allNetworkOptions_tbl = task.allNetworkOptions_tbl
+    allNetworkOptions_tbl.trainOnGPU = useGPU
        --print('print1', allNetworks)    
     local allNetworks = expandOptionsToList(allNetworkOptions_tbl, task.networkOpts_loopKeysOrder)
     if allNetworkOptions_tbl.netType == 'ConvNet' then
@@ -60,6 +61,7 @@ doTask = function(task)
     
     for i,opt in ipairs(allDataOpts) do
         -- unpack values in OriXY to main struct.
+        D = allDataOpts[i]
         allDataOpts[i] = fixDataOpts(allDataOpts[i])
         
     end
@@ -184,7 +186,13 @@ doTask = function(task)
 
     local nTotal = 0;
 
+    
     local results
+    
+    task.trainOpts.TEST_ERR_NEPOCHS_STOP_AFTER_MIN = 1
+    task.trainOpts.EXTRA_EPOCHS = 1
+    task.trainOpts.MIN_EPOCHS = 3
+ 
     
     repeat 
         
@@ -207,7 +215,7 @@ doTask = function(task)
     --until (results.nCompletedAlready == nTotal) or not repeatUntilNoSkips
     until (results.nSkipped == 0) or not repeatUntilNoSkips
     
-    if task.taskFileName and (results.nSkipped == 0) then
+    if task.taskFileName and (results.nSkipped == 0) and (results.nBeingDoneByOthers == 0) then
         print('\n------------------------ Completed task! (' .. task.taskFileName .. ')------------------------\n')
         local completedTaskFileName = string.gsub(task.taskFileName, '.t7', '_completed.txt')
         if not string.find(completedTaskFileName, tasks_dir) then

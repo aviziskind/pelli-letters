@@ -7,7 +7,7 @@ function viewAllFontsForOneSize(fontSize)
 %     allFontNames  = {'BookmanU', 'Bookman', 'KuenstlerU', 'Braille'};
     allFontNames  = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'};
 
-    allFontNames  = {'BookmanU', 'Bookman',  'BookmanB',  'Helvetica', 'Courier',  ...
+    allFontNames  = {'BookmanU', 'Bookman',  'BookmanB', 'BookmanUB',  'Helvetica', 'Courier',  ...
                         'Hebraica', 'Yung', 'KuenstlerU', 'Sloan', 'Braille', 'Checkers4x4', 'Devanagari', 'Armenian'};
 
     includeKuenstler = 1;
@@ -25,7 +25,7 @@ function viewAllFontsForOneSize(fontSize)
         fontSize = 'k48';
 %         fontSize = 'x32';
     end
-    nLettersEachFont = 26;
+    nLettersEachFont = 16;
     let_use_idx = 1:nLettersEachFont;
 %     let_use_idx = unique([let_use_idx, 11, 12, 15, 16, 20, 24]);
     nLettersEachFont = length(let_use_idx);

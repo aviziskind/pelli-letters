@@ -131,6 +131,14 @@ Yung 17 [25x23]
     if requireSquareImage
         [imageHeight, imageWidth] = deal(max(imageWidth, imageHeight)); %#ok<UNRCH>
     end
+
     
     
 end
+
+
+
+
+% allFontNames= {'Bookman'};
+% oris = [0];
+% xs = [1, 20]; ys = [1,20]; [imH, imW] = getBestImageSize(oris, xs, ys, allFontNames, 'k15', 2); fprintf('%dx%d\n', imH, imW);

@@ -2,7 +2,7 @@ function [eff, th_model, th_ideal, weibull_slope_model, weibull_slope_ideal] = g
     % calculate efficiency for multiple models (comparing all with a single ideal observer )
     
     global plotThresholds
-    plotThresholds = false;
+    plotThresholds = true;
     global plotThresholds_fig
     if isempty(plotThresholds_fig)
         plotThresholds_fig = 201;

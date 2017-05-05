@@ -52,7 +52,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
 
     for opt_i, dataOpts_i in ipairs(allDataOpts) do        
         --DataOpts = dataOpts_i 
-        O = dataOpts_i
+        DataOpts_i = dataOpts_i
         
         local dataOpts = table.copy(dataOpts_i)
         local sizeStyle = dataOpts.sizeStyle
@@ -83,12 +83,19 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
         local dataOpts_data_train   = table.copy(dataOpts)               
             dataOpts_data_train.trainingFonts   = nil  -- dont add '_trfX' (=trainedWithFontsX)' tag to training data files, 
             dataOpts_data_train.trainingNoise   = nil  -- dont add '_trX' (=trainedWithX)' tag to training data files, 
+            dataOpts_data_train.retrainingNoise   = nil  -- dont add '_trX' (=trainedWithX)' tag to training data files, 
             dataOpts_data_train.retrainFromLayer  = nil  -- dont add '_trfX' (=trainedWithFontsX)' tag to training data files, 
+            dataOpts_data_train.secondRetrainFromLayer  = nil  -- dont add '_trfX' (=trainedWithFontsX)' tag to training data files, 
             dataOpts_data_train.trainOnIndividualPositions = nil  -- dont add '_trIP' (=trainedWithIndividualPositions)' tag to training data files,             
             dataOpts_data_train.retrainOnCombinedPositions = nil
             dataOpts_data_train.classifierForEachFont = nil -- don't add 'clsFnt' (=separate set of classes for each font) tag to training data files.
         local dataOpts_data_retrain = table.copy(dataOpts_data_train)
+            dataOpts_data_retrain.secondRetrainFromLayer = nil 
+            --dataOpts_data_retrain.noiseFilter = 
+            
+        
         local dataOpts_data_test    = table.copy(dataOpts_data_train)  
+            
         
 
         local saveNetworkToMatfile_now = saveNetworkToMatfile
@@ -168,7 +175,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
             dataOpts_network.trainingNoise = nil  -- dont add '_trX' (=trainedWithX)' tag to saved network, 
                 
             if retrainSomeLayers then                                        
-                dataOpts_network.retrainFromLayer = nil -- for regular network don't add 'retrained-with' tag.   
+                dataOpts_network.retrainFromLayer = nil -- for initially trained network don't add 'retrained-with' tag.   
             else
                 --saveNetworkToMatfile_now = false -- this isn't a new network, so don't bother saving it.
             end
@@ -176,6 +183,8 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
              --dataOpts_data_stats.trainingNoise = nil  -- so that loads stats wi
         
         end
+    
+    
     
         if trainTestOnDifferentWiggle then
           
@@ -353,15 +362,16 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
             
             test_1let_tsData = nil      -- crowding : test on 1 letter
             test_2let_tsData = nil      -- crowding : test on 2 letters
-            
-                        
+                
             
             if haveEnoughMemory then
                 
                 -------------------------------------------------------------------
                 ----------------------- LOOP OVER NETWORKS ------------------------
                 
-                for net_i, networkOpts_i in ipairs(allNetworks) do                        
+                for net_i, networkOpts_i in ipairs(allNetworks) do                
+                    NetworkOpts_i  = networkOpts_i 
+                    
                     local pct_correct_vs_snr_total       = torch.Tensor(nFontsThisSet, nSNRs_test):zero()
                     local pct_correct_vs_snr_eachLetter  = torch.Tensor(nFontsThisSet, nSNRs_test, inputStatsTest.nClasses):zero()
                     
@@ -380,6 +390,33 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                             doThisNetwork = false
                         end                    
                     end                        
+                    
+                    local checkCanRetrainFromLayer = true;  
+                    if checkCanRetrainFromLayer and dataOpts_i.retrainFromLayer and #dataOpts_i.retrainFromLayer > 0 then
+                        
+                        local networkStr, networkStr_nice = getNetworkStr(networkOpts_i)
+                        local nConvLayers = #networkOpts_i.nStatesConv
+                        local layerTypeToRetrain, retrainLayerIdx = stringAndNumber(dataOpts_i.retrainFromLayer)
+                        if (layerTypeToRetrain == 'conv') then
+                            if (retrainLayerIdx > nConvLayers) then  --- eg 2 conv layers, and want to retrain from layer 4
+                                cprintf.blue('%s : Cant retrain from conv layer %d if there are only %d layers. Skipping this network\n', 
+                                    networkStr, retrainLayerIdx, nConvLayers)
+                                   doThisNetwork = false 
+                            else
+                                --cprintf.red('%s Will retrain from conv layer %d (there are a total of %d layers).\n', 
+                                --    networkStr, retrainLayerIdx, nConvLayers)
+                                --doThisNetwork = false 
+                            end
+                           
+                        else
+                            --cprintf.red('%s Will retrain from %s\n', networkStr, layerTypeToRetrain) 
+                            --doThisNetwork = false 
+                        end
+                    
+                    end
+                    
+                    
+                      
                       
                     if doThisNetwork then
                         
@@ -470,6 +507,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                         local allMultiLetterTestOpts = dataOpts.allMultiLetterTestOpts
                         
                         local allMultiLetterResultsFileNames = {}
+                        
                         if dataOpts.expName == 'Crowding' and allMultiLetterTestOpts and crowding_testMultipleLetters then
                             for i,optMultiLet in ipairs(allMultiLetterTestOpts) do
                                 local expSubtitle_2let = getExpSubtitle(optMultiLet, networkOpts_i, trialId)
@@ -709,7 +747,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         if doTestingNow then
                                             print('Loading 1-letter TESTING data  ... ')
                                             _, test_1let_tsData = loadDatafile(dataOpts_data_test, loadOpts_test_1let)
-                                            if crowding_testMultipleLetters then                                        
+                                            if crowding_testMultipleLetters and allMultiLetterTestOpts then                                        
                                                 print('Loading MULTIPLE-letter TESTING data  ... ')
                                                 
                                                 test_2let_tsData = {}
@@ -801,6 +839,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     -- train original network on training data 
                                     io.write(string.format('Training on one dataset, then retraining on a different dataset\n'))
                                     
+                                    
                                     local trainingFileBase = training_dir .. expSubtitle_network
                                     if pretrainedNetwork_filename then
                                         print('Again, using pretrained network : ', pretrainedNetwork_filename)
@@ -808,13 +847,20 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                     end
                                     
                                     trainOpts.trainingFileBase = trainingFileBase
+                                    trainOpts.shouldBeCompletedTraining = true   -- to avoid mistakes & delays, 
+                                                    -- we want to make sure first network is already trained
                                     
+                                    print(1, model_struct.model)
+                                    -- INITIAL TRAINING
                                     model_struct = trainModel(model_struct, train_trData, train_tsData, trainOpts)
+                                    print(2, model_struct.model)
+                                   -- error('!')
                                     local model_struct_pretrained = model_struct
                                     local firstConvWeightVal = firstConvolutionalWeightValue(model_struct_pretrained)
                                     print('  ==> Pretrained model, first conv value = ',
                                         firstConvolutionalWeightValue(model_struct_pretrained))
                                     
+                                    -- SUBSEQUENT RETRAINING
                                     Train_trData = train_trData
                                     Retrain_trData = retrain_trData
                                     M = model_struct
@@ -830,6 +876,8 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         
                                         copyConvolutionalFiltersToNetwork(model_struct, model_struct_newSize)
                                         assert ( areConvolutionalWeightsTheSame(model_struct, model_struct_newSize) )
+                                        
+                                        print(3, model_struct.model)
                                         
                                         model_struct = model_struct_newSize
                                        
@@ -849,13 +897,21 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         model_struct = replaceClassifierLayer(model_struct, retrain_trData.nClasses)
                                     end
                                     
+                                    -- expand last pooling layer if we want full image pooling
+                                    if (networkOpts_i.fullImagePooling) then
+                                        model_struct = expandFinalPoolingLayerToCoverFullImage(model_struct, retrain_trData.inputMatrix[1])
+                                    end
+                                    print(4, model_struct.model)
+                                    
                                     -- split network and retrain upper layers on retraining data
                                     model_struct = splitModelFromLayer(model_struct, dataOpts_network_retrain.retrainFromLayer)
+                                                                           
                                                                            
 
                                     -- retrain network
                                     local retrainOpts = table.copy(trainOpts)
                                     retrainOpts.trainingFileBase = training_dir .. expSubtitle_network_retrain
+                                    retrainOpts.shouldBeCompletedTraining = false
                                     retrainOpts.freezeFeatures = true
                                     retrainOpts.prevTrainingDate = model_struct.trainingDate
                                     --retrainOpts.redoTraining = true
@@ -995,7 +1051,7 @@ doTrainingBatch = function(allNetworks, allDataOpts, loadOpts, trainOpts)
                                         
                                                 
                                         ---2. TEST Model on multiple letters (all SNRs)
-                                        if crowding_testMultipleLetters then
+                                        if crowding_testMultipleLetters and allMultiLetterTestOpts then
                                             io.write(string.format('*** Testing on multiple letters: \n'))
                                                       
                                             for opt_j, multLetOpt in ipairs(allMultiLetterTestOpts) do 

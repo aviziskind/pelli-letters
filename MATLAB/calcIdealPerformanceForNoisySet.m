@@ -234,7 +234,7 @@ function [propCorrectLetter, propCorrectEachLetter, propCorrectOrientation, prop
 
             end
             
-            trainFilterStr = sprintf('[Ideal for: %s]', filterStr(trainingNoise, 1));
+            trainFilterStr = sprintf('[Ideal for: %s]', getFilterStr(trainingNoise, 1));
 
         end
         

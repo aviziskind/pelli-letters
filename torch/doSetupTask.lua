@@ -21,20 +21,30 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     local doOverFeat     = (modelName == 'OverFeat')
     
     ------- ChannelTuning Settings ------
-    local channels_trainOn = 'RealData'
-        --local channels_realDataName = 'SVHN'
-        local channels_realDataName = 'CIFAR10'
-    --local channels_trainOn = 'PinkNoise'
     
     --local channelTuningStage = 'train'
+    --local channelTuningStage = 'retrain'
     local channelTuningStage = 'test'
     
-    local testOnCentralBands = false
     
-    --local channelTuningTestOn = 'hiLo'
-    local channelTuningTestOn = 'band'
-    
+    -- TRAIN
     local channels_realData_imageSize_train = {32, 32}
+    local channels_trainOn = 'RealData'
+        local channels_realDataName = 'SVHN'
+        --local channels_realDataName = 'CIFAR10'
+    --local channels_trainOn = 'PinkNoise'
+
+    -- RETRAIN
+    --local channelTuningRetrainOn = 'white'
+    local channelTuningRetrainOn = ''
+
+    -- TEST
+    local channelTuningTestOn = 'band'
+    --local channelTuningTestOn = 'hiLo'
+    
+        local testOnCentralBands = false
+
+    
     --local channels_realData_imageSize_train = {64, 64}
         
     --local channels_imageSize_test = {30, 30}
@@ -42,6 +52,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     --local channels_imageSize_test = {36, 36}
     --local channels_imageSize_test = {45, 45}
     local channels_imageSize_test = {64, 64}
+        
         
         
     --local channels_imageSize = {32, 32}
@@ -74,11 +85,6 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     local complexity_realData_imageSize_train = {32, 32}
     --local complexity_realData_imageSize_train = {64, 64}
     
-    --local complexity_imageSize = {32, 32}
-    --local complexity_imageSize = {45, 45}
-    --local complexity_imageSize = {56, 56}
-    local complexity_imageSize = {64, 64}
-    --local complexity_imageSize = {80, 80}
     
     --local complexity_trainOn = 'PinkNoise'
     local complexity_trainOn = 'RealData'
@@ -93,8 +99,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     
     
-    local complexityStage = 'train'
-    --local complexityStage = 'test'
+    --local complexityStage = 'train'
+    local complexityStage = 'test'
     
     
     ------ Crowding Settings ------
@@ -102,8 +108,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local crowding_realDataName = 'SVHN'
     --local crowding_trainOn = 'WhiteNoise'
     
-    local crowdingStage = 'train'
-    --local crowdingStage = 'test'
+    --local crowdingStage = 'train'
+    local crowdingStage = 'test'
     
     
     
@@ -219,7 +225,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     local snr_train4 = {4}
         
     local finalLayer = 'LogSoftMax'
-    local all_nStates_and_filtSizes_and_poolSizes
+    local all_nStates_and_filtSizes_and_poolSizes_and_fullImagePooling
     print('=======NetType', netType)
     
     local snr_train, snr_train2, tbl_allSNRs_train
@@ -560,18 +566,93 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
           --allNStates = {{6, -120}, {6, 16, -120}}
             --allFiltSizes = {{5, 5}}
             --allPoolSizes = {{2,2}, }
-                allNStates =  {  {16, 64, 256, 512, 1024, -120},  }
+            
+                    -- 4 layers
+                allNStates =  {  {16, 64, 256, 512, -120}, {16, 64, 256, 512, -1200},  }
                 --allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
-                allFiltSizes = { {5, 5, 5, 5, 5},  }
-                allPoolSizes = { {2,2,2,2,4},  }
+                allFiltSizes = { {5, 5, 5, 5},  }
+                allPoolSizes = { {2,2,2,2}, {2,2,2,8},  }
 
 
-            allNStates = {{6, -120}}
-            allFiltSizes = {{5}}
-            allPoolSizes = {{2}}
+                -- 3 layers
+                allNStates =  {  {16, 64, -120}, {16, 64, -1200},  }
+                --allFiltSizes = { {5, 5, 5, 5, 5}, {5, 5, 5, 3, 3}, }
+                allFiltSizes = { {5, 5},  }
+                allPoolSizes = { {2,2}, {2,32},  }
+
+            all_nStates_and_filtSizes_and_poolSizes_and_fullImagePooling = {
+                --{ {16, -120},  {5}, {2}, },
+                --{ {16, -1200}, {5}, {2}, },
+                --{ {16, -120},  {5}, {64}, },
+                --{ {16, -1200}, {5}, {64}, },
+                { {16, 64, 256, 512, 1024, -120},  {5, 5, 5, 5, 5}, {2,2, 2, 2, 4}, true},
+                
+                
+                --{ {16, 64, -120},  {5, 5}, {2,2}, false},
+                --{ {16, 64, -1200}, {5, 5}, {2,2}, false },
+                { {16, 64, -120},  {5, 5}, {2,32}, true },
+               -- { {16, 64, -1200}, {5, 5}, {2,32}, true },
+             
+                --{ {16, 64, 256, -120},  {5, 5, 5}, {2,2, 2}, false, },
+                --{ {16, 64, 256, -1200}, {5, 5, 5}, {2,2, 2}, false, },
+               { {16, 64, 256, -120},  {5, 5, 5}, {2,2, 16}, true, },
+                --{ {16, 64, 256, -1200}, {5, 5, 5}, {2,2, 16}, true, },
+            
+                --{ {16, 64, 256, 512, -120},  {5, 5, 5, 5}, {2,2, 2, 2}, false, },
+                --{ {16, 64, 256, 512, -1200}, {5, 5, 5, 5}, {2,2, 2, 2}, false },
+                { {16, 64, 256, 512, -120},  {5, 5, 5, 5}, {2,2, 2, 8}, true },
+                --{ {16, 64, 256, 512, -1200}, {5, 5, 5, 5}, {2,2, 2, 8}, true },
+                 
+                --{ {16, 64, 256, 512, 1024, -120},  {5, 5, 5, 5, 5}, {2,2, 2, 2, 2}, false },
+                --{ {16, 64, 256, 512, 1024, -1200}, {5, 5, 5, 5, 5}, {2,2, 2, 2, 2}, false },
+                { {16, 64, 256, 512, 1024, -120},  {5, 5, 5, 5, 5}, {2,2, 2, 2, 4}, true},
+                --{ {16, 64, 256, 512, 1024, -1200}, {5, 5, 5, 5, 5}, {2,2, 2, 2, 4}, true },
+                 
+             }
+            
+            if expName == 'Crowding' then
+                
+
+                all_nStates_and_filtSizes_and_poolSizes_and_fullImagePooling = {
+                    --{ {16, -120},  {5}, {2}, },
+                    --{ {16, -1200}, {5}, {2}, },
+                    --{ {16, -120},  {5}, {64}, },
+                    --{ {16, -1200}, {5}, {64}, },
+                    { {16, 64, 256, 512, 1024, -120},  {5, 5, 5, 5, 5}, {2,2, 2, 2, 10}, },
+                    
+                    { {16, 64, -120},  {5, 5}, {2,2}, },
+                    { {16, 64, -120},  {5, 5}, {2,80}, },
+                    --{ {16, 64, -1200}, {5, 5}, {2,2}, },
+                   -- { {16, 64, -1200}, {5, 5}, {2,32}, },
+                 
+                    { {16, 64, 256, -120},  {5, 5, 5}, {2,2, 2}, },
+                    --{ {16, 64, 256, -1200}, {5, 5, 5}, {2,2, 2}, },
+                    { {16, 64, 256, -120},  {5, 5, 5}, {2,2, 40}, },
+                    --{ {16, 64, 256, -1200}, {5, 5, 5}, {2,2, 16}, },
+                
+                    { {16, 64, 256, 512, -120},  {5, 5, 5, 5}, {2,2, 2, 2}, },
+                    --{ {16, 64, 256, 512, -1200}, {5, 5, 5, 5}, {2,2, 2, 2}, },
+                    { {16, 64, 256, 512, -120},  {5, 5, 5, 5}, {2,2, 2, 20}, },
+                    --{ {16, 64, 256, 512, -1200}, {5, 5, 5, 5}, {2,2, 2, 8}, },
+                     
+                    { {16, 64, 256, 512, 1024, -120},  {5, 5, 5, 5, 5}, {2,2, 2, 2, 2}, },
+                    --{ {16, 64, 256, 512, 1024, -1200}, {5, 5, 5, 5, 5}, {2,2, 2, 2, 2}, },
+                    --{ {16, 64, 256, 512, 1024, -1200}, {5, 5, 5, 5, 5}, {2,2, 2, 2, 4}, },
+                     
+                 }                
+                    
+            end
+
+
+            allNStates = nil ; allPoolSizes =nil; allFiltSizes = nil;
+
+            --allNStates = {{6, -120}}
+            --allFiltSizes = {{5}}
+            --allPoolSizes = {{2}}
     
         end
         
+        --2Layer_fromScratch_u1_1369_Bookman_Sloan
         --[[
         allNStates = { {6, 16, -120},  }
         allPoolSizes = { {2, 2}, } 
@@ -590,6 +671,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local tbl_trainConfig = {config_sgd_mom }
         
         local zeroPadForConvolutions = true
+        local fullImagePooling = false
             
         allNetworkOptions_tbl = { netType = 'ConvNet', 
                                 tbl_nStates = allNStates,
@@ -609,7 +691,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                 --poolTypes = poolTypes,
                                 tbl_poolTypes = allPoolTypes,
                                 
-                                tbl_nStates_and_filtSizes_and_poolSizes = all_nStates_and_filtSizes_and_poolSizes,
+                                tbl_nStates_and_filtSizes_and_poolSizes_and_fullImagePooling 
+                                = all_nStates_and_filtSizes_and_poolSizes_and_fullImagePooling,
                                 
                                 --useConnectionTable = useConnectionTable,
                                 convFunction = convFunction,
@@ -621,6 +704,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                 
                                 finalLayer = finalLayer,
                                 zeroPadForConvolutions = zeroPadForConvolutions,
+                                
+                                fullImagePooling = fullImagePooling,
                                 
                               }
 
@@ -684,6 +769,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     
     local allStdFontNames      = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'}
+    local allStdFontNames2      = {'Bookman', 'BookmanU', 'HelveticaU', 'CourierU', 'BookmanUB', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung'}
     local allExtFontNames      = {'Bookman', 'Sloan', 'Helvetica', 'KuenstlerU', 'Braille', 'Yung', 
                                     'BookmanB', 'BookmanU', 'Hebraica', 'Devanagari', 'Armenian', 'Checkers4x4', 'Courier'};
     local allStdFontNames_tbl  = { {'Bookman'}, {'Sloan'}, {'Helvetica'}, {'KuenstlerU'}, {'Braille'}, {'Yung'} }
@@ -709,6 +795,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     --local allBandNoise_cycPerLet = {0.5, 0.8, 1.3, 2.0, 3.2, 5.1, 8.1, 13}
     --local allCycPerLet = {0.5, 0.71, 1, 1.41, 2, 2.83, 4, 5.66, 8, 11.31, 16}
     local allCycPerLet = {0.5, 0.59, 0.71, 0.84, 1.00, 1.19, 1.41, 1.68, 2, 2.38, 2.83, 3.36, 4, 4.76, 5.66, 6.73, 8, 9.51, 11.31, 13.45, 16}
+    allCycPerLet = {2 }
     
     if testOnCentralBands then
         --allCycPerLet = {1.00,  1.41,    2, 2.38,    3.36, 4.76, }
@@ -776,136 +863,10 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     
     local allBlurs = {0}
     
-    -----------------
-    ---- UNCERTAINTY 
-    local oriXYSet_mult = {  {Nori = 1, dOri = 0,    Nx = 1, dX = 0,    Ny = 1, dY = 0}, 
-                             --{Nori = 1, dOri = 0,    Nx = 2, dX = 4,    Ny = 1, dY = 0}, -- 2x1 [4] --> span = 4
-                             --{Nori = 1, dOri = 0,    Nx = 3, dX = 2,    Ny = 1, dY = 0}, -- 3x1 [2] --> span = 4
-                             --{Nori = 1, dOri = 0,    Nx = 5, dX = 1,    Ny = 1, dY = 0}, -- 5x1 [1] --> span = 4 
-                             {Nori = 1, dOri = 0,    Nx = 3, dX = 4,    Ny = 1, dY = 0}, -- 3x1 [4] --> span = 8
-                             {Nori = 1, dOri = 0,    Nx = 4, dX = 4,    Ny = 1, dY = 0},   -- 4x1 [4] --> span = 12
-                             {Nori = 1, dOri = 0,    Nx = 4, dX = 4,    Ny = 4, dY = 4},   -- 4x4 [4] --> span = 12 x 12
-                             {Nori = 1, dOri = 0,    Nx = 6, dX = 4,    Ny = 6, dY = 4},   -- 6x6 [4] --> span = 20 x 20
-                             {Nori = 1, dOri = 0,    Nx = 11, dX = 2,    Ny = 11, dY = 2}, -- 11x11 [2] --> span = 20 x 20
-                          }
-        
-    local oriXYSet_1pos = {Nori = 1, dOri = 0,    Nx = 1, dX = 0,    Ny = 1, dY = 0}
-    local oriXYSet_3x3y = {Nori = 1, dOri = 0,    Nx = 3, dX = 1,    Ny = 3, dY = 1}
-    local oriXYSet_5x5y = {Nori = 1, dOri = 0,    Nx = 5, dX = 1,    Ny = 5, dY = 1}
-    local oriXYSet_9x9y7o = {Nori = 7, dOri = 5,    Nx = 9, dX = 3,    Ny = 9, dY = 3}
-    local oriXYSet_10x10y11o = {Nori = 11, dOri = 4,    Nx = 10, dX = 2,    Ny = 10, dY = 2}
-    local oriXYSet_10x10y21o = {Nori = 21, dOri = 2,    Nx = 10, dX = 2,    Ny = 10, dY = 2}
-    local oriXYSet_5x5y11o = {Nori = 11, dOri = 4,    Nx = 5, dX = 4,    Ny = 5, dY = 4}
-    local oriXYSet_5x5y11o_d2 = {Nori = 11, dOri = 2,    Nx = 5, dX = 2,    Ny = 5, dY = 2}
-    local oriXYSet_41o = {Nori = 41, dOri = 1,    Nx = 1, dX = 0,    Ny = 1, dY = 0}
-    local oriXYSet_7x7y = {Nori = 1, dOri = 0,    Nx = 7, dX = 2,    Ny = 7, dY = 2}
-    
-    local oriXYSet_30x30y21o = {Nori = 21, dOri = 2,    Nx = 30, dX = 1,    Ny = 30, dY = 1}
-    local oriXYSet_19x19y21o = {Nori = 21, dOri = 2,    Nx = 19, dX = 1,    Ny = 19, dY = 1}
-    local oriXYSet_6x5y21o = {Nori = 21, dOri = 2,    Nx = 6, dX = 2,    Ny = 5, dY = 2}
-    
-    
-    local oriXYSet_scan = expandOptionsToList( {Nori = 1, dOri = 0,    Ny = 1, dY = 0, 
-                                                tbl_Nx_and_dX =  {  --{2, 25}
-                                                     --{2, 25}, {3, 25}, {4, 25} 
-                                                       --{1, 0}, {2, 25}, {3, 25}, {4, 25} 
-                                                      --{1, 0}, {51, 1}, {26, 2}, {17, 3}, {13, 4}, {11, 5}, {9, 6}, {7, 8}, {6, 10}, {4, 14}, {3, 18}, {2, 22},
-                                                      --{9, 6}
-                                                      {1, 0}, {51, 1}, {26, 2}, {17, 3}, {13, 4}, {11, 5}, {9, 6}, {6, 10}, {3, 18}, {2, 22},
-                                                      --  {1, 0}, 
-                                                        --{2, 1}, {2, 2}, {2, 3}, {2, 4}, {2, 8}, {2, 16}, {2, 24},   
-                                                        --{4, 1}, {4, 2}, {4, 3}, {4, 4}, {4, 8}, {4, 16}, {4, 24}, 
-                                                        --{9, 1}, {9, 2}, {9, 3}, {9, 4}, {9, 8}, {9, 16}, 
-                                                     --{ {1, 0}, {51, 1},  {17, 3},  {11, 5},   {7, 8},  {4, 14},   {2, 22},
-                                                     --{2, 1}, {2, 2}, {2, 3}, {2, 4}, {2, 5}, {2, 6}, {2, 8}, {2, 10}, {2, 14}, {2, 18}, {2, 22},
-                                                    }
-                                                } );
-            --[[
-    local oriXYSet_large = {  {Nori = 11, dOri = 2,    Nx = 6, dX = 1,    Ny = 12, dY = 1}, 
-                                {Nori = 1, dOri = 0,    Nx = 6, dX = 1,    Ny = 12, dY = 1}, 
-                                {Nori = 11, dOri = 2,    Nx = 1, dX = 0,    Ny = 1, dY = 0},
-                                 {Nori = 1, dOri = 0,    Nx = 1, dX = 0,    Ny = 1, dY = 0},
-                            }
-    
-    local oriXYSet_large_48 = {Nori = 11, dOri = 2,    Nx = 5, dX = 2,    Ny = 9, dY = 2}
-    local oriXYSet_large_48_k14 = {Nori = 11, dOri = 2,    Nx = 6, dX = 2,    Ny = 9, dY = 2}
-                            
-    local oriXYSet_med1 = {  {Nori = 1, dOri = 0,    Nx = 6, dX = 1,    Ny = 12, dY = 1} }
-    local oriXYSet_test = {  {Nori = 3, dOri = 2,    Nx = 2, dX = 4,    Ny = 2, dY = 4} }
-    
-    local oriXYSet_long = {  {Nori = 11, dOri = 2,    Nx = 24, dX = 2,    Ny = 5, dY = 1} }
-    local oriXYSet_long_32_128_dx2_ori = {Nori = 11, dOri = 2,    Nx = 49, dX = 2,    Ny = 1, dY = 0}
-    
-    local oriXYSet_long_32_128_dx5      = {Nori = 1,  dOri = 0,    Nx = 20, dX = 5,    Ny = 1, dY = 0}
-    local oriXYSet_long_32_128_dx5_ori  = {Nori = 11, dOri = 2,    Nx = 20, dX = 5,    Ny = 1, dY = 0}
-    local oriXYSet_long_32_128_dx10     = {Nori = 1,  dOri = 0,    Nx = 10, dX = 10,   Ny = 1, dY = 0}
-    local oriXYSet_long_32_128_dx10_ori = {Nori = 11, dOri = 2,    Nx = 10, dX = 10,   Ny = 1, dY = 0}
-    local oriXYSet_6x9y21o = {Nori = 21, dOri = 2,    Nx = 6, dX = 2,   Ny = 9, dY = 2}
-    
-    local oriXYSet_4x4y7o  = {Nori = 7,  dOri = 5,    Nx = 4, dX = 3,   Ny = 4, dY = 3}
-    local oriXYSet_6x6y11o = {Nori = 11, dOri = 3,    Nx = 6, dX = 2,   Ny = 6, dY = 2}
-    local oriXYSet_2x2y3o  = {Nori = 3,  dOri = 5,    Nx = 2, dX = 5,   Ny = 2, dY = 5}
-    local oriXYSet_3x6y7o  = {Nori = 7,  dOri = 5,    Nx = 3, dX = 4,   Ny = 6, dY = 4}
-    local oriXYSet_3x6y7o_d2  = {Nori = 7,  dOri = 5,    Nx = 3, dX = 2,   Ny = 6, dY = 2}
-        
-        local oriXYSet_2x_d4   = {Nori = 1,  dOri = 0,    Nx = 2, dX = 4,   Ny = 1, dY = 0}        
-        local oriXYSet_2x2y_d4 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 4,   Ny = 2, dY = 4}        
-        --local oriXYSet_2x4y_d4 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 4,   Ny = 4, dY = 4}        
-        
-        local oriXYSet_3o_d5 = {Nori = 3,  dOri = 5,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-        local oriXYSet_7o_d5 = {Nori = 7,  dOri = 5,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-        local oriXYSet_11o_d4 = {Nori = 11,  dOri = 4,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-        local oriXYSet_21o_d2 = {Nori = 21,  dOri = 2,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-    
-        local oriXYSet_13o_d5 = {Nori = 13,  dOri = 5,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-        local oriXYSet_19o_d5 = {Nori = 19,  dOri = 5,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-        local oriXYSet_25o_d5 = {Nori = 25,  dOri = 5,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-        local oriXYSet_37o_d5 = {Nori = 37,  dOri = 5,    Nx = 1, dX = 0,   Ny = 1, dY = 0}
-    
-        local oriXYSet_2x4y_d4 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 4,   Ny = 4, dY = 4}
-        local oriXYSet_2x4y_d2 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 2,   Ny = 4, dY = 2}
-        local oriXYSet_2x4y_d1 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_3x7y_d2 = {Nori = 1,  dOri = 0,    Nx = 3, dX = 2,   Ny = 7, dY = 2}
-        --local oriXYSet_5x13y_d1 = {Nori = 1,  dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-        
-        local oriXYSet_21o_d2_2x4y_d4 = {Nori = 21,  dOri = 2,    Nx = 2, dX = 4,   Ny = 4, dY = 4}
-        local oriXYSet_21o_d2_2x4y_d2 = {Nori = 21,  dOri = 2,    Nx = 2, dX = 2,   Ny = 4, dY = 2}
-        local oriXYSet_21o_d2_2x4y_d1 = {Nori = 21,  dOri = 2,    Nx = 2, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_21o_d2_3x7y_d2 = {Nori = 21,  dOri = 2,    Nx = 3, dX = 2,   Ny = 7, dY = 2}
-        local oriXYSet_21o_d2_5x13y_d1 = {Nori = 21,  dOri = 2,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-    
-        local oriXYSet_5x13y_d1 = {Nori = 1,  dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-        local oriXYSet_7x18y_d1 = {Nori = 1,  dOri = 0,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-        local oriXYSet_10x26y_d1 = {Nori = 1,  dOri = 0,    Nx = 10, dX = 1,   Ny = 26, dY = 1}
-        local oriXYSet_14x37y_d1 = {Nori = 1,  dOri = 0,    Nx = 14, dX = 1,   Ny = 37, dY = 1}
-        local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,    Nx = 30, dX = 1,   Ny = 39, dY = 1}
-        
-    
-        local oriXYSet_2x2y_d1 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 1,   Ny = 2, dY = 1}
-        local oriXYSet_3x3y_d1 = {Nori = 1,  dOri = 0,    Nx = 3, dX = 1,   Ny = 3, dY = 1}
-        local oriXYSet_4x4y_d1 = {Nori = 1,  dOri = 0,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_5x6y_d1 = {Nori = 1,  dOri = 0,    Nx = 5, dX = 1,   Ny = 6, dY = 1}
-        local oriXYSet_8x8y_d1 = {Nori = 1,  dOri = 0,    Nx = 8, dX = 1,   Ny = 8, dY = 1}
-        local oriXYSet_13x11y_d1={Nori = 1,  dOri = 0,    Nx = 13, dX = 1,   Ny = 11, dY = 1}
-    
-        local oriXYSet_16x16y_d1 = {Nori = 1,  dOri = 0,    Nx = 16, dX = 1,   Ny = 16, dY = 1}
-        local oriXYSet_22x22y_d1 = {Nori = 1,  dOri = 0,    Nx = 22, dX = 1,   Ny = 22, dY = 1}
-                            
-        
-
-            local oriXYSet_15x15y_d1    = {Nori = 1,  dOri = 0,    Nx = 15, dX = 1,   Ny = 15, dY = 1}
-            local oriXYSet_7x7y_d2      = {Nori = 1,  dOri = 0,    Nx = 7,  dX = 2,   Ny = 7, dY = 2}
-            local oriXYSet_21x21y_d1    = {Nori = 1,  dOri = 0,    Nx = 21, dX = 1,   Ny = 21, dY = 1}
-            local oriXYSet_10x10y_d2    = {Nori = 1,  dOri = 0,    Nx = 10, dX = 2,   Ny = 10, dY = 2}
-            local oriXYSet_11o_15x15y_d1  = {Nori = 21,  dOri = 2,    Nx = 15, dX = 1,   Ny = 15, dY = 1}
-            local oriXYSet_11o_7x7y_d2    = {Nori = 21,  dOri = 2,    Nx = 7,  dX = 2,   Ny = 7, dY = 2}            
-            local oriXYSet_11o_21x21y_d1  = {Nori = 21,  dOri = 2,    Nx = 21, dX = 1,   Ny = 21, dY = 1}
-            local oriXYSet_11o_10x10y_d2  = {Nori = 21,  dOri = 2,    Nx = 10, dX = 2,   Ny = 10, dY = 2}
-
-                    --]]
-
-    local tbl_fontNames, allSNRs_test, tbl_OriXY, tbl_imageSize, tbl_sizeStyle, tbl_imageSize_and_sizeStyle
-    local tbl_noiseFilter, tbl_trainingNoise, tbl_trainingFonts, tbl_retrainFromLayer, tbl_classifierForEachFont, tbl_trainingOriXY
+   
+   
+    local tbl_fontNames, allSNRs_test, tbl_OriXY, tbl_imageSize, tbl_sizeStyle, tbl_imageSize_and_sizeStyle, tbl_imageSize_and_sizeStyle_and_OriXY
+    local tbl_noiseFilter, tbl_trainingNoise, tbl_retrainingNoise, tbl_trainingFonts, tbl_retrainFromLayer, tbl_secondRetrainFromLayer, tbl_classifierForEachFont, tbl_trainingOriXY
     local xrange, trainPositions, testPositions, tbl_xrange_and_trainPositions_and_testPositions
     local allMultiLetterTestOpts_tbl
     
@@ -915,6 +876,8 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
     if expName == 'ChannelTuning' then
         print('Channel Tuning Experiment')
         tbl_fontNames = { {'Bookman'}  }
+        --tbl_fontNames = { {'Bookman'}, {'BookmanU'}, {'BookmanB'}, {'BookmanUB'}, {'Helvetica'}, {'HelveticaU'}, } 
+        --tbl_fontNames = { {'Bookman'}, {'BookmanU'}, } 
         
         --tbl_fontNames = { {'Bookman'}, {'Braille'}, {'Sloan'}, {'Helvetica'}, {'Yung'}, {'KuenstlerU'} }
         if channels_trainOn == 'RealData' then
@@ -937,71 +900,16 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 end
         end
         
-    
+            
         
-        --allSNRs_test = {-1, 0, 1, 2, 3, 4, 5, 6};
-       
-        
-        
-        --tbl_OriXY = { oriXYSet_4x4y7o , oriXYSet_6x6y11o, oriXYSet_1pos } --  oriXYSet_6x5y21o, 
-        --tbl_OriXY = { oriXYSet_1pos } --  oriXYSet_6x5y21o, 
-        --tbl_OriXY = { oriXYSet_2x2y3o, oriXYSet_4x4y7o, oriXYSet_1pos } --  oriXYSet_6x5y21o, 
-        
-        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, 
-          --       oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
-
-        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_2x2y_d1,    oriXYSet_3x3y_d1, oriXYSet_4x4y_d1, 
-          --  oriXYSet_5x6y_d1, oriXYSet_8x8y_d1, oriXYSet_13x11y_d1};
-   --[[
-  
-        local oriXYSet_4x4y_d1 = {Nori = 1,  dOri = 0,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_4x4y_d1_3o_d5 = {Nori = 3,  dOri = 5,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_4x4y_d1_7o_d5 = {Nori = 7,  dOri = 5,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_4x4y_d1_11o_d1 = {Nori = 11,  dOri = 1,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
-
-   
-        tbl_OriXY = { oriXYSet_1pos, oriXYSet_4x4y_d1, oriXYSet_4x4y_d1_3o_d5, oriXYSet_4x4y_d1_7o_d5, oriXYSet_4x4y_d1_11o_d1 }
-    --]]
-   
-        --local oriXYSet_2x2y_d1 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 1,   Ny = 2, dY = 1}
-        --local oriXYSet_3x3y_d1 = {Nori = 1,  dOri = 0,    Nx = 3, dX = 1,   Ny = 3, dY = 1}
-        local oriXYSet_4x4y_d1 = {Nori = 1,  dOri = 0,    Nx = 4, dX = 1,   Ny = 4, dY = 1}
-        local oriXYSet_8x8y_d1 = {Nori = 1,  dOri = 0,    Nx = 8, dX = 1,   Ny = 8, dY = 1}
-        local oriXYSet_13x11y_d1={Nori = 1,  dOri = 0,    Nx = 13, dX = 1,   Ny = 11, dY = 1}
-        local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
-
-   
-        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_30x39y_d1, oriXYSet_4x4y_d1, }
-
-        tbl_OriXY = { oriXYSet_1pos, oriXYSet_13x11y_d1}
-        --tbl_OriXY = { oriXYSet_1pos }
-        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_30x39y_d1}
-
-   
+        tbl_OriXY = { getXYset(1,1,1) }
         if doTextureModel then
-            tbl_OriXY = { oriXYSet_1pos }
+            tbl_OriXY = { getXYset(1,1,1) }
         end
-        --tbl_imageSize = { {64, 64}, {32, 32} }
-        --tbl_sizeStyle = {'k40'}    
-        --tbl_sizeStyle = {'k32'}    
         
-        --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} , {{32, 32}, 'k16'},   }
-        --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'}  }
-        if channels_imageSize_test[1] == 30 then
-            tbl_imageSize_and_sizeStyle =  {  {{30, 30}, 'k15'} }
-        elseif channels_imageSize_test[1] == 32 then
-            tbl_imageSize_and_sizeStyle =  {  {{32, 32}, 'k15'}, {{32, 32}, 'k20'}  }
-        elseif channels_imageSize_test[1] == 36 then
-            tbl_imageSize_and_sizeStyle =  {  {{36, 36}, 'k20'} }
-        elseif channels_imageSize_test[1] == 45 then
-            --tbl_imageSize_and_sizeStyle =  {   {{45, 45}, 'k30'} , {{45, 45}, 'k15'}}
-            tbl_imageSize_and_sizeStyle =  {   {{45, 45}, 'k30'} }
-        elseif channels_imageSize_test[1] == 64 then
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'}  }
-            tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k36'} }
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'} }
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k24'} }
-        end
+      
+        
+        --tbl_imageSize_and_sizeStyle_and_OriXY =  {  {{64, 64}, 'k36',  getXYset(1, 1, 1) }, }
         
         --local channels_train_noiseFilters = tbl_whiteNoiseAndPinkOrWhiteNoises
         --local channels_train_noiseFilters = tbl_allPinkWideNoiseFilters
@@ -1022,6 +930,19 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 allSNRs_test = table.range(-1, 5,  0.5);
             end
             
+        elseif channelTuningStage == 'retrain' then  -- e.g retrain on white noise (after training on SVHN), before testing on band noise
+            tbl_OriXY = nil
+            if channelTuningRetrainOn == 'white' then
+                --channels_realData_imageSize_retrain = {64, 64}
+                tbl_noiseFilter = {whiteNoiseFilter}
+                
+                tbl_imageSize_and_sizeStyle_and_OriXY =  {  {{64, 64}, 'k36',  getXYset(8, 11, 1) } }
+                tbl_retrainFromLayer = {'conv5', 'conv4', 'conv3', 'linear'}
+                
+                --tbl_
+                
+                
+            end
             
         elseif channelTuningStage == 'test' then
             
@@ -1031,11 +952,16 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             
             elseif channelTuningTestOn == 'band' then
                 tbl_noiseFilter = tbl_allBandNoiseFilters    -- TEST ON BAND  NOISE (after being trained on PINK NOISE or SVHN)    
+                --tbl_noiseFilter = {whiteNoiseFilter}         -- RETRAIN ON WHITE NOISE
                  allSNRs_test = table.range(-1, 5,  0.5);
             end
             
+            
+            
             if channels_trainOn == 'RealData' then 
                 tbl_trainingFonts = tbl_realData_fontNames
+                tbl_trainingNoise = {'same'}
+                
                 --tbl_trainingImageSize = { channels_realData_imageSize_train } -- this is done automatically
                 --tbl_retrainFromLayer = {'classifier'}
                 --tbl_retrainFromLayer = {'classifier', 'linear'}
@@ -1043,11 +969,26 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                     tbl_retrainFromLayer = {'linear-2', 'classifier'}
                 else
                     --tbl_retrainFromLayer = {'linear', 'conv3'}
-                    tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
+                    --tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
                     --tbl_retrainFromLayer =  {'conv1'} -- {'conv2', 'conv3', 'linear'} -- {'conv1'}
+                    
+                    if channelTuningRetrainOn == 'white' then
+                        
+                        tbl_retrainingNoise = {whiteNoiseFilter}
+                        --tbl_retrainFromLayer = nil  -- already trained on letters (in white noise). now just test
+                        --tbl_retrainFromLayer = {'conv5', 'conv4', 'conv3', 'linear'}
+                        tbl_retrainFromLayer = {'conv3'}
+                        tbl_secondRetrainFromLayer = {'linear'}
+                    elseif channelTuningRetrainOn == '' then
+                        
+                        tbl_retrainFromLayer = {'conv5', 'conv4', 'conv3', 'linear'}
+                    end
+                    
+                    
                 end
-                tbl_trainingNoise = {'same'}
-                
+            
+            
+            
             elseif channels_trainOn == 'PinkNoise' then
                 tbl_trainingNoise = channels_train_noiseFilters 
                 
@@ -1057,6 +998,31 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 tbl_retrainFromLayer = {'linear'}
             end            
             loopKeysOrder_dataOpts  = { 'noiseFilter', 'OriXY', };
+            
+            
+
+            if channels_imageSize_test[1] == 30 then
+                tbl_imageSize_and_sizeStyle =  {  {{30, 30}, 'k15'} }
+            elseif channels_imageSize_test[1] == 32 then
+                tbl_imageSize_and_sizeStyle =  {  {{32, 32}, 'k15'}, {{32, 32}, 'k20'}  }
+            elseif channels_imageSize_test[1] == 36 then
+                tbl_imageSize_and_sizeStyle =  {  {{36, 36}, 'k20'} }
+            elseif channels_imageSize_test[1] == 45 then
+                --tbl_imageSize_and_sizeStyle =  {   {{45, 45}, 'k30'} , {{45, 45}, 'k15'}}
+                tbl_imageSize_and_sizeStyle =  {   {{45, 45}, 'k30'} }
+            elseif channels_imageSize_test[1] == 64 then
+                --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'}  }
+                --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k36'} }
+                --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'} }
+                --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k24'} }
+
+                tbl_imageSize_and_sizeStyle_and_OriXY =  {  {{64, 64}, 'k36',  getXYset(8, 11, 1) },
+                  --                                          {{64, 64}, 'k24',  getXYset(27, 28, 1) }, 
+                                                        }
+
+            end
+            
+            
         end 
 
         
@@ -1085,14 +1051,14 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         
         tbl_OriXY = { oriXYSet_long_32_128_dx5, oriXYSet_long_32_128_dx5_ori, oriXYSet_long_32_128_dx10, oriXYSet_long_32_128_dx10_ori }
         
-          --tbl_OriXY = { oriXYSet_1pos }, 
-          --tbl_OriXY = { oriXYSet_1pos, oriXYSet_large_48_k14}, 
+          --tbl_OriXY = { getXYset(1,1,1) }, 
+          --tbl_OriXY = { getXYset(1,1,1), oriXYSet_large_48_k14}, 
           --tbl_OriXY  = { oriXYSet_long_32_128_dx2_ori }, 
           --tbl_OriXY = { oriXYSet_long_32_128_dx5, oriXYSet_long_32_128_dx5_ori, oriXYSet_long_32_128_dx10, oriXYSet_long_32_128_dx10_ori }, 
         --tbl_imageSize = { {32, 128}  }
         
-        --tbl_imageSize = { {64, 64}  }
-        tbl_imageSize = { {32, 160}  }
+        tbl_imageSize = { {64, 64}  }
+        --tbl_imageSize = { {32, 160}  }
         
         --tbl_sizeStyle = {'k16'}
         tbl_sizeStyle = {'k15'}
@@ -1108,11 +1074,12 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_2x15y_d1 = {Nori = 1,  dOri = 0,    Nx = 2, dX = 1,   Ny = 15, dY = 1}
         local oriXYSet_1x30y_d1 = {Nori = 1,  dOri = 0,    Nx = 1, dX = 1,   Ny = 30, dY = 1}
         
-        tbl_OriXY = { oriXYSet_1pos, oriXYSet_3x1y_d1, oriXYSet_5x1y_d1, oriXYSet_15x1y_d1, oriXYSet_30x1y_d1, 
+        tbl_OriXY = { getXYset(1,1,1), oriXYSet_3x1y_d1, oriXYSet_5x1y_d1, oriXYSet_15x1y_d1, oriXYSet_30x1y_d1, 
                         oriXYSet_15x2y_d1, oriXYSet_3x5y_d1, oriXYSet_5x3y_d1, oriXYSet_2x15y_d1, oriXYSet_1x30y_d1 };
     --]]
     
     
+    --[[
         local oriXYSet_3x_d3  = {Nori = 1,  dOri = 0,    Nx = 3,  dX = 3,   Ny = 1, dY = 0}
         local oriXYSet_7x_d3  = {Nori = 1,  dOri = 0,    Nx = 7,  dX = 3,   Ny = 1, dY = 0}
         local oriXYSet_15x_d3 = {Nori = 1,  dOri = 0,    Nx = 15, dX = 3,   Ny = 1, dY = 0}
@@ -1120,15 +1087,38 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_30x_d3 = {Nori = 1,  dOri = 0,    Nx = 30, dX = 3,   Ny = 1, dY = 0}
         local oriXYSet_45x_d3 = {Nori = 1,  dOri = 0,    Nx = 45, dX = 3,   Ny = 1, dY = 0}
                
-       tbl_OriXY = {oriXYSet_1pos, oriXYSet_3x_d3, oriXYSet_7x_d3, oriXYSet_15x_d3, oriXYSet_20x_d3, 
+       tbl_OriXY = {getXYset(1,1,1), oriXYSet_3x_d3, oriXYSet_7x_d3, oriXYSet_15x_d3, oriXYSet_20x_d3, 
                     oriXYSet_30x_d3, oriXYSet_45x_d3};
+--]]
+
+        local oriXYSet_1x_d1      = {Nori = 1,  dOri = 0,    Nx = 1,  dX = 1,   Ny = 1, dY = 1}
+        local oriXYSet_2x1y_d1    = {Nori = 1,  dOri = 0,    Nx = 2,  dX = 1,   Ny = 1, dY = 1}
+        local oriXYSet_3x1y_d1    = {Nori = 1,  dOri = 0,    Nx = 3,  dX = 1,   Ny = 1, dY = 1}
+        local oriXYSet_5x1y_d1    = {Nori = 1,  dOri = 0,    Nx = 5,  dX = 1,   Ny = 1, dY = 1}
+        local oriXYSet_11x1y_d1   = {Nori = 1,  dOri = 0,    Nx = 11,  dX = 1,   Ny = 1, dY = 1}
+        local oriXYSet_25x1y_d1   = {Nori = 1,  dOri = 0,    Nx = 25,  dX = 1,   Ny = 1, dY = 1}
+        local oriXYSet_5x5_d1     = {Nori = 1,  dOri = 0,    Nx = 5,  dX = 1,   Ny = 5, dY = 1}
+        local oriXYSet_11x5y_d1   = {Nori = 1,  dOri = 0,    Nx = 11,  dX = 1,   Ny = 5, dY = 1}
+        local oriXYSet_25x5y_d1   = {Nori = 1,  dOri = 0,    Nx = 25,  dX = 1,   Ny = 5, dY = 1}
+        local oriXYSet_25x11y_d1  = {Nori = 1,  dOri = 0,    Nx = 25,  dX = 1,   Ny = 11, dY = 1}
+        local oriXYSet_22x28y_d1  = {Nori = 1,  dOri = 0,    Nx = 22,  dX = 1,   Ny = 28, dY = 1}
+        local oriXYSet_37x37y_d1  = {Nori = 1,  dOri = 0,    Nx = 37,  dX = 1,   Ny = 37, dY = 1}
+
+               
+
+        tbl_OriXY = {getXYset(1,1,1), oriXYSet_2x1y_d1, oriXYSet_3x1y_d1, oriXYSet_5x1y_d1 , oriXYSet_11x1y_d1 , oriXYSet_25x1y_d1, oriXYSet_5x5_d1,
+                    oriXYSet_11x5y_d1,  oriXYSet_25x5y_d1 ,oriXYSet_25x11y_d1 , oriXYSet_22x28y_d1, oriXYSet_37x37y_d1 }
+
+        tbl_OriXY = {getXYset(1,1,1), oriXYSet_11x1y_d1 , oriXYSet_25x5y_d1, oriXYSet_37x37y_d1 }
 
    
+   
         local all_realData_opts = {imageSize = {32, 32}, globalNorm = true, localContrastNorm = false}
-                    error('fix')
+                    
         tbl_realData_fontNames = expandOptionsToList( {fonts = 'SVHN', tbl_realData_opts= {all_realData_opts} } )
         
-        tbl_trainingFonts = {tbl_realData_fontNames[1], 'same'}
+        --tbl_trainingFonts = {tbl_realData_fontNames[1], 'same'}
+        tbl_trainingFonts = { 'same'}
         tbl_retrainFromLayer = {'linear'}
         
         loopKeysOrder_dataOpts  = {'OriXY', 'fontName', 'trainingFonts'  };
@@ -1141,15 +1131,18 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         
         
         
-        tbl_fontNames = allStdFontNames
+        --tbl_fontNames = allStdFontNames
+        --tbl_fontNames = allStdFontNames2
+        
+        --tbl_fontNames = {{allStdFontNames}, {allStdFontNames2}}
         --tbl_fontNames = allExtFontNames
+        tbl_fontNames = {allStdFontNames}
+        --tbl_fontNames = table.merge(allStdFontNames, {allStdFontNames})
         
         if doOnlyBookman then
             tbl_fontNames = { 'Bookman'}
         end
         
-        --tbl_fontNames = {allStdFontNames}
-        --tbl_fontNames = table.merge(allStdFontNames, {allStdFontNames})
             
         if complexity_trainOn == 'RealData' then
             
@@ -1178,11 +1171,12 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 
             elseif complexityStage == 'test' then
                 tbl_trainingFonts = tbl_realData_fontNames
+                
                 tbl_noiseFilter = {whiteNoiseFilter}
                 --tbl_retrainFromLayer = {'classifier', 'linear'}
                 --tbl_retrainFromLayer = {'linear'}
                 --tbl_retrainFromLayer = {'linear-2', 'classifier'}
-                tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
+                tbl_retrainFromLayer = {'conv3', 'conv5', 'conv4', 'linear'}
                 
                 loopKeysOrder_dataOpts  = {'fontName', 'trainingFonts', };
             end
@@ -1209,6 +1203,13 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         end
         
             
+            
+        --local complexity_imageSize = {32, 32}
+        --local complexity_imageSize = {45, 45}
+        --local complexity_imageSize = {56, 56}
+        local complexity_imageSize = {64, 64}
+        --local complexity_imageSize = {80, 80}
+            
         --tbl_fontNames = table.merge( { allStdFontNames, {fonts=allStdFontNames}, } )
         --tbl_fontNames = table.merge( { allStdFontNames, {fonts=allStdFontNames} , {fonts=allStdFontNames, styles= styles_use} } )
         
@@ -1216,115 +1217,39 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --allSNRs_test = {0, 0.5, 1, 1.5, 2, 2.5, 3, 4}
         allSNRs_test = table.range(0, 5,  0.5);
         
-        --tbl_OriXY = { oriXYSet_6x9y21o, oriXYSet_1pos }
-        --tbl_OriXY = { oriXYSet_4x4y7o , oriXYSet_6x6y11o, oriXYSet_6x9y21o, }
         
-        --tbl_imageSize = {64, 64}          
-        --tbl_sizeStyle = {'k16'}
-        --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} , {{32, 32}, 'k16'},   }
         if doTextureModel then
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} }
         end
-        if complexity_imageSize[1] == 80 then
+        
+        if complexity_imageSize[1] == 64 then
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} }
-            tbl_imageSize_and_sizeStyle =  {  {{80, 80}, 'k30'} }
-            tbl_OriXY = { oriXYSet_2x2y3o, oriXYSet_3x6y7o, oriXYSet_1pos } --  oriXYSet_6x5y21o, 
-        elseif complexity_imageSize[1] == 64 then
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} }
-            tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k24'} }
+            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k24'} }
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k30'} }
             --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'}, {{64, 64}, 'k24'} }
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k15'} }
+            tbl_imageSize_and_sizeStyle_and_OriXY =  { -- {{64, 64}, 'k15',  getXYset(1, 1, 1) },
+                                                        {{64, 64}, 'k15',  getXYset(30, 39, 1) }, 
+                                                        {{64, 64}, 'k24',  getXYset(15, 26, 1) }, }
+            tbl_OriXY = { getXYset(1,1,1) }
             
-            --[[
-            tbl_OriXY = { oriXYSet_1pos, oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, 
-                        oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5} --  oriXYSet_6x5y21o, 
-
-
-     --]]
-        --[[
-                local oriXYSet_7x18y_d1        = {Nori = 1,   dOri = 0,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-                local oriXYSet_7x18y_d1_3o_d5  = {Nori = 3,   dOri = 5,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-                local oriXYSet_7x18y_d1_7o_d5  = {Nori = 7,   dOri = 5,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-                local oriXYSet_7x18y_d1_11o_d3 = {Nori = 11,  dOri = 3,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-                local oriXYSet_7x17y_d1_11o_d4 = {Nori = 11,  dOri = 4,    Nx = 7, dX = 1,   Ny = 18, dY = 1}
-
-               
-                tbl_OriXY  = { oriXYSet_1pos, oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, 
-                                oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3}
-    --]]
-
-    --[[
-                local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-                local oriXYSet_5x13y_d1_3ori_d5   = {Nori = 3,   dOri = 5,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-           s     local oriXYSet_5x13y_d1_3ori_d10  = {Nori = 3,   dOri = 10,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-                local oriXYSet_5x13y_d1_3ori_d15  = {Nori = 3,   dOri = 15,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-                local oriXYSet_5x13y_d1_3ori_d30  = {Nori = 3,   dOri = 30,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-                
-                tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_5x13y_d1_3ori_d5, 
-                    oriXYSet_5x13y_d1_3ori_d10, oriXYSet_5x13y_d1_3ori_d15, oriXYSet_5x13y_d1_3ori_d30};
-     --]]
-     
-     --[[
-                local oriXYSet_5x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 13, dY = 1}
-                local oriXYSet_6x13y_d1           = {Nori = 1,   dOri = 0,    Nx = 6, dX = 1,   Ny = 13, dY = 1}
-                local oriXYSet_5x14y_d1           = {Nori = 1,   dOri = 0,    Nx = 5, dX = 1,   Ny = 14, dY = 1}
-     
-                 tbl_OriXY = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_6x13y_d1, oriXYSet_5x14y_d1};
-    --]]
-
-            local oriXYSet_5x13y_d1 =  {Nori = 1,  dOri = 0,   Nx = 5, dX = 1,   Ny = 13, dY = 1}
-            local oriXYSet_7x18y_d1 =  {Nori = 1,  dOri = 0,   Nx = 7, dX = 1,   Ny = 18, dY = 1}
-            local oriXYSet_10x26y_d1 = {Nori = 1,  dOri = 0,   Nx = 10, dX = 1,  Ny = 26, dY = 1}
-            local oriXYSet_14x37y_d1 = {Nori = 1,  dOri = 0,   Nx = 14, dX = 1,  Ny = 37, dY = 1}
-            local oriXYSet_30x39y_d1 = {Nori = 1,  dOri = 0,   Nx = 30, dX = 1,  Ny = 39, dY = 1}
-            local oriXYSet_15x20y_d1 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 1,  Ny = 20, dY = 1}
-            local oriXYSet_15x20y_d2 = {Nori = 1,  dOri = 0,   Nx = 15, dX = 2,  Ny = 20, dY = 2}
-            
-            
-            local oriXYSet_17x28y_d1 = {Nori = 1,  dOri = 0,   Nx = 17, dX = 1,  Ny = 28, dY = 1}
-            
-            --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_5x13y_d1,  oriXYSet_7x18y_d1, oriXYSet_10x26y_d1, 
-              --                  oriXYSet_14x37y_d1, oriXYSet_30x39y_d1, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2};
-            --tbl_OriXY  = { oriXYSet_1pos, oriXYSet_30x39y_d1};
-            --tbl_OriXY  = { oriXYSet_30x39y_d1};
-            tbl_OriXY  = { oriXYSet_17x28y_d1 };
-     
- 
-        elseif complexity_imageSize[1] == 56 then
-            --tbl_imageSize_and_sizeStyle =  {  {{64, 64}, 'k32'} }
-            tbl_imageSize_and_sizeStyle =  {  {{56, 56}, 'k15'} }
-            tbl_OriXY = { oriXYSet_2x2y3o, oriXYSet_3x6y7o_d2, oriXYSet_3x6y7o, oriXYSet_1pos } --  oriXYSet_6x5y21o, 
---[[            
-            tbl_OriXY = { oriXYSet_2x_d4, oriXYSet_2x2y_d4, oriXYSet_2x4y_d4, }
-              --  oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, oriXYSet_1pos} --  oriXYSet_6x5y21o, 
-                        
-            tbl_tbl_OriXYOriXY = { oriXYSet_13o_d5, oriXYSet_19o_d5, oriXYSet_25o_d5, oriXYSet_37o_d5, oriXYSet_1pos} --  oriXYSet_6x5y21o, 
-            
-            tbl_OriXY = { oriXYSet_1pos, oriXYSet_2x_d4, oriXYSet_2x2y_d4, oriXYSet_2x4y_d4, oriXYSet_3x6y7o, oriXYSet_3x6y7o_d2, }
-        
-            tbl_OriXY = { oriXYSet_1pos, oriXYSet_2x4y_d4,    oriXYSet_2x4y_d2, oriXYSet_2x4y_d1, oriXYSet_3x7y_d2, oriXYSet_5x13y_d1, 
-                 oriXYSet_21o_d2, oriXYSet_21o_d2_2x4y_d4, oriXYSet_21o_d2_2x4y_d2, oriXYSet_21o_d2_3x7y_d2, oriXYSet_21o_d2_5x13y_d1};
-    --]]    
-        elseif complexity_imageSize[1] == 45 then
-            tbl_imageSize_and_sizeStyle =  {   {{45, 45}, 'k30'} }        
         elseif complexity_imageSize[1] == 32 then
-            tbl_imageSize_and_sizeStyle =  {  {{32, 32}, 'k15'} }
+            --tbl_imageSize_and_sizeStyle =  {  {{32, 32}, 'k15'} }
+            tbl_imageSize_and_sizeStyle_and_OriXY =  { -- {{64, 64}, 'k15',  getXYset(1, 1, 1) },
+                                                        --{{64, 64}, 'k15',  getXYset(30, 39, 1) }, 
+                                                          {{32, 160}, 'k15',  getXYset(12, 1, 12) }, }
+            
+            
         end
         
         
-                if doTextureModel  then
-                    tbl_OriXY = { oriXYSet_1pos }
-                end
-
         tbl_classifierForEachFont = {false}
         --allBlurs = {0, 1, 1.5, 2}
         --allBlurs = {0, 1, 2}
         allBlurs = {0}
         
-            
+        
         if (complexity_trainOn == 'RealData' and complexityStage == 'train') then
-            tbl_OriXY = { oriXYSet_1pos }
+            tbl_OriXY = { getXYset(1,1,1) }
         end        
 
         loopKeysOrder_dataOpts  = {'fontName', 'OriXY' };
@@ -1344,11 +1269,11 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local tbl_OriXY_forTraining
         
         
-        tbl_OriXY_forTraining = { oriXYSet_1pos, oriXYSet_3x3y, oriXYSet_5x5y }
+        tbl_OriXY_forTraining = { getXYset(1,1,1), oriXYSet_3x3y, oriXYSet_5x5y }
         --tbl_OriXY = { oriXYSet_9x9y7o }
         --tbl_OriXY_forTraining = { oriXYSet_10x10y11o }
         --tbl_OriXY_forTraining = { oriXYSet_10x10y21o }
-        --tbl_OriXY_forTraining = { oriXYSet_1pos }
+        --tbl_OriXY_forTraining = { getXYset(1,1,1) }
         tbl_OriXY_forTraining = { oriXYSet_30x30y21o }
         --tbl_OriXY_forTraining = { oriXYSet_19x19y21o }
         
@@ -1368,7 +1293,12 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         --tbl_sizeStyle = { 'k32' } 
         --tbl_sizeStyle = { 'k48' } 
         --tbl_sizeStyle = { 'k27' } 
+        tbl_sizeStyle = nil
         
+        tbl_imageSize_and_sizeStyle_and_OriXY =  { -- {{64, 64}, 'k15',  getXYset(1, 1, 1) },
+                                            {{64, 64}, 'k23',  getXYset(38, 38, 1) }, 
+                                            {{64, 64}, 'k32',  getXYset(30, 28, 1) }, }
+
         
         local doNoWiggle = true
         local doOriWiggle    = true
@@ -1449,7 +1379,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             if grouping_trainOn == 'RealData' then
                 tbl_fontNames = { {fonts = grouping_realDataName, realData_opts = grouping_realData_settings} }
                 tbl_imageSize = { grouping_realData_settings.imageSize }
-                tbl_OriXY         = { oriXYSet_1pos }  
+                tbl_OriXY         = { getXYset(1,1,1) }  
                 
             else
                 
@@ -1477,14 +1407,14 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 tbl_trainingNoise = {'same'}
                 tbl_trainingFonts = tbl_realData_fontNames
                 --tbl_trainingImageSize = { grouping_realData_settings.imageSize } -- this is done automatically
-                --tbl_OriXY         = { oriXYSet_1pos, oriXYSet_5x5y11o, oriXYSet_10x10y21o } 
-                --tbl_OriXY         = { oriXYSet_5x5y11o_d2, oriXYSet_41o, oriXYSet_7x7y, oriXYSet_1pos, oriXYSet_5x5y11o,  }
+                --tbl_OriXY         = { getXYset(1,1,1), oriXYSet_5x5y11o, oriXYSet_10x10y21o } 
+                --tbl_OriXY         = { oriXYSet_5x5y11o_d2, oriXYSet_41o, oriXYSet_7x7y, getXYset(1,1,1), oriXYSet_5x5y11o,  }
                                 
-             --   tbl_OriXY         = { oriXYSet_1pos, oriXYSet_2x2y_d1, 
+             --   tbl_OriXY         = { getXYset(1,1,1), oriXYSet_2x2y_d1, 
                     --                    oriXYSet_4x4y_d1, oriXYSet_8x8y_d1, oriXYSet_16x16y_d1, oriXYSet_22x22y_d1}
                           
               
-                tbl_OriXY = { oriXYSet_1pos, oriXYSet_15x15y_d1,    oriXYSet_7x7y_d2, oriXYSet_21x21y_d1, oriXYSet_10x10y_d2, 
+                tbl_OriXY = { getXYset(1,1,1), oriXYSet_15x15y_d1,    oriXYSet_7x7y_d2, oriXYSet_21x21y_d1, oriXYSet_10x10y_d2, 
                     oriXYSet_11o_15x15y_d1, oriXYSet_11o_7x7y_d2,  oriXYSet_11o_21x21y_d1, oriXYSet_11o_10x10y_d2 };
 
                 
@@ -1502,11 +1432,11 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 --tbl_trainingNoise = tbl_whiteNoiseAndPinkOrWhiteNoises     
                 tbl_trainingNoise = {whiteNoiseFilter}
             
-                --tbl_OriXY         = { oriXYSet_1pos, oriXYSet_10x10y21o }
+                --tbl_OriXY         = { getXYset(1,1,1), oriXYSet_10x10y21o }
                 tbl_OriXY         = tbl_OriXY_forTraining -- { oriXYSet_19x19y21o }
                 tbl_trainingOriXY = {'same'}
                 
-                --tbl_OriXY         = { oriXYSet_1pos}
+                --tbl_OriXY         = { getXYset(1,1,1)}
             end
             tbl_noiseFilter = { whiteNoiseFilter }
             
@@ -1514,10 +1444,11 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             --tbl_retrainFromLayer = {'classifier', 'linear'}
             --tbl_retrainFromLayer = {'linear'}
             --tbl_retrainFromLayer = {'linear', 'linear-2'}
-            tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
+            --tbl_retrainFromLayer = {'linear', 'conv3', 'conv5'}
+            tbl_retrainFromLayer = {'conv5', 'linear', 'conv4', 'conv3'}
             --tbl_retrainFromLayer = {''}
             
-            --tbl_OriXY         = { oriXYSet_1pos }
+            --tbl_OriXY         = { getXYset(1,1,1) }
             
             
             loopKeysOrder_dataOpts  = {'OriXY', 'fontName'};
@@ -1526,7 +1457,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         end  -- if groupingStage == 'train' or 'test'
         
         
-        --tbl_OriXY = {oriXYSet_1pos,  oriXYSet_3o_d5, oriXYSet_13o_d5, oriXYSet_21o_d2,   oriXYSet_25o_d5 };
+        --tbl_OriXY = {getXYset(1,1,1),  oriXYSet_3o_d5, oriXYSet_13o_d5, oriXYSet_21o_d2,   oriXYSet_25o_d5 };
         --[[
         
         local oriXYSet_15x19y_d1_3o_d5  = {Nori = 3,  dOri = 5,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
@@ -1535,7 +1466,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_15x19y_d1_11o_d1 = {Nori = 11, dOri = 1,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
         local oriXYSet_15x19y_d1_31o_d1 = {Nori = 31, dOri = 1,    Nx = 15, dX = 1,   Ny = 19, dY = 1}
         
-        tbl_OriXY = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, 
+        tbl_OriXY = { getXYset(1,1,1), oriXYSet_15x19y_d1,  oriXYSet_15x19y_d1_3o_d5, oriXYSet_15x19y_d1_7o_d5, 
                              oriXYSet_15x19y_d1_21o_d2, oriXYSet_15x19y_d1_11o_d1, oriXYSet_15x19y_d1_31o_d1}        
         --]]
         
@@ -1545,7 +1476,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_22x26y_d1_21o_d1 = {Nori = 21, dOri = 1,    Nx = 22, dX = 1,   Ny = 26, dY = 1}
         local oriXYSet_22x26y_d1_41o_d1 = {Nori = 41, dOri = 1,    Nx = 22, dX = 1,   Ny = 26, dY = 1}
                            
-        --tbl_OriXY = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_22x26y_d1_21o_d1, 
+        --tbl_OriXY = { getXYset(1,1,1), oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_22x26y_d1_21o_d1, 
           --                              oriXYSet_22x26y_d1_41o_d1};
 --]]
 ---[[
@@ -1558,18 +1489,18 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         local oriXYSet_7x7y_d1          = {Nori = 1,  dOri = 0,    Nx = 7,  dX = 1,   Ny = 7,  dY = 1}
                    
 
-        --tbl_OriXY = { oriXYSet_45x47y_d1, oriXYSet_31x36y_d1, oriXYSet_22x26y_d1, oriXYSet_15x19y_d1, oriXYSet_1pos,
+        --tbl_OriXY = { oriXYSet_45x47y_d1, oriXYSet_31x36y_d1, oriXYSet_22x26y_d1, oriXYSet_15x19y_d1, getXYset(1,1,1),
           --             };
     
-        --tbl_OriXY = { oriXYSet_15x19y_d1, oriXYSet_1pos };
-        --tbl_OriXY = { oriXYSet_7x7y_d1, oriXYSet_1pos };
+        --tbl_OriXY = { oriXYSet_15x19y_d1, getXYset(1,1,1) };
+        --tbl_OriXY = { oriXYSet_7x7y_d1, getXYset(1,1,1) };
         --tbl_OriXY = { oriXYSet_15x19y_d1 };   -- standard for k32 in 64x64
-        tbl_OriXY = { oriXYSet_7x7y_d1};  -- standardd for k55 in 64x64
+        --tbl_OriXY = { oriXYSet_7x7y_d1};  -- standardd for k55 in 64x64
     
     --]]
     
                    --[[
-        tbl_OriXY = { oriXYSet_1pos, oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_31x36y_d1, 
+        tbl_OriXY = { getXYset(1,1,1), oriXYSet_15x19y_d1,  oriXYSet_22x26y_d1, oriXYSet_31x36y_d1, 
                        oriXYSet_45x47y_d1, oriXYSet_45x47y_d1_21o_d1, oriXYSet_45x47y_d1_41o_d1};
         
         local oriXYSet_2x_d1        = {Nori = 1,  dOri = 0,    Nx = 2, dX = 1,   Ny = 1, dY = 0}
@@ -1644,7 +1575,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         tbl_fontNames = { {'Bookman'}, {'KuenstlerU' } }
         tbl_imageSize = { {32, 32} }
         tbl_sizeStyle = { 'k16' }
-        tbl_OriXY = { oriXYSet_1pos }
+        tbl_OriXY = { getXYset(1,1,1) }
         
         tbl_allSNRs_train = { {0}, {1}, {2}, {3}, {4},   {0, 1}, {1, 2}, {2, 3}, {3, 4},    {0, 1, 2}, {1, 2, 3}, {2, 3, 4},   
                                 {0, 1, 2}, {.5, 1.5, 2.5}, {1, 2, 3}, {1.5, 2.5, 3.5}, {2, 3, 4}, 
@@ -1661,12 +1592,13 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
         tbl_imageSize = { {40, 40} }
         tbl_sizeStyle = { 'k14' }
         --tbl_OriXY = { oriXYSet_8x8y21o }
-        tbl_OriXY = { oriXYSet_1pos }
+        tbl_OriXY = { getXYset(1,1,1) }
         tbl_allSNRs_train = { {1, 2, 3}, }
             
         allSNRs_test = table.range(0, 4,   1)
         
     elseif expName == 'Crowding' then
+        --tbl_fontNames = { {'Bookman'}, {'Sloan'} }
         tbl_fontNames = { {'Bookman'}, {'Sloan'} }
         --tbl_fontNames = { {'Sloan'} }
         --tbl_fontNames = { {'HelveticaUB'} }
@@ -1693,8 +1625,9 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             
             tbl_imageSize = {{32, 160}}
             
-            xrange = {-16, 12, 176};  trainPositions = table.range(3,15);  testPositions = 9 -- CONVNET & TEXTURE STATISTICS
+            --xrange = {-16, 12, 176};  trainPositions = table.range(3,15);  testPositions = 9 -- CONVNET & TEXTURE STATISTICS
             --xrange = {-16, 8, 176};   trainPositions = table.range(3,23);  testPositions = 13 -- CONVNET & TEXTURE STATISTICS
+            xrange = {-15, 5, 175};  trainPositions = table.range(6,34);  testPositions = 20 -- CONVNET & TEXTURE STATISTICS
             
             
             
@@ -1705,15 +1638,16 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
             testPositions = 11   --- OVERFEAT
         end
             
-        allMultiLetterTestOpts_tbl = {  testPositions = testPositions,
+        if  crowdingStage == 'test' then
+            allMultiLetterTestOpts_tbl = {  testPositions = testPositions,
                                      --testPositions = {11},
                                      
-                                     --tbl_nDistractors = {2},
-                                     --tbl_logDNR = {2.9} , 
-                                     tbl_nDistractors = {1, 2},
+                                     tbl_nDistractors = {2},
+                                     --tbl_logDNR = {2.5} , 
+                                     --tbl_nDistractors = {2, 1},
                                      tbl_logDNR = {2.5, 2.9}
                                      }
-                           
+        end
                            
         if crowding_trainOn == 'RealData' then
             
@@ -1732,6 +1666,7 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                          --{fonts = crowding_realDataName, realData_opts = channels_realData_settings_norm}, 
                                        
                                     }
+                
             end
 
             
@@ -1741,15 +1676,19 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                 tbl_trainingNoise = {'same'}
                 
             elseif crowdingStage == 'test' then
-                --tbl_trainingFonts = table.merge(tbl_realData_fontNames, {'same'})  -- once have figured out to convert texture 
-                --tbl_trainingFonts = {'same'}
-                tbl_noiseFilter = {whiteNoiseFilter}
-                --tbl_retrainFromLayer = {'classifier', 'linear'}
-                --tbl_retrainFromLayer = {'linear'}
-                tbl_retrainFromLayer = {'linear-2'}
-                --tbl_retrainFromLayer = {'linear-2', 'classifier'}
+                tbl_trainingFonts = table.merge(tbl_realData_fontNames, {'same'})  -- once have figured out to convert texture 
+                --tbl_trainingFonts = tbl_realData_fontNames   -- once have figured out to convert texture 
                 
-                loopKeysOrder_dataOpts  = {'fontName', 'trainingFonts', };
+                
+                --tbl_trainingFonts = {'same'}
+                --tbl_noiseFilter = {whiteNoiseFilter}
+                --tbl_retrainFromLayer = {'classifier', 'linear'}
+                -- tbl_retrainFromLayer = {'linear'}
+                --tbl_retrainFromLayer = {'linear-2'}
+                --tbl_retrainFromLayer = {'linear-2', 'classifier'}
+                tbl_retrainFromLayer = {'conv3', 'conv4', 'conv5', 'linear',}
+                
+                loopKeysOrder_dataOpts  = {'retrainFromLayer', 'trainingFonts', 'fontName', }; 
             end
             
             
@@ -1829,10 +1768,17 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
                                       tbl_imageSize = tbl_imageSize,
                                       tbl_sizeStyle = tbl_sizeStyle,
                                       tbl_imageSize_and_sizeStyle = tbl_imageSize_and_sizeStyle,                                      
+                                      tbl_imageSize_and_sizeStyle_and_OriXY = tbl_imageSize_and_sizeStyle_and_OriXY,
                                       
                                       tbl_blurStd = allBlurs,
                                                                             
-                                      tbl_noiseFilter = tbl_noiseFilter, tbl_trainingNoise = tbl_trainingNoise, tbl_retrainFromLayer = tbl_retrainFromLayer, 
+                                      tbl_noiseFilter = tbl_noiseFilter, 
+                                            tbl_trainingNoise = tbl_trainingNoise, 
+                                            tbl_retrainingNoise = tbl_retrainingNoise,
+                                      
+                                      tbl_retrainFromLayer = tbl_retrainFromLayer, 
+                                            tbl_secondRetrainFromLayer = tbl_secondRetrainFromLayer,
+                                      
                                       tbl_trainingFonts = tbl_trainingFonts,
 									  
                                       doTextureStatistics = doTextureModel,  
@@ -1932,7 +1878,19 @@ doSetupTask = function(expName, modelName) -- (allFontNames, allSNRs, loadOpts, 
   
 end
 
-
+getXYset = function(nx,ny,dx, dy)
+    assert(nx > 0)
+    assert(ny > 0)
+    if not dx then
+        dx = 1;
+        dy = 1;
+    elseif not dy then
+        dy = dx;
+    end
+        
+    local s = {Nori = 1,  dOri = 0,  Nx = nx, dX = dx,  Ny = ny, dY = dy}
+    return s
+end
 
 
     

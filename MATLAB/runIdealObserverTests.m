@@ -3,7 +3,7 @@ function runIdealObserverTests(expName)
     if nargin < 1
 %         expName = 'Grouping';
         expName = 'Complexity';
-    %     expName = 'Uncertainty';
+%         expName = 'Uncertainty';
 %         expName = 'ChannelTuning';
     end    
     
@@ -121,7 +121,11 @@ function runIdealObserverTests(expName)
         oriXYSet_7x18y_d1_11o_d3 = struct('oris', [-15 : 3 : 15], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 17] );  % for complexity 7*18*3    = 126
         oriXYSet_7x17y_d1_11o_d4 = struct('oris', [-20 : 4 : 20], 'xs', [0 : 1 : 6], 'ys', [0 : 1 : 16] );  % for complexity 7*18*3    = 126
 
+        oriXYSet_17x28y_d1 = struct('oris', [0], 'xs', [1 : 1 : 17], 'ys', [1 : 1 : 28] );  % for k24
 
+               
+        
+        
 %     oriXYSet = [oriXYSet_test_no, oriXYSet_med1, oriXYSet_med2, oriXYSet_large];
 %     oriXYSet = [oriXYSet_test_no, oriXYSet_med2];
 %     oriXYSet = [oriXYSet_long];
@@ -184,7 +188,7 @@ function runIdealObserverTests(expName)
     end
     
 %     redo = 0;
-    redo = 0;
+%     redo = 0;
 %     fontNames_use = num2cell(allFontNames_std);
 %     fontNames_use = {allFontNames_std};
 %     fontNames_use = {allFontNames_std, fontSets_allFonts_allStyles};
@@ -247,6 +251,9 @@ function runIdealObserverTests(expName)
     allUncertaintySets = {oriXYSet_2x2y3o, oriXYSet_3x6y7o, oriXYSet_1pos};
     
 
+    
+    
+
 %     allUncertaintySets = {oriXYSet_1pos, oriXYSet_large_48_k14};
         
 %     allSizeStyle_imageSizes = { {'k32', [64, 64]}, {'k16', [32 32]} };
@@ -282,6 +289,8 @@ function runIdealObserverTests(expName)
      switch expName
         case 'Complexity',
             fontNames_use = num2cell(allFontNames_std);
+            fontNames_use = {'Bookman', 'BookmanU', 'BookmanUB', 'Sloan', 'Helvetica', 'HelveticaU', 'CourierU', 'KuenstlerU', 'Braille', 'Yung'};
+
 
 %             allSizeStyle_imageSizes = { {'k24', [64, 64]}  };
 %             allSizeStyle_imageSizes = { {'k15', [32, 32]}  };
@@ -293,6 +302,7 @@ function runIdealObserverTests(expName)
 %             allSizeStyle_imageSizes = { {'k15', [56, 56]}, {'k15', [64, 64]}   };
 %             allSizeStyle_imageSizes = { {'k15', [56, 56]}  };
             allSizeStyle_imageSizes = { {'k15', [64, 64]}  };
+%             allSizeStyle_imageSizes = { {'k24', [64, 64]}  };
 %             allSizeStyle_imageSizes = { {'k15', [64, 64]}, {'k24', [64, 64]}  };
 %              allUncertaintySets = {oriXYSet_2x2y3o, oriXYSet_3x6y7o_d2, oriXYSet_3x6y7o, oriXYSet_1pos};
 %              allUncertaintySets = { oriXYSet_2x_d4, oriXYSet_2x2y_d4, oriXYSet_2x4y_d4, oriXYSet_3o_d5, oriXYSet_7o_d5, oriXYSet_11o_d4, oriXYSet_21o_d2, oriXYSet_1pos};
@@ -309,7 +319,7 @@ function runIdealObserverTests(expName)
 
                 loopKeysOrder = {'fontName'};
                 
-                    allUncertaintySets = {oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3};
+%                     allUncertaintySets = {oriXYSet_7x18y_d1, oriXYSet_7x18y_d1_3o_d5, oriXYSet_7x18y_d1_7o_d5, oriXYSet_7x18y_d1_11o_d3};
 
                     
 %                     fontNames_use = {'Braille', 'BookmanB', 'Courier', 'KuenstlerU'};
@@ -321,6 +331,7 @@ function runIdealObserverTests(expName)
 %                 allUncertaintySets = { oriXYSet_1pos };
                 
 %                 allSizeStyle_imageSizes = { {'k15', [64, 64]} };
+                allSizeStyle_imageSizes = { {'k24', [64, 64]} };
 
                 oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65                
                 oriXYSet_5x13y_d1_3ori_d5 = struct('oris', [-5:5:5], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65
@@ -331,7 +342,7 @@ function runIdealObserverTests(expName)
                 allUncertaintySets = {oriXYSet_1pos, oriXYSet_5x13y_d1, oriXYSet_5x13y_d1_3ori_d5, oriXYSet_5x13y_d1_3ori_d10, oriXYSet_5x13y_d1_3ori_d15, oriXYSet_5x13y_d1_3ori_d30};
 
                 
-                fontNames_use = num2cell(allFontNames_ext);
+%                 fontNames_use = num2cell(allFontNames_ext);
                 
                 oriXYSet_5x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 5], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65                
                 oriXYSet_6x13y_d1 = struct('oris', [0], 'xs', [1 : 1 : 6], 'ys', [1 : 1 : 13] );  % for complexity  5*13   = 65                
@@ -355,12 +366,26 @@ function runIdealObserverTests(expName)
                 oriXYSet_30x39y_d1 = struct('oris', [0], 'xs', [1 : 1 : 30], 'ys', [1 : 1 : 39] );  % for complexity 31*39 = 1209
                 oriXYSet_15x20y_d1 = struct('oris', [0], 'xs', [1 : 1 : 15], 'ys', [1 : 1 : 20] );  % for complexity 31*39 = 1209
                 oriXYSet_15x20y_d2 = struct('oris', [0], 'xs', [1 : 2 : 30], 'ys', [1 : 2 : 39] );  % for complexity 31*39 = 1209
+                oriXYSet_15x26y_d1 = struct('oris', [0], 'xs', [1 : 1 : 15], 'ys', [1 : 1 : 26] );  % for k24
                 
                 allUncertaintySets = { oriXYSet_1pos, oriXYSet_15x20y_d1, oriXYSet_15x20y_d2, oriXYSet_30x39y_d1};
 
                 
                 allUncertaintySets = { oriXYSet_15x20y_d2, oriXYSet_30x39y_d1};
+    
+%                 allUncertaintySets = {oriXYSet_17x28y_d1, oriXYSet_1pos};
                 
+%                 allSizeStyle_imageSizes = {  {'k24', [64, 64]}  };
+                allSizeStyle_imageSizes = {  {'k15', [64, 64]}  };
+
+                if strcmp(allSizeStyle_imageSizes{1}{1}, 'k15')
+                    allUncertaintySets = { oriXYSet_30x39y_d1};
+                    
+                elseif strcmp(allSizeStyle_imageSizes{1}{1}, 'k24')
+                    allUncertaintySets = { oriXYSet_15x26y_d1};
+                    
+                end                    
+    
         case 'Grouping',
             
             all_SNRs = [-1 : 0.5 : 5];
@@ -505,13 +530,28 @@ function runIdealObserverTests(expName)
                      oriXYSet_7x7y_d1 = struct('oris', [0], 'xs', [1:7], 'ys', [1:7]);
                      allUncertaintySets = { oriXYSet_1pos, oriXYSet_7x7y_d1};
 %                     
-                     loopKeysOrder = {'fontName'};
-         case 'Uncertainty',
-%              fontNames_use = {{'Bookman'}};
-             fontNames_use = {{'Bookman'}, {'Sloan'} };
-%              allSizeStyle_imageSizes = { {'k15', [64, 64]}  };
-             allSizeStyle_imageSizes = { {'k15', [32, 160]}  };
 
+
+%                     allSizeStyle_imageSizes = { {'k23', [64, 64]} };
+                    allSizeStyle_imageSizes = { {'k32', [64, 64]} };
+                     
+                    if strcmp(allSizeStyle_imageSizes{1}{1}, 'k23')
+                        allUncertaintySets = { getXYset(38, 38, 1) };
+
+                    elseif strcmp(allSizeStyle_imageSizes{1}{1}, 'k32')
+                        allUncertaintySets = { getXYset(30, 28, 1) };
+                     
+                    end
+
+
+                        loopKeysOrder = {'fontName'};
+         case 'Uncertainty',
+             fontNames_use = {{'Bookman'}};
+%              fontNames_use = {{'Bookman'}, {'Sloan'} };
+%              allSizeStyle_imageSizes = { {'k15', [64, 64]}  };
+%              allSizeStyle_imageSizes = { {'k15', [32, 160]}  };
+
+%              allSizeStyle_imageSizes = { {'k15', [45, 45]}  };
 
                allUncertaintySets = {oriXYSet_1pos, oriXYSet_3x1y_d1, oriXYSet_5x1y_d1, oriXYSet_15x1y_d1, oriXYSet_30x1y_d1, oriXYSet_15x2y_d1, oriXYSet_3x5y_d1, oriXYSet_5x3y_d1, oriXYSet_2x15y_d1, oriXYSet_1x30y_d1 };
                
@@ -523,10 +563,75 @@ function runIdealObserverTests(expName)
                oriXYSet_30x_d3 = struct('oris', [0], 'xs', [1 : 3 : 30*3], 'ys', [0] );  
                oriXYSet_45x_d3 = struct('oris', [0], 'xs', [1 : 3 : 45*3], 'ys', [0] );  
                
-               allUncertaintySets = {oriXYSet_1pos, oriXYSet_3x_d3, oriXYSet_7x_d3, oriXYSet_15x_d3, oriXYSet_20x_d3, oriXYSet_30x_d3, oriXYSet_45x_d3};
+%                allUncertaintySets = {oriXYSet_1pos, oriXYSet_2x_d3, oriXYSet_3x_d3, oriXYSet_7x_d3, oriXYSet_15x_d3, oriXYSet_20x_d3, oriXYSet_30x_d3, oriXYSet_45x_d3};
                
+               oriXYSet_2x1y_d1 = struct('oris', [0], 'xs', [1 : 2], 'ys', [0] );    %n = 3
+               oriXYSet_3x1y_d1 = struct('oris', [0], 'xs', [1 : 3], 'ys', [0] );    %n = 3
+               oriXYSet_5x1y_d1 = struct('oris', [0], 'xs', [1 : 5], 'ys', [0] );    %n = 5
+               oriXYSet_11x1y_d1 = struct('oris', [0], 'xs', [1 : 11], 'ys', [0] );  %n = 11
+               oriXYSet_25x1y_d1 = struct('oris', [0], 'xs', [1 : 25], 'ys', [0] );  %n = 25 (a)
+               oriXYSet_5x5_d1 = struct('oris', [0], 'xs', [1 : 5], 'ys', [1 : 5] ); %n = 25 (b)
+               oriXYSet_11x5y_d1 = struct('oris', [0], 'xs', [1 : 11], 'ys', [1 : 5] );  %n = 55
+               oriXYSet_25x5y_d1 = struct('oris', [0], 'xs', [1 : 25], 'ys', [1 : 5] );  %n = 125
+               oriXYSet_25x11y_d1 = struct('oris', [0], 'xs', [1 : 25], 'ys', [1 : 11] );  %n = 275
+               oriXYSet_22x28y_d1 = struct('oris', [0], 'xs', [1 : 22], 'ys', [1 : 28] );  %n = 616
+               oriXYSet_37x37y_d1 = struct('oris', [0], 'xs', [1 : 37], 'ys', [1 : 37] );  %n = 1369
                
+              allUncertaintySets = {oriXYSet_1pos, oriXYSet_2x1y_d1, oriXYSet_3x1y_d1, oriXYSet_5x1y_d1 , oriXYSet_11x1y_d1 , oriXYSet_25x1y_d1, oriXYSet_5x5_d1 ...
+                    oriXYSet_11x5y_d1,  oriXYSet_25x5y_d1 ,oriXYSet_25x11y_d1 , oriXYSet_22x28y_d1, oriXYSet_37x37y_d1 };
+
+                
+%              allSizeStyle_imageSizes = {  {'k15', [45, 45]} };  
+%               allUncertaintySets = {...               
+%                   getXYset(2,1, 1), getXYset(2,1, 2), getXYset(2,1, 4),getXYset(2,1, 6),getXYset(2,1, 8), ...
+%                   getXYset(2,1, 10), getXYset(2,1, 12), getXYset(2,1, 13),getXYset(2,1, 14),getXYset(2,1, 15), ...
+%                   getXYset(2,1, 16), getXYset(2,1, 17), getXYset(2,1, 18),getXYset(2,1, 19),getXYset(2,1, 20), ...
+%                   ...
+%                   getXYset(1,2, 1), getXYset(1,2, 2), getXYset(1,2, 4),getXYset(1,2, 6),getXYset(1,2, 8), ...
+%                   getXYset(1,2, 10), getXYset(1,2, 12), getXYset(1,2, 13),getXYset(1,2, 14),getXYset(1,2, 15), ...
+%                   getXYset(1,2, 16), getXYset(1,2, 17), getXYset(1,2, 18),getXYset(1,2, 19),getXYset(1,2, 20), ...
+%                  }; 
+                
+             allSizeStyle_imageSizes = {  {'k15', [75, 75]} };  
+              allUncertaintySets = { getXYset(4,1, 1),  getXYset(1,4, 1), getXYset(2,2, 1),  ...
+                                     getXYset(4,1, 8),  getXYset(1,4, 8), getXYset(2,2, 8),  ...
+                                     getXYset(4,1, 10),  getXYset(1,4, 10), getXYset(2,2, 10),  ...
+                                     getXYset(4,1, 12),  getXYset(1,4, 12), getXYset(2,2, 12) };
+ 
+
+             allSizeStyle_imageSizes = {  {'k15', [195, 195]} };  
+              allUncertaintySets = { getXYset(12,2, 1),  getXYset(6,4, 1), getXYset(4,6, 1), getXYset(2,12, 1),  ...
+                                     getXYset(12,2, 5),  getXYset(6,4, 5), getXYset(4,6, 5), getXYset(2,12, 5),  ...
+                                     getXYset(12,2, 6),  getXYset(6,4, 6), getXYset(4,6, 6), getXYset(2,12, 6),  ...
+                                     getXYset(12,2, 7),  getXYset(6,4, 7), getXYset(4,6, 7), getXYset(2,12, 7),  ...
+                                     getXYset(12,2, 8),  getXYset(6,4, 8), getXYset(4,6, 8), getXYset(2,12, 8),  ...
+                                     getXYset(12,2, 10),  getXYset(6,4, 10), getXYset(4,6, 10), getXYset(2,12, 10),  ...
+                                     getXYset(12,2, 12),  getXYset(6,4, 12), getXYset(4,6, 12), getXYset(2,12, 12),  ...
+                                     getXYset(12,2, 14),  getXYset(6,4, 14), getXYset(4,6, 14), getXYset(2,12, 14),  ...
+                                     };
+
+                                 
+             allSizeStyle_imageSizes = {  {'k15', [95, 95]} };  
+             spc = 8;
+              allUncertaintySets = { getXYset(10,10, spc),  getXYset(1,1, spc),  getXYset(2,2, spc), getXYset(3,3, spc),  ...
+                                     getXYset(4,4, spc),  getXYset(6,6, spc), getXYset(8,8, spc),  ...
+                                     getXYset(1,9, spc), getXYset(9,1, spc), ...
+                                     };
+                                 
+%              allSizeStyle_imageSizes = {  {'k15', [75, 75]} };  
+%               allUncertaintySets = { getXYset(1,1, 25),  getXYset(1,2, 25), getXYset(2,1, 25), ...
+%                                      getXYset(1,3, 25),  getXYset(3,1, 25), ...
+%                                      getXYset(2,2, 25),  getXYset(2,3, 25), getXYset(3,2, 25),  getXYset(3,3, 25) };
+                                 
+
+             allSizeStyle_imageSizes = {  {'k15', [75, 75]} };  
+             spc = 5;
+              allUncertaintySets = { getXYset(10,10, spc),  getXYset(1,1, spc),  getXYset(2,2, spc), getXYset(3,3, spc),  ...
+                                     getXYset(4,4, spc),  getXYset(6,6, spc), getXYset(8,8, spc),  };
+                                 
+
             loopKeysOrder = {'OriXY', 'fontName'};
+            allSNRs = [0 : 0.1 : 2];
 
         case 'ChannelTuning',
             

@@ -8,6 +8,7 @@ function main()
     dofile 'avi_scripts.lua'   -- should be in the same folder
 
     torch.manualSeed(123)
+    timeStarted = sys.clock()
 
     hostname = os.getenv('hostname') 
     onLaptop = (hostname == 'cortex') or (hostname == 'neuron')
@@ -18,11 +19,11 @@ function main()
 
 
     if onLaptop then
-        useGPU = true
+        useGPU = false
     else
-        useGPU = true
+        useGPU = false
     end
-    useGPU = false
+    --useGPU = false
 
 
     useZBSdebugger = false
@@ -30,10 +31,10 @@ function main()
     local expName, modelName
     --if not expName then
 
-    --expName = 'ChannelTuning'
+    expName = 'ChannelTuning'
     --expName = 'Crowding'
     --expName = 'Grouping'
-    expName = 'Complexity'
+    --expName = 'Complexity'
     --expName = 'TrainingWithNoise'
     --expName = 'TestConvNet'
     --expName = 'Uncertainty'
@@ -332,9 +333,9 @@ function main()
     tasks_dir = torchLetters_dir .. 'tasks/'
         --nTaskFilesPresent, taskFiles = paths.nFilesMatching(tasks_dir .. 'task*.t7')
        
-    local checkForTasks = true and not useGPU
+    local checkForTasks = true -- and not useGPU
     
-    local askIfOnNYUServer = false or ASK
+    local askIfOnNYUServer = false or ASK or (os.getenv('ASK')=='1')
     local doRegularScriptsOnNYUServer = false or askIfOnNYUServer or not checkForTasks
     local ans
     if checkForTasks then
@@ -347,6 +348,12 @@ function main()
             curTaskId = specialTaskId
         end
         
+        local allTasks = sys.dir(tasks_dir .. 'task_*.t7')
+        maxTaskId = 1;
+        for i,tsk in ipairs(allTasks) do
+            maxTaskId = math.max( maxTaskId, tonumber( string.sub(tsk, 6,8)) )
+        end
+        
         io.write(string.format('Checking for tasks in %s\n', tasks_dir))
         repeat 
             
@@ -356,6 +363,11 @@ function main()
                 specialTaskId = nil
                 startAgain = false
             end
+            
+            
+        
+            
+
             
             local taskFileBaseNamePattern = string.format('task_%03d_*.t7', curTaskId)
             local nTaskFilesPresentThisID, taskFiles_i = paths.nFilesMatching(tasks_dir .. taskFileBaseNamePattern)
@@ -385,25 +397,33 @@ function main()
                         local S_task = torch.load(taskFileName)
                         S_task.taskFileName = taskFileName -- update in case changed file name
                         doTask(S_task)
+                        
+                        
+                        local allTasks = sys.dir(tasks_dir .. 'task_*.t7')  -- during the time it took to do this task, 
+                        for i,tsk in ipairs(allTasks) do                    -- check if any other tasks were added
+                            maxTaskId = math.max( maxTaskId, tonumber( string.sub(tsk, 6,8)) )
+                        end
+
                         --end
                     end
                 end
                 if ans and not (string.lower(ans) == 'y') then
                     break
                 end      
-                curTaskId = curTaskId + 1;
             end
+            
+            curTaskId = curTaskId + 1;
             
             if specialTaskId then
                 startAgain = true
             end
 
-        until nTaskFilesPresentThisID == 0  and not specialTaskId
+        until curTaskId > maxTaskId and not specialTaskId    -- nTaskFilesPresentThisID == 0
 
 
         if curTaskId > 1 then
             print('------------------------------')
-            print(' All tasks completed. \n ')
+            print(' All tasks (up to ' .. maxTaskId .. ') completed. \n ')
         end
         
     end

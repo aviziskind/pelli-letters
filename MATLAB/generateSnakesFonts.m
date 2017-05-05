@@ -65,22 +65,25 @@ function generateSnakesFonts
     allPixPerDegree = [11];  %kheight = 55;
 %     allPixPerDegree = [12.9]; % kheight = 64
 %     allPixPerDegree = [25.9]; % kheight = 128
-%     allPixPerDegree = [51.8]; % kheight = 256
+%     allPixPerDegree = [51.8]; % kheight = 257
 
 %     allPixPerDegree = [10];
 %     allPixPerDegree = [6.5, 9.6, 12.9, 25.9];
 %     allPixPerDegree = [6.5, 9.6, 12.9];
+    allPixPerDegree = [4.7]; % k24
 
-    allPixPerDegree = [5.5, 6.5, 9.6, 11, 12.9]; % kheight = 27;
+%     allPixPerDegree = [5.5, 6.5, 9.6, 11, 12.9]; % kheight = 27;
 
     if 0 && 0
        %%
-        x = [6.5,  11];
-        y = [32,   55];
+%         x = [6.5,  11];
+%         y = [32,   55];
+        x = [5.5,  6.5,  9.6,  11,  12.9];
+        y = [27,   32,   48,   55,  64];
         plot( x,y, 'o-')
         p = polyfit(x, y, 1);
 
-        y_new = 48;
+        y_new = 24;
         x_new = fzero(@(x) polyval(p, x)-y_new, 10); 
     end
 
@@ -98,7 +101,9 @@ function generateSnakesFonts
     %                 opts.lambda_deg = .3;
     %                 opts.markSpacing_deg = .91;
 %     opts.numGaborsPerLetterHeight = 4.2;
-        if ibetween(ppd, 5.0, 5.49)
+        if ibetween(ppd, 4.7, 5.0)        
+            opts.numGaborsPerLetterHeight = 4.25;
+        elseif ibetween(ppd, 5.0, 5.49)
             opts.numGaborsPerLetterHeight = 4.25;
         elseif ibetween(ppd, 5.5, 5.99)
             opts.numGaborsPerLetterHeight = 4.2;
@@ -164,7 +169,7 @@ function generateSnakesFonts
                     clf; imagesc(tileImages((allLetters_show), 2, 5)); axis image; ticksOff;  imageToScale([], 2);  
                     colormap(gray(250));
                     ticksOff;   
-                    imageToScale([], 1);
+                    imageToScale([], 4);
                     drawnow;
                     
                     
